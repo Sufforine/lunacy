@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://bl2yw82b40qvk"]
+
+[ext_resource type="Script" uid="uid://1e8tcfivhrh8" path="res://things/CameraRig.gd" id="1_u5kg4"]
+[ext_resource type="Script" uid="uid://enqqa8dhsvyr" path="res://scenes/camera_debug.gd" id="2_kod1s"]
+[ext_resource type="Script" uid="uid://ctuy1adbyfh6p" path="res://scenes/camera_utils.gd" id="3_tmlye"]
+
+[node name="CameraRig" type="Node3D" unique_id=269756323]
+script = ExtResource("1_u5kg4")
+enabled = true
+enable_cursor_shift = true
+
+[node name="OffsetRig" type="Node3D" parent="." unique_id=1018309025]
+
+[node name="Camera3D" type="Camera3D" parent="OffsetRig" unique_id=900118472]
+current = true
+
+[node name="CameraDebug" type="Node2D" parent="." unique_id=1811521565]
+script = ExtResource("2_kod1s")
+
+[node name="CameraUtils" type="Node" parent="." unique_id=1460497747]
+script = ExtResource("3_tmlye")
