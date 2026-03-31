@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://bl2yw82b40qvk"]
+
+[ext_resource type="Script" uid="uid://1e8tcfivhrh8" path="res://Scripts/Camera/camera_rig.gd" id="1_u5kg4"]
+
+[node name="CameraRig" type="Node3D" unique_id=269756323]
+script = ExtResource("1_u5kg4")
+enabled = true
+enable_cursor_shift = true
+
+[node name="OffsetRig" type="Node3D" parent="." unique_id=1018309025]
+transform = Transform3D(1, 0, 0, 0, 0.94583637, 0.32464385, 0, -0.32464385, 0.94583637, 0, 3.03516, 2.459097)
+
+[node name="Camera3D" type="Camera3D" parent="OffsetRig" unique_id=900118472]
+transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 10, 7)
+far = 500.0
