@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://bowkf26i4v23c"]
+
+[ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://Scripts/MainMenu/main_menu.gd" id="1_l6cm7"]
+
+[sub_resource type="FontFile" id="FontFile_vue75"]
+cache/0/variation_coordinates = {}
+cache/0/face_index = 0
+cache/0/embolden = 0.0
+cache/0/transform = Transform2D(1, 0, 0, 1, 0, 0)
+cache/0/spacing_top = 0
+cache/0/spacing_bottom = 0
+cache/0/spacing_space = 0
+cache/0/spacing_glyph = 0
+cache/0/baseline_offset = 0.0
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/50/0/ascent = 0.0
+cache/0/50/0/descent = 0.0
+cache/0/50/0/underline_position = 0.0
+cache/0/50/0/underline_thickness = 0.0
+cache/0/50/0/scale = 1.0
+
+[node name="Main_Menu" type="Control" unique_id=330657710]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_l6cm7")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1153336140]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -74.25
+offset_top = -80.6371
+offset_right = 74.25
+offset_bottom = 80.6371
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Start" type="Button" parent="VBoxContainer" unique_id=638077575]
+layout_mode = 2
+text = "Start game"
+
+[node name="Options" type="Button" parent="VBoxContainer" unique_id=454955286]
+layout_mode = 2
+text = "Options"
+
+[node name="Exit" type="Button" parent="VBoxContainer" unique_id=1931846576]
+layout_mode = 2
+text = "Exit"
+
+[node name="Label" type="Label" parent="." unique_id=985789367]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -268.0
+offset_top = 115.0
+offset_right = 268.0
+offset_bottom = 203.0
+grow_horizontal = 2
+theme_override_colors/font_shadow_color = Color(0.101960786, 0.05490196, 0.24313726, 1)
+theme_override_constants/shadow_offset_x = 6
+theme_override_constants/shadow_offset_y = 8
+theme_override_fonts/font = SubResource("FontFile_vue75")
+theme_override_font_sizes/font_size = 50
+text = "Lunacy"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="debug" type="Button" parent="." unique_id=1329413541]
+layout_mode = 0
+offset_left = 296.0
+offset_top = 247.0
+offset_right = 444.0
+offset_bottom = 278.0
+text = "DEBUG"
+
+[connection signal="pressed" from="debug" to="." method="_on_debug_pressed"]
