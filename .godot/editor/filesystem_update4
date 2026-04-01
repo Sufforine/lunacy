@@ -1,2 +1,9 @@
 res://scenes/main_menu.tscn
 res://Scripts/MainMenu/main_menu.gd
+<<<<<<< Updated upstream
+=======
+res://scenes/hub.tscn
+res://Scripts/merchant_house.gd
+res://Scripts/buildings/merchant_house.gd
+res://scenes/house.gd
+>>>>>>> Stashed changes

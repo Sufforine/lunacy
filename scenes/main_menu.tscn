@@ -85,4 +85,5 @@ offset_right = 444.0
 offset_bottom = 278.0
 text = "DEBUG"
 
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="_on_start_pressed"]
 [connection signal="pressed" from="debug" to="." method="_on_debug_pressed"]
