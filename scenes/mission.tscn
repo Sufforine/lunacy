@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://34tutc6qerwc"]
 
 [ext_resource type="Script" uid="uid://bcu0tkuixafso" path="res://Player/player.gd" id="1_nbcaj"]
-[ext_resource type="PackedScene" uid="uid://bl2yw82b40qvk" path="res://Scripts/Camera/camera.tscn" id="2_uxhhj"]
+[ext_resource type="PackedScene" uid="uid://ci3vfmgo8653m" path="res://Scripts/Camera2/camera.tscn" id="2_v3nvf"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nbcaj"]
 albedo_color = Color(0.15762597, 0.13005483, 0.06703506, 1)
@@ -35,6 +35,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27936244, 0)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07881653, 0.2788086, 0)
 shape = SubResource("CapsuleShape3D_ebncj")
 
-[node name="CameraRig" parent="Player" unique_id=269756323 node_paths=PackedStringArray("player") instance=ExtResource("2_uxhhj")]
-top_level = true
-player = NodePath("..")
+[node name="CameraPivot" parent="Player" unique_id=1510790156 instance=ExtResource("2_v3nvf")]
