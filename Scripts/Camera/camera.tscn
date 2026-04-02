@@ -1,15 +1,18 @@
-[gd_scene format=3 uid="uid://bl2yw82b40qvk"]
+[gd_scene format=3 uid="uid://ci3vfmgo8653m"]
 
-[ext_resource type="Script" uid="uid://1e8tcfivhrh8" path="res://Scripts/Camera/camera_rig.gd" id="1_u5kg4"]
+[ext_resource type="Script" uid="uid://cyuam00vvn345" path="res://Scripts/Camera/camera.gd" id="1_b3jth"]
 
-[node name="CameraRig" type="Node3D" unique_id=269756323]
-script = ExtResource("1_u5kg4")
-enabled = true
-enable_cursor_shift = true
+[node name="CameraPivot" type="Node3D" unique_id=1510790156]
+script = ExtResource("1_b3jth")
+rotation_speed = 15.0
+deadzone = 0.4
 
-[node name="OffsetRig" type="Node3D" parent="." unique_id=1018309025]
-transform = Transform3D(1, 0, 0, 0, 0.94583637, 0.32464385, 0, -0.32464385, 0.94583637, 0, 3.03516, 2.459097)
+[node name="Node3D" type="Node3D" parent="." unique_id=742246724]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.0788136, 0)
 
-[node name="Camera3D" type="Camera3D" parent="OffsetRig" unique_id=900118472]
-transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 10, 7)
-far = 500.0
+[node name="SpringArm3D" type="SpringArm3D" parent="Node3D" unique_id=256493671]
+transform = Transform3D(6.0621777, 2.8670323, -2.0075173, 0, 4.0150347, 5.7340646, 3.5, -4.9658456, 3.477122, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Node3D/SpringArm3D" unique_id=1578011494]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+current = true
