@@ -1,45 +1,49 @@
-[gd_scene format=3 uid="uid://34tutc6qerwc"]
+[gd_scene format=3 uid="uid://b3qxvv8cnwgxo"]
 
-[ext_resource type="Script" uid="uid://bcu0tkuixafso" path="res://Player/player.gd" id="1_nbcaj"]
-[ext_resource type="PackedScene" uid="uid://bl2yw82b40qvk" path="res://Scripts/Camera/camera.tscn" id="2_uxhhj"]
-[ext_resource type="PackedScene" uid="uid://brq3t758nrchs" path="res://scenes/pause_menu.tscn" id="3_cv0tx"]
+[ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="2_bo1nx"]
+[ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="4_jjvhh"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nbcaj"]
-albedo_color = Color(0.15762597, 0.13005483, 0.06703506, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7u77a"]
+albedo_color = Color(1.3957917e-06, 0.3974248, 0.13629475, 1)
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ebncj"]
-radius = 0.42626953
-height = 2.024414
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7u77a"]
 
-[node name="Main" type="Node3D" unique_id=226150206]
+[node name="Main" type="Node3D" unique_id=1324539419]
 
-[node name="environment" type="Node" parent="." unique_id=1200524416]
+[node name="Environment" type="Node" parent="." unique_id=1850370483]
 
-[node name="Ground" type="CSGBox3D" parent="environment" unique_id=460631642]
-transform = Transform3D(5, 0, 0, 0, 0.023, 0, 0, 0, 4.629, -0.5902605, -0.09994364, -0.02190435)
-size = Vector3(3.179657, 10, 4.235077)
-material = SubResource("StandardMaterial3D_nbcaj")
+[node name="Ground" type="CSGBox3D" parent="Environment" unique_id=1765339458]
+transform = Transform3D(159.46626, 0, 0, 0, 0.109848976, 0, 0, 0, 159.46626, 0, -0.03935182, 0)
+material = SubResource("StandardMaterial3D_7u77a")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="environment" unique_id=184489667]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-light_color = Color(0.76558864, 0.72944033, 0.548492, 1)
-shadow_enabled = true
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment" unique_id=743627005]
+transform = Transform3D(1, 0, 0, 0, 0.54976654, 0.8353183, 0, -0.8353183, 0.54976654, 0, 9.144337, 0)
 
-[node name="Player" type="CharacterBody3D" parent="." unique_id=1604413574]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7367828, 0)
-script = ExtResource("1_nbcaj")
+[node name="Column" type="CSGBox3D" parent="Environment" unique_id=2067663866]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.107869, 1.9654582, 10.945772)
+size = Vector3(2, 4, 2)
 
-[node name="Body" type="CSGCylinder3D" parent="Player" unique_id=992610557]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.27936244, 0)
+[node name="Column2" type="CSGBox3D" parent="Environment" unique_id=466518459]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1530323, 1.9654582, -13.636396)
+size = Vector3(2, 4, 2)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player" unique_id=49067132]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.07881653, 0.2788086, 0)
-shape = SubResource("CapsuleShape3D_ebncj")
+[node name="Column3" type="CSGBox3D" parent="Environment" unique_id=1041366786]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.500141, 1.9654582, 5.3566685)
+size = Vector3(2, 4, 2)
 
-[node name="CameraRig" parent="Player" unique_id=269756323 node_paths=PackedStringArray("player") instance=ExtResource("2_uxhhj")]
-top_level = true
+[node name="Player" type="CharacterBody3D" parent="." unique_id=1664162560]
+script = ExtResource("4_jjvhh")
+
+[node name="Body" type="CSGCylinder3D" parent="Player" unique_id=2064365457]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.020128, 0)
+sides = 16
+
+[node name="Beak" type="CSGBox3D" parent="Player" unique_id=74011822]
+transform = Transform3D(0.55359936, 0, 0, 0, 0.33874202, 0, 0, 0, 1, 0, 1.4096835, -0.41314787)
+
+[node name="Collision" type="CollisionShape3D" parent="Player" unique_id=1991275495]
+transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 0.95863795, 0)
+shape = SubResource("CapsuleShape3D_7u77a")
+
+[node name="CameraRig" parent="Player" unique_id=1214719725 node_paths=PackedStringArray("player") instance=ExtResource("2_bo1nx")]
 player = NodePath("..")
-
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1811784069]
-
-[node name="pause_menu" parent="CanvasLayer" unique_id=1310243284 instance=ExtResource("3_cv0tx")]
