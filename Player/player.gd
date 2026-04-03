@@ -45,3 +45,7 @@ func _handle_rotation(delta: float) -> void:
 		var target_rot_y = atan2(target_dir.x, target_dir.z)
 		var current_rot_y = rotation.y
 		rotation.y = lerp_angle(current_rot_y, target_rot_y, 1.0 - pow(0.001, delta * ease_speed))
+		
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

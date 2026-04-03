@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://bowkf26i4v23c"]
 
 [ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://Scripts/MainMenu/main_menu.gd" id="1_l6cm7"]
+[ext_resource type="VideoStream" uid="uid://b04xmwuac0o1k" path="res://assets/video/IMG_6853.ogv" id="2_ekxnf"]
 
 [sub_resource type="FontFile" id="FontFile_vue75"]
 cache/0/variation_coordinates = {}
@@ -28,9 +29,21 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_right = 3.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_l6cm7")
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="." unique_id=908214786]
+layout_mode = 1
+offset_left = 257.0
+offset_top = 5.0
+offset_right = 1537.0
+offset_bottom = 1285.0
+scale = Vector2(0.5, 0.5)
+stream = ExtResource("2_ekxnf")
+autoplay = true
+loop = true
 
 [node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1153336140]
 layout_mode = 1
