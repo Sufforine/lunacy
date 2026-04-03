@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://chvroptg4fcgo"]
+
+[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="1_4upu1"]
+[ext_resource type="Script" uid="uid://bfgyuokwe48bb" path="res://Scripts/Shop/sell_items.gd" id="1_uhxtw"]
+[ext_resource type="Texture2D" uid="uid://jc1diekt5c3y" path="res://Icons/coin.png" id="2_uhxtw"]
+
+[node name="SellItems" type="Control" unique_id=136732146 node_paths=PackedStringArray("card_frame")]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uhxtw")
+card_frame = NodePath("TextureRect")
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=1191958201]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 20.0
+offset_right = 393.0
+offset_bottom = 392.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_4upu1")
+
+[node name="Label" type="Label" parent="TextureRect" unique_id=439386925]
+layout_mode = 0
+offset_left = 82.0
+offset_top = 368.0
+offset_right = 122.0
+offset_bottom = 391.0
+scale = Vector2(4, 4)
+text = "50"
+
+[node name="TextureRect" type="TextureRect" parent="TextureRect/Label" unique_id=631099710]
+layout_mode = 0
+offset_left = 21.499998
+offset_top = -15.000005
+offset_right = 533.5
+offset_bottom = 497.0
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_uhxtw")
