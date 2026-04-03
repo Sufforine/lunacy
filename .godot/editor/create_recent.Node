@@ -1,3 +1,9 @@
+TextureRect
+Label
+HBoxContainer
+Panel
+Control
+Node
 CanvasLayer
 Button
 AnimationPlayer
@@ -5,11 +11,4 @@ ColorRect
 VBoxContainer
 PanelContainer
 VideoStreamPlayer
-Label
-Panel
-Control
 CSGBox3D
-Camera3D
-CollisionShape3D
-CSGCylinder3D
-CameraRig
