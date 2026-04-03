@@ -1,1 +1,73 @@
-.godot
+#################################
+# Godot 4.x
+#################################
+
+# Godot editor/cache folder (should never be committed)
+.godot/
+
+# Import cache (auto-generated from source assets)
+.import/
+
+# Generated import artifacts
+*.import
+*.oggstr
+*.pngstr
+
+# Temporary scene/resource files
+*.tmp
+*.tmp.*
+*.tscn.tmp
+*.scn.tmp
+*.res.tmp
+*.tres.tmp
+*.import.tmp
+
+# Godot export output (if you export builds into folders)
+export/
+exports/
+build/
+_bin/
+*.exe
+*.x86*
+*.x86_64
+*.wasm
+*.wasm64
+*.apk
+*.aab
+*.app
+*.pck
+*.zip
+*.pck.tmp
+
+#################################
+# Mono / C# (if using Godot .NET)
+#################################
+.mono/
+data_*/
+mono_crash.*
+
+#################################
+# IDE/editor files
+#################################
+.vscode/
+.vs/
+.idea/
+*.sln
+*.csproj
+*.user
+*.csproj.user
+
+#################################
+# Logs & cache
+#################################
+logs/
+*.log
+.cache/
+*.converted.*
+
+#################################
+# OS junk
+#################################
+.DS_Store
+Thumbs.db
+desktop.ini

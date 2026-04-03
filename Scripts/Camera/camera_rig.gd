@@ -6,7 +6,10 @@ extends Node3D
 @onready var offset_rig = $OffsetRig
 ## Active camera
 @onready var camera = $OffsetRig/Camera3D
-
+## Camera debug overlay
+@onready var camera_debug = $CameraDebug
+## Camera utils
+@onready var utils = $CameraUtils
 
 ## Camera target to focus on
 @export var player: Player
@@ -74,7 +77,10 @@ func _physics_process(delta):
 	
 	global_position = final_pos
 	
-	
+	# Recalculate lookahead value for the next iteration
+	var target_shift = _add_cursor_offset()
+	calculate_lookahead(target_shift)
+
 ## Calculate smooth shift toward lookahead position
 func calculate_lookahead(target: Vector3):
 	if _lookahead.is_equal_approx(target):
@@ -88,7 +94,31 @@ func calculate_lookahead(target: Vector3):
 	_tween.set_ease(Tween.EASE_OUT)
 	_tween.tween_property(self, "_lookahead", target, 0.5)
 
+## Returns a new position considering shift to cursor
+func _add_cursor_offset() -> Vector3:
+	var viewport = get_viewport()
+	var mouse_pos = viewport.get_mouse_position()
+	var center_pos = viewport.get_visible_rect().size / 2
 
+	#
+	# Calculate direction vector from center of screen to cursor
+	# and convert it to the viewport width rate (to make it work on all resolutions)
+	#
+	var offset_vector = mouse_pos - center_pos
+	var offset_rate = utils.pixel_to_rate(round(offset_vector.length()))
+	
+	#
+	# Map a value from shift radius range to a shift power range
+	#
+	var shift = remap(offset_rate, near_radius, far_radius, near_shift, far_shift)
+
+	#
+	# Clamp lower value and fix the maximum value
+	# translate into vector space to calculate final shift
+	#
+	var step_shift = step(shift, near_shift, far_shift) 
+	var shift_vector = step_shift * offset_vector.normalized();
+	return Vector3(shift_vector.x, 0, shift_vector.y)
 
 func step(value, min_value, max_value):
 	if value < min_value:
