@@ -4,3 +4,8 @@ res://scenes/house.gd
 res://scenes/mission.tscn
 res://Player/player.gd
 res://scenes/main_menu.tscn
+res://scenes/pause_menu.tscn
+res://assets/shaders/pause_menu.gdshader
+res://Scripts/MainMenu/Pause.gd
+res://scenes/options.tscn
+res://Scripts/MainMenu/options.gd
