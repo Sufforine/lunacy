@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://cs0c4pqfplg4y"]
 
-[ext_resource type="Script" uid="uid://ox8e1r51aeba" path="res://Scripts/buildings/merchant_house.gd" id="1_qssp3"]
-[ext_resource type="Script" uid="uid://bg726yf0y54c7" path="res://scenes/house.gd" id="2_d1od2"]
+[ext_resource type="Script" uid="uid://4wcfqadoo037" path="res://Scripts/hubscr/merchant.gd" id="1_d1od2"]
+[ext_resource type="Script" uid="uid://bg726yf0y54c7" path="res://Scripts/hubscr/house.gd" id="2_d1od2"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qssp3"]
 albedo_color = Color(0.28985527, 0.41622728, 0.27746338, 1)
@@ -45,7 +45,7 @@ light_color = Color(0.76558864, 0.72944033, 0.548492, 1)
 shadow_enabled = true
 
 [node name="Merchant" type="StaticBody3D" parent="." unique_id=1777797438]
-script = ExtResource("1_qssp3")
+script = ExtResource("1_d1od2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant" unique_id=962645088]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)

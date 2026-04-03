@@ -33,7 +33,7 @@ func _on_mouse_exited():
 			tween.kill()
 		tween = create_tween()
 		tween.set_ease(Tween.EASE_IN)
-		tween.tween_property(glow_ring, "scale", Vector3(2.0, 0.0, 2.0), 0.3)
+		tween.tween_property(glow_ring, "scale", Vector3(2.0, 0.0, 2.0), 0.1)
 		tween.tween_callback(func(): glow_ring.visible = false)
 
 func _on_input_event(camera, event, position, normal, shape_idx):

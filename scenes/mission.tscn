@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bcu0tkuixafso" path="res://Player/player.gd" id="1_nbcaj"]
 [ext_resource type="PackedScene" uid="uid://bl2yw82b40qvk" path="res://Scripts/Camera/camera.tscn" id="2_uxhhj"]
+[ext_resource type="PackedScene" uid="uid://brq3t758nrchs" path="res://scenes/pause_menu.tscn" id="3_cv0tx"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nbcaj"]
 albedo_color = Color(0.15762597, 0.13005483, 0.06703506, 1)
@@ -38,3 +39,7 @@ shape = SubResource("CapsuleShape3D_ebncj")
 [node name="CameraRig" parent="Player" unique_id=269756323 node_paths=PackedStringArray("player") instance=ExtResource("2_uxhhj")]
 top_level = true
 player = NodePath("..")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1811784069]
+
+[node name="pause_menu" parent="CanvasLayer" unique_id=1310243284 instance=ExtResource("3_cv0tx")]
