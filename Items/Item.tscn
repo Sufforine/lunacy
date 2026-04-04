@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://djeajxn4mcwo2"]
+
+[ext_resource type="Script" uid="uid://b6ju0v1tstv5u" path="res://Items/item.gd" id="1_qum4w"]
+[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="2_rbkru"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_ww0on"]
+radius = 26.0192
+
+[node name="Bandage" type="Area2D" unique_id=756168673]
+script = ExtResource("1_qum4w")
+item_name = "Bandage"
+icon = ExtResource("2_rbkru")
+is_stackable = true
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=914705297]
+position = Vector2(0, 2)
+scale = Vector2(0.26344088, 0.29438192)
+texture = ExtResource("2_rbkru")
+region_rect = Rect2(0.703102, 64.9395, 7.6366, 6.58327)
+region_filter_clip_enabled = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1508220309]
+shape = SubResource("CircleShape2D_ww0on")
