@@ -18,10 +18,14 @@ enum InventorySlotAction {
 signal slot_input(which: InventorySlot, action: InventorySlotAction)
 signal slot_hovered(which: InventorySlot, is_hovering: bool)
 
-func _ready():
+func _ready() -> void:
 	add_to_group("inventory_slots")
+	var tb := $TextureButton as TextureButton
+	tb.gui_input.connect(_on_texture_button_gui_input)
+	tb.mouse_entered.connect(_on_texture_button_mouse_entered)
+	tb.mouse_exited.connect(_on_texture_button_mouse_exited)
 
-func _on_texture_button_gui_input(event):
+func _on_texture_button_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			slot_input.emit(
@@ -32,10 +36,10 @@ func _on_texture_button_gui_input(event):
 				self, InventorySlotAction.SPLIT
 			)
 
-func _on_texture_button_mouse_entered():
+func _on_texture_button_mouse_entered() -> void:
 	slot_hovered.emit(self, true)
 
-func _on_texture_button_mouse_exited():
+func _on_texture_button_mouse_exited() -> void:
 	slot_hovered.emit(self, false)
 
 # Is it having same type and amount as indicated by the hint_item

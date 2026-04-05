@@ -2,10 +2,12 @@
 
 [ext_resource type="Script" uid="uid://cjvofhapvv5lk" path="res://scenes/Inventory/InventorySlot/InventoryItem/InventoryItem.gd" id="1_gdey7"]
 
-[node name="InventoryItem" type="Control" unique_id=684195203]
+[node name="InventoryItem" type="Control" unique_id=684195203 node_paths=PackedStringArray("sprite", "label")]
 layout_mode = 3
 anchors_preset = 0
 script = ExtResource("1_gdey7")
+sprite = NodePath("Sprite2D")
+label = NodePath("Label")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=70156482]
 

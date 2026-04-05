@@ -6,11 +6,12 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_ww0on"]
 radius = 26.0192
 
-[node name="Bandage" type="Area2D" unique_id=756168673]
+[node name="Bandage" type="Area2D" unique_id=756168673 node_paths=PackedStringArray("card_frame")]
 script = ExtResource("1_qum4w")
 item_name = "Bandage"
 icon = ExtResource("2_rbkru")
 is_stackable = true
+card_frame = NodePath("Sprite2D")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=914705297]
 position = Vector2(0, 2)

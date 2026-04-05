@@ -8,6 +8,16 @@ class_name InventoryItem
 @export var label: Label
 
 
+func _ready() -> void:
+	_set_mouse_filter_ignore_recursive(self)
+
+
+func _set_mouse_filter_ignore_recursive(n: Node) -> void:
+	if n is Control:
+		(n as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for c in n.get_children():
+		_set_mouse_filter_ignore_recursive(c)
+
 
 func set_data(_name: String, _icon: Texture2D, _is_stackable: bool, _amount: int):
 	self.item_name = _name

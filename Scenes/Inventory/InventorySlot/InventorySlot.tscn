@@ -18,7 +18,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_idb6c")
-inventory_item_scene = null
 
 [node name="TextureButton" type="TextureButton" parent="." unique_id=1959705996]
 layout_mode = 2

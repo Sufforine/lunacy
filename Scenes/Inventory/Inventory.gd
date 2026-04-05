@@ -15,9 +15,7 @@ var slots: Array[InventorySlot]
 
 @export var tooltip: Tooltip # Must be shared among all instanesself
 
-
 static var selected_item: Item = null
-
 
 func _ready():
 	inventory_grid.columns = cols
