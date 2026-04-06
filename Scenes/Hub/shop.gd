@@ -25,7 +25,7 @@ func _on_mouse_entered():
 		tween = create_tween()
 		tween.set_ease(Tween.EASE_OUT)
 		tween.set_trans(Tween.TRANS_BACK)
-		tween.tween_property(glow_ring, "scale", Vector3(2.2, 0.2, 2.2), 1.2)
+		tween.tween_property(glow_ring, "scale", Vector3(2.7, 0.2, 2.7), 1.2)
 
 func _on_mouse_exited():
 	if glow_ring:
@@ -33,9 +33,9 @@ func _on_mouse_exited():
 			tween.kill()
 		tween = create_tween()
 		tween.set_ease(Tween.EASE_IN)
-		tween.tween_property(glow_ring, "scale", Vector3(2.0, 0.0, 2.0), 0.1)
+		tween.tween_property(glow_ring, "scale", Vector3(2.5, 0.0, 2.5), 0.1)
 		tween.tween_callback(func(): glow_ring.visible = false)
 
 func _on_input_event(camera, event, position, normal, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		get_tree().change_scene_to_file("res://scenes/mission.tscn")
+		get_tree().change_scene_to_file("res://Scenes/Hub/Shop/Shop.tscn")
