@@ -1,13 +1,15 @@
 [gd_scene format=3 uid="uid://b3qxvv8cnwgxo"]
 
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="2_bo1nx"]
-[ext_resource type="PackedScene" uid="uid://dwco8nnhhy1wv" path="res://scenes/Inventory/Inventory.tscn" id="3_cv0tx"]
+[ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_ebncj"]
+[ext_resource type="PackedScene" uid="uid://dwco8nnhhy1wv" path="res://Scenes/Inventory/Inventory.tscn" id="3_cv0tx"]
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="4_jjvhh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7u77a"]
 albedo_color = Color(1.3957917e-06, 0.3974248, 0.13629475, 1)
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_7u77a"]
+height = 3.4350586
 
 [node name="Main" type="Node3D" unique_id=1324539419]
 
@@ -35,15 +37,62 @@ size = Vector3(2, 4, 2)
 [node name="Player" type="CharacterBody3D" parent="." unique_id=1664162560]
 script = ExtResource("4_jjvhh")
 
-[node name="Body" type="CSGCylinder3D" parent="Player" unique_id=2064365457]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.020128, 0)
-sides = 16
+[node name="Dullahan" parent="Player" unique_id=1619511346 instance=ExtResource("2_ebncj")]
 
-[node name="Beak" type="CSGBox3D" parent="Player" unique_id=74011822]
-transform = Transform3D(0.55359936, 0, 0, 0, 0.33874202, 0, 0, 0, 1, 0, 1.4096835, -0.41314787)
+[node name="Skeleton3D" parent="Player/Dullahan/Armature" parent_id_path=PackedInt32Array(1619511346, 1378042491) index="0" unique_id=771089523]
+bones/0/rotation = Quaternion(6.123235e-17, 1, -8.15358e-24, 1.3315805e-07)
+bones/1/rotation = Quaternion(0.06073066, 0.00063552306, 0.011471939, 0.99808806)
+bones/2/rotation = Quaternion(0.086261936, 0.00051093136, 0.0160482, 0.9961431)
+bones/3/rotation = Quaternion(0.04523178, 0.000274369, 0.009137402, 0.9989347)
+bones/4/rotation = Quaternion(-0.026520168, 0.00011248879, -0.0066331793, 0.99962634)
+bones/5/rotation = Quaternion(-0.071640365, 0.009655876, -0.0045574685, 0.9973734)
+bones/7/rotation = Quaternion(-0.67825943, -0.3500535, 0.55204654, -0.33566564)
+bones/8/rotation = Quaternion(0.2064802, 0.085059814, 0.08133205, 0.97134745)
+bones/9/rotation = Quaternion(-0.031245567, -0.098813064, 0.48049608, 0.87085205)
+bones/10/rotation = Quaternion(-0.057090282, 0.024182124, 0.16602157, 0.9841711)
+bones/11/rotation = Quaternion(-4.3077384e-07, 2.0760156e-09, 0.4415839, 0.89721996)
+bones/12/rotation = Quaternion(0.005924651, -5.625287e-07, 1.8999316e-07, 0.99998254)
+bones/13/rotation = Quaternion(-0.050120912, 5.3898185e-07, -2.126088e-07, 0.9987432)
+bones/15/rotation = Quaternion(0.029062001, -0.0024465243, -0.08384695, 0.9960518)
+bones/16/rotation = Quaternion(0.15879534, -4.3768728e-07, -1.1791145e-07, 0.9873116)
+bones/17/rotation = Quaternion(-0.0413529, 5.2198715e-07, 4.6605994e-08, 0.9991446)
+bones/19/rotation = Quaternion(0.68747205, -0.43226758, 0.5114158, 0.28103533)
+bones/20/rotation = Quaternion(0.17428514, 0.16964483, -0.078590564, 0.96678275)
+bones/21/rotation = Quaternion(0.015816113, 0.0374499, -0.040133476, 0.998367)
+bones/22/rotation = Quaternion(0.14876814, 0.23819876, 0.075562224, 0.9567758)
+bones/23/rotation = Quaternion(0.2520056, -0.22471935, -0.13740133, 0.9311903)
+bones/24/rotation = Quaternion(2.0467332e-05, -0.0005333644, 0.002845556, 0.9999958)
+bones/25/rotation = Quaternion(0.049306687, 9.0250154e-07, 7.666542e-08, 0.9987837)
+bones/27/rotation = Quaternion(0.016517356, -0.026490526, 0.08858873, 0.99557894)
+bones/28/rotation = Quaternion(0.12045328, -0.0049785953, 0.19592229, 0.9731808)
+bones/29/rotation = Quaternion(0.78541684, -0.09364491, 0.03662843, 0.61074495)
+bones/31/rotation = Quaternion(-0.05751892, -0.11400329, -0.676324, 0.72545207)
+bones/33/rotation = Quaternion(0.025322512, 0.07952137, 0.9954776, -0.04538188)
+bones/34/rotation = Quaternion(-0.1974197, -0.017399548, 0.004250607, 0.98015547)
+bones/35/rotation = Quaternion(0.6478178, 0.029773578, -0.002944021, 0.76120764)
+bones/36/rotation = Quaternion(0.36738008, -0.017368509, 0.013113674, 0.9298163)
+bones/38/rotation = Quaternion(-0.0029997157, 0.09992206, 0.99335104, 0.057100367)
+bones/39/rotation = Quaternion(-0.33189145, -0.028304927, 0.056608636, 0.94119203)
+bones/40/rotation = Quaternion(0.6307059, -0.02164878, -0.043079436, 0.7745228)
+bones/41/rotation = Quaternion(0.19849521, -0.005348419, -0.026399111, 0.9797317)
+bones/43/rotation = Quaternion(0.96035886, -0.00014579043, -0.0005633367, 0.27876619)
+bones/44/rotation = Quaternion(0.0025860965, -0.0006792058, 0.009545427, 0.99995095)
+bones/45/rotation = Quaternion(0.0019627323, 0.029580124, -0.0041595446, 0.99955183)
+bones/46/rotation = Quaternion(-0.0015591034, 0.03518794, 0.005523698, 0.99936426)
+bones/47/rotation = Quaternion(-0.00035667728, 0.037313767, -0.008569917, 0.99926686)
+bones/49/rotation = Quaternion(0.95471984, 0.23756404, -0.030540574, -0.17646705)
+bones/50/rotation = Quaternion(-0.04262264, 0.01991993, 0.03390849, 0.998317)
+bones/51/rotation = Quaternion(-0.055002533, 0.009561764, 0.042981844, 0.9975149)
+bones/52/rotation = Quaternion(-0.04674549, 0.0025213978, 0.066093825, 0.99671465)
+bones/53/rotation = Quaternion(-0.027298193, 0.00036150793, 0.04458494, 0.9986326)
+bones/55/rotation = Quaternion(0.9524825, -0.25080565, 0.021492131, -0.17149833)
+bones/56/rotation = Quaternion(-0.04637155, 0.014486381, -0.0666162, 0.99659526)
+bones/57/rotation = Quaternion(-0.056852713, 0.0011519364, -0.06736406, 0.99610674)
+bones/58/rotation = Quaternion(-0.054413356, 0.0013465906, -0.058597066, 0.9967968)
+bones/59/rotation = Quaternion(-0.034474086, 0.00031412026, -0.026370147, 0.9990576)
 
 [node name="Collision" type="CollisionShape3D" parent="Player" unique_id=1991275495]
-transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 0.95863795, 0)
+transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 2.0564578, 0.014858723)
 shape = SubResource("CapsuleShape3D_7u77a")
 
 [node name="CameraRig" parent="Player" unique_id=1214719725 node_paths=PackedStringArray("player") instance=ExtResource("2_bo1nx")]
@@ -59,3 +108,5 @@ grow_horizontal = 0
 grow_vertical = 0
 rows = 4
 cols = 2
+
+[editable path="Player/Dullahan"]

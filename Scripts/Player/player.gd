@@ -1,28 +1,34 @@
 class_name Player
 extends CharacterBody3D
 
-## Player move speed
+
 @export var move_speed: float = 5.0
-
-## Rotation ease speed
 @export var ease_speed: float = 5.0
-
-## Camera rig
 @onready var camera_rig = $CameraRig
+@onready var Dullahan: Node3D = $Dullahan
+@onready var animation_player: AnimationPlayer = $Dullahan/AnimationPlayer
+
+enum AnimationState {IDLE, WALK}
+var animation_state : int = AnimationState.IDLE
+
+func _process(_delta : float) -> void:
+	match(animation_state):
+		AnimationState.WALK:
+			animation_player.play('Armature|run_f')
+			
 
 func _physics_process(delta: float) -> void:
 	_handle_movement()
 	_handle_rotation(delta)
 
-## Handle player movement
 func _handle_movement() -> void:
 	var input_dir = InputManager.get_input_direction()
 	var velocity_vector = input_dir * move_speed
 	velocity.x = velocity_vector.x
 	velocity.z = velocity_vector.z
+	animation_state = AnimationState.WALK
 	move_and_slide()
 
-## Handle player rotation
 func _handle_rotation(delta: float) -> void:
 	if not camera_rig:
 		printerr("Missing camera")
