@@ -7,6 +7,8 @@ extends Control
 @onready var grid: GridContainer = $VBoxContainer/ScrollContainer/GridContainer
 
 func _ready():
+	GlobalRefs.player_inventory_root = self
+	print(GlobalRefs.player_inventory_root)
 	# Подписываемся на изменения в данных
 	if inventory_data:
 		inventory_data.update_slots.connect(refresh_ui)
@@ -22,10 +24,10 @@ func refresh_ui():
 	for child in grid.get_children():
 		child.queue_free()
 	
-	# Создаем новые на основе размера массива в Inventory.gd
-	for slot_data in inventory_data.slots:
+	
+	for i in range(inventory_data.slots.size()):
 		var slot_view = slot_scene.instantiate()
 		grid.add_child(slot_view)
+		slot_view.slot_index = i
+		slot_view.display(inventory_data.slots[i])
 		
-		if slot_data != null:
-			slot_view.display(slot_data) # Функция внутри ячейки для отрисовки иконки
