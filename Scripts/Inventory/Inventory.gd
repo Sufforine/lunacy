@@ -14,6 +14,8 @@ func setup(size: int):
 
 
 func swap_slots(index1: int, index2: int):
+	print("index1 - ", index1)
+	print("index2! - ", index2)
 	var temp = slots[index1]
 	slots[index1] = slots[index2]
 	slots[index2] = temp

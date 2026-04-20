@@ -8,7 +8,6 @@ extends Control
 
 func _ready():
 	GlobalRefs.player_inventory_root = self
-	print(GlobalRefs.player_inventory_root)
 	# Подписываемся на изменения в данных
 	if inventory_data:
 		inventory_data.update_slots.connect(refresh_ui)
