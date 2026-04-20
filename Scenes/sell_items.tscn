@@ -3,7 +3,8 @@
 [ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="1_4upu1"]
 [ext_resource type="Script" uid="uid://bfgyuokwe48bb" path="res://Scripts/Store/sell_items.gd" id="1_uhxtw"]
 [ext_resource type="Texture2D" uid="uid://jc1diekt5c3y" path="res://Icons/coin.png" id="2_uhxtw"]
-[ext_resource type="Script" uid="uid://b6ju0v1tstv5u" path="res://Items/item.gd" id="3_item"]
+[ext_resource type="Script" uid="uid://b6ju0v1tstv5u" path="res://Items/_old/item.gd" id="3_item"]
+
 
 [node name="SellItems" type="Control" unique_id=136732146 node_paths=PackedStringArray("card_frame")]
 layout_mode = 3

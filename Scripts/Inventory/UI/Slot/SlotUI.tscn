@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://cen1l5d0vvofk"]
+
+[ext_resource type="Script" uid="uid://cjkebb6m8bd55" path="res://Scripts/Inventory/UI/Slot/SlotUI.gd" id="1_723bw"]
+
+[node name="InventorySlot" type="PanelContainer" unique_id=917996458]
+custom_minimum_size = Vector2(64, 64)
+offset_right = 64.0
+offset_bottom = 64.0
+script = ExtResource("1_723bw")
+
+[node name="Icon" type="TextureRect" parent="." unique_id=50942935]
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Quantity" type="Label" parent="." unique_id=79532847]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+horizontal_alignment = 2
+vertical_alignment = 2
+autowrap_trim_flags = 0
+justification_flags = 0

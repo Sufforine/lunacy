@@ -1,11 +1,17 @@
-extends Node
+extends Resource
 class_name Item
 
-@export var item_name: String = ""
+enum ItemType {
+	QUEST,
+	CONSUMABLE,
+	RESOURCE,
+}
+
+@export_group("Visuals")
+@export var name: String
 @export var icon: Texture2D
+
+@export_group("Logic")
+@export var id: int
 @export var is_stackable: bool = false
-
-var inventory: Inventory
-
-func _ready():
-	add_to_group("items")
+@export var type: ItemType

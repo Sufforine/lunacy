@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://c6imdrouks1q5"]
+
+[ext_resource type="Script" uid="uid://cc7dkgqloqv55" path="res://Scripts/Inventory/UI/InventoryUI.gd" id="1_e0n32"]
+[ext_resource type="PackedScene" uid="uid://cen1l5d0vvofk" path="res://Scripts/Inventory/UI/Slot/SlotUI.tscn" id="2_cd6ey"]
+[ext_resource type="Resource" uid="uid://c5uds2a8pjcvu" path="res://Scripts/Inventory/inventory.tres" id="2_exhx7"]
+
+[node name="InventoryUi" type="Control" unique_id=309938120]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 405.0
+offset_bottom = 160.0
+script = ExtResource("1_e0n32")
+inventory_data = ExtResource("2_exhx7")
+slot_scene = ExtResource("2_cd6ey")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2137964201]
+layout_direction = 2
+layout_mode = 0
+offset_right = 405.0
+offset_bottom = 160.0
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=759432114]
+layout_mode = 2
+text = "Инвентарь"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=30088571]
+clip_contents = false
+custom_minimum_size = Vector2(0, 132)
+layout_direction = 1
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer/ScrollContainer" unique_id=1426531401]
+z_index = 100
+z_as_relative = false
+layout_mode = 2
+columns = 6

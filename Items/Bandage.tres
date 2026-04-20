@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Item" format=3 uid="uid://dl748tpklmpu"]
+
+[ext_resource type="Script" uid="uid://ckirtyqrpm4d7" path="res://Items/Item.gd" id="1_6si8d"]
+[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="1_8uvp1"]
+
+[resource]
+script = ExtResource("1_6si8d")
+name = "Bandage"
+icon = ExtResource("1_8uvp1")
+id = 1
+is_stackable = true
+type = 1
+metadata/_custom_type_script = "uid://ckirtyqrpm4d7"

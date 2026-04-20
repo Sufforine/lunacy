@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://b3qxvv8cnwgxo"]
 
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="2_bo1nx"]
-[ext_resource type="PackedScene" uid="uid://dwco8nnhhy1wv" path="res://scenes/Inventory/Inventory.tscn" id="3_cv0tx"]
+[ext_resource type="PackedScene" uid="uid://dwco8nnhhy1wv" path="res://scenes/_Old_Inventory/Inventory.tscn" id="3_cv0tx"]
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="4_jjvhh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7u77a"]
@@ -59,3 +59,16 @@ grow_horizontal = 0
 grow_vertical = 0
 rows = 4
 cols = 2
+
+[node name="Storage" parent="Player" instance=ExtResource("3_cv0tx")]
+visible = false
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 0
+grow_vertical = 0
+offset_left = -220.0
+rows = 3
+cols = 3

@@ -10,9 +10,35 @@ extends CharacterBody3D
 ## Camera rig
 @onready var camera_rig = $CameraRig
 
+@onready var mission_inventory: Inventory = get_node_or_null("Inventory")
+@onready var storage_inventory: Inventory = get_node_or_null("Storage")
+
+var _storage_open := false
+
 func _physics_process(delta: float) -> void:
 	_handle_movement()
 	_handle_rotation(delta)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("toggle_storage"):
+		_toggle_storage()
+
+func _toggle_storage() -> void:
+	if not storage_inventory:
+		return
+
+	_storage_open = not _storage_open
+	storage_inventory.visible = _storage_open
+
+	if _storage_open:
+		if PlayerStorage.slots_state.is_empty():
+			PlayerStorage.slots_state.resize(storage_inventory.rows * storage_inventory.cols)
+		storage_inventory.import_state(PlayerStorage.slots_state)
+		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	else:
+		PlayerStorage.slots_state = storage_inventory.export_state()
+		Inventory.selected_item = null
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 ## Handle player movement
 func _handle_movement() -> void:

@@ -1,8 +1,7 @@
 [gd_scene format=3 uid="uid://dnawls3cnguii"]
 
 [ext_resource type="Script" uid="uid://ckd7kg510x74q" path="res://Scripts/Store/shop.gd" id="1_tb7bw"]
-[ext_resource type="PackedScene" uid="uid://chvroptg4fcgo" path="res://scenes/sell_items.tscn" id="2_88ji8"]
-[ext_resource type="PackedScene" uid="uid://dwco8nnhhy1wv" path="res://scenes/Inventory/Inventory.tscn" id="3_t4md6"]
+[ext_resource type="PackedScene" uid="uid://c6imdrouks1q5" path="res://Scripts/Inventory/UI/InventoryUI.tscn" id="2_1all2"]
 
 [node name="ShopScene" type="Control" unique_id=1097916710 node_paths=PackedStringArray("card_container")]
 layout_mode = 3
@@ -14,7 +13,6 @@ anchor_bottom = 0.5
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_tb7bw")
-sell_card = ExtResource("2_88ji8")
 card_container = NodePath("HBoxContainer")
 
 [node name="InventoryBase" type="Panel" parent="." unique_id=67755007]
@@ -31,6 +29,9 @@ offset_top = -206.0
 offset_right = 340.0
 offset_bottom = -98.0
 
-[node name="Inventory" parent="." unique_id=338099603 instance=ExtResource("3_t4md6")]
+[node name="InventoryUi" parent="." unique_id=309938120 instance=ExtResource("2_1all2")]
 layout_mode = 0
-rows = 2
+offset_left = -353.0
+offset_top = 83.0
+offset_right = 52.0
+offset_bottom = 243.0
