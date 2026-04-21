@@ -20,6 +20,10 @@ GlobalRefs="*uid://b6atbsuox4481"
 InputManager="*uid://syrhs8bs5ts4"
 PlayerStorage="*res://Scripts/Player/player_storage.gd"
 
+[display]
+
+window/subwindows/embed_subwindows=false
+
 [input]
 
 move_forward={
