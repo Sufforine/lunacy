@@ -6,31 +6,27 @@
 
 [node name="InventoryUi" type="Control" unique_id=309938120]
 layout_mode = 3
-anchors_preset = 0
-offset_right = 405.0
-offset_bottom = 160.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_e0n32")
 inventory_data = ExtResource("2_exhx7")
 slot_scene = ExtResource("2_cd6ey")
+metadata/_edit_use_anchors_ = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2137964201]
-layout_direction = 2
-layout_mode = 0
-offset_right = 405.0
-offset_bottom = 160.0
-
-[node name="Label" type="Label" parent="VBoxContainer" unique_id=759432114]
-layout_mode = 2
-text = "Инвентарь"
-
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer" unique_id=30088571]
-clip_contents = false
-custom_minimum_size = Vector2(0, 132)
-layout_direction = 1
-layout_mode = 2
-
-[node name="GridContainer" type="GridContainer" parent="VBoxContainer/ScrollContainer" unique_id=1426531401]
+[node name="GridContainer" type="GridContainer" parent="." unique_id=1426531401]
 z_index = 100
 z_as_relative = false
-layout_mode = 2
+layout_direction = 2
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -55.0
+offset_right = 59.0
+grow_vertical = 0
 columns = 6

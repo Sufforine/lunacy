@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="2_bo1nx"]
 [ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_ebncj"]
-[ext_resource type="PackedScene" uid="uid://dwco8nnhhy1wv" path="res://Scenes/Inventory/Inventory.tscn" id="3_cv0tx"]
+[ext_resource type="PackedScene" uid="uid://c6imdrouks1q5" path="res://Scripts/Inventory/UI/InventoryUI.tscn" id="4_0mvd2"]
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="4_jjvhh"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7u77a"]
@@ -39,7 +39,7 @@ script = ExtResource("4_jjvhh")
 
 [node name="Dullahan" parent="Player" unique_id=1619511346 instance=ExtResource("2_ebncj")]
 
-[node name="Skeleton3D" parent="Player/Dullahan/Armature" parent_id_path=PackedInt32Array(1619511346, 1378042491) index="0" unique_id=771089523]
+[node name="Skeleton3D" parent="Player/Dullahan/Armature" parent_id_path=PackedInt32Array(1619511346, 769455970) index="0" unique_id=488053510]
 bones/0/rotation = Quaternion(6.123235e-17, 1, -8.15358e-24, 1.3315805e-07)
 bones/1/rotation = Quaternion(0.06073066, 0.00063552306, 0.011471939, 0.99808806)
 bones/2/rotation = Quaternion(0.086261936, 0.00051093136, 0.0160482, 0.9961431)
@@ -98,7 +98,7 @@ shape = SubResource("CapsuleShape3D_7u77a")
 [node name="CameraRig" parent="Player" unique_id=1214719725 node_paths=PackedStringArray("player") instance=ExtResource("2_bo1nx")]
 player = NodePath("..")
 
-[node name="Inventory" parent="Player" unique_id=338099603 instance=ExtResource("3_cv0tx")]
+[node name="InventoryUi" parent="Player" unique_id=309938120 instance=ExtResource("4_0mvd2")]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -106,7 +106,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 0
 grow_vertical = 0
-rows = 4
-cols = 2
+columns = 2
+layout_side = 1
 
 [editable path="Player/Dullahan"]
