@@ -28,7 +28,7 @@ func create_preview():
 	preview.custom_minimum_size = Vector2(50, 50)
 	
 	var previewLabel = Label.new()
-	previewLabel.text = str(1)
+	previewLabel.text = str(active_drag_data.amount) if active_drag_data != null else "x"
 	previewLabel.name = "CountLabel"
 	previewLabel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE)
 	preview.add_child(previewLabel)
@@ -71,6 +71,22 @@ func _drop_data(_at_position, data):
 #	index: int, item_to_add: Item, amount: int
 	inventory.place_at(slot_index, data.item, data.amount)
 
+func _on_split_confirmed(amount: int):
+	var inv_data = GlobalRefs.player_inventory_root.inventory_data
+	var slot_data = inv_data.slots[slot_index]
+	slot_data.amount -= amount
+	
+	active_drag_data = {
+		"origin_index": slot_index,
+		"item": slot_data.item,
+		"amount": amount,
+		"is_split": true
+	}
+	
+	inv_data.update_slots.emit()
+	force_drag(active_drag_data, create_preview())
+	
+
 # В пизду
 func _gui_input(event):
 	var inventory_data = GlobalRefs.player_inventory_root.inventory_data
@@ -79,13 +95,11 @@ func _gui_input(event):
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_RIGHT and Input.is_key_pressed(KEY_SHIFT):
 			if slot_data and slot_data.amount > 1:
-				if active_drag_data == null:
-					slot_data.amount -= 1
-					active_drag_data = create_drag_data_for_split(slot_data.item)
-					var preview_node = create_preview()
-					
-					inventory_data.update_slots.emit()
-					force_drag(active_drag_data, preview_node)
+				var dialog = GlobalRefs.split_dialog_root
+				dialog.setup(slot_data.amount)
+			
+				if not dialog.confirmed.is_connected(_on_split_confirmed):
+					dialog.confirmed.connect(_on_split_confirmed, CONNECT_ONE_SHOT)
 
 func _notification(what):
 	if what == NOTIFICATION_DRAG_END:

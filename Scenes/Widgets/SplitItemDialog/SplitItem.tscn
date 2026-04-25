@@ -32,7 +32,7 @@ size_flags_vertical = 3
 size_flags_stretch_ratio = 0.16
 alignment = 1
 
-[node name="minus" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=784015604]
+[node name="Minus" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=784015604]
 custom_minimum_size = Vector2(20, 10)
 layout_mode = 2
 size_flags_horizontal = 10
@@ -50,7 +50,7 @@ size_flags_vertical = 4
 size_flags_stretch_ratio = 1.25
 theme_override_font_sizes/font_size = 24
 
-[node name="plus" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=491313015]
+[node name="Plus" type="Button" parent="VBoxContainer/HBoxContainer" unique_id=491313015]
 custom_minimum_size = Vector2(20, 0)
 layout_mode = 2
 size_flags_horizontal = 2
@@ -65,14 +65,19 @@ size_flags_vertical = 3
 size_flags_stretch_ratio = 0.0
 alignment = 1
 
-[node name="confirm" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=591520527]
+[node name="Confirm" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=591520527]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_stretch_ratio = 20.0
 text = "confirm"
 
-[node name="cancel" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=1818676813]
+[node name="Cancel" type="Button" parent="VBoxContainer/HBoxContainer2" unique_id=1818676813]
 layout_mode = 2
 size_flags_horizontal = 6
 size_flags_stretch_ratio = 20.0
 text = "cancel"
+
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Minus" to="." method="_on_minus_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer/Plus" to="." method="_on_plus_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/Confirm" to="." method="_on_confirm_btn_pressed"]
+[connection signal="pressed" from="VBoxContainer/HBoxContainer2/Cancel" to="." method="_on_cancel_btn_pressed"]

@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://cc7dkgqloqv55" path="res://Scripts/Inventory/UI/InventoryUI.gd" id="1_e0n32"]
 [ext_resource type="PackedScene" uid="uid://cen1l5d0vvofk" path="res://Scripts/Inventory/UI/Slot/SlotUI.tscn" id="2_cd6ey"]
 [ext_resource type="Resource" uid="uid://c5uds2a8pjcvu" path="res://Scripts/Inventory/inventory.tres" id="2_exhx7"]
+[ext_resource type="PackedScene" uid="uid://kgmqf0i1lqjb" path="res://scenes/Widgets/SplitItemDialog/SplitItem.tscn" id="4_exhx7"]
 
 [node name="InventoryUi" type="Control" unique_id=309938120]
 layout_mode = 3
@@ -30,3 +31,7 @@ offset_top = -55.0
 offset_right = 59.0
 grow_vertical = 0
 columns = 6
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1016774048]
+
+[node name="SplitDialog" parent="CanvasLayer" unique_id=865649643 instance=ExtResource("4_exhx7")]
