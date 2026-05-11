@@ -47,15 +47,17 @@ op_type = 0
 default_input_values = [0, Vector2(0, 0), 1, Vector2(0, 0)]
 op_type = 0
 
+[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_rbryy"]
+output_port_for_preview = 0
+function = 31
+
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_g5ukx"]
 input_name = "uv"
 
 [sub_resource type="VisualShaderNodeVectorDecompose" id="VisualShaderNodeVectorDecompose_h57j8"]
+output_port_for_preview = 1
 default_input_values = [0, Vector2(0, 0)]
 op_type = 0
-
-[sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_njuvn"]
-function = 31
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_50faj"]
 input_name = "vertex"
@@ -74,15 +76,14 @@ operator = 2
 [resource]
 modes/cull = 2
 modes/diffuse = 3
-preview_params/WindNoise = "Object(NoiseTexture2D,\"resource_local_to_scene\":false,\"resource_name\":\"\",\"width\":512,\"height\":512,\"generate_mipmaps\":true,\"noise\":null,\"color_ramp\":null,\"seamless\":false,\"invert\":false,\"in_3d_space\":false,\"as_normal_map\":false,\"normalize\":true,\"seamless_blend_skirt\":0.1,\"bump_strength\":8.0,\"script\":null)
+preview_params/WindNoise = "Object(NoiseTexture2D,\"resource_local_to_scene\":false,\"resource_name\":\"\",\"width\":512,\"height\":512,\"generate_mipmaps\":true,\"noise\":Object(FastNoiseLite,\"resource_local_to_scene\":false,\"resource_name\":\"\",\"noise_type\":1,\"seed\":0,\"frequency\":0.01,\"offset\":Vector3(0, 0, 0),\"fractal_type\":1,\"fractal_octaves\":5,\"fractal_lacunarity\":2.0,\"fractal_gain\":0.5,\"fractal_weighted_strength\":0.0,\"fractal_ping_pong_strength\":2.0,\"cellular_distance_function\":0,\"cellular_jitter\":1.0,\"cellular_return_type\":1,\"domain_warp_enabled\":false,\"domain_warp_type\":0,\"domain_warp_amplitude\":30.0,\"domain_warp_frequency\":0.05,\"domain_warp_fractal_type\":1,\"domain_warp_fractal_octaves\":5,\"domain_warp_fractal_lacunarity\":6.0,\"domain_warp_fractal_gain\":0.5,\"script\":null)
+,\"color_ramp\":null,\"seamless\":false,\"invert\":false,\"in_3d_space\":false,\"as_normal_map\":false,\"normalize\":true,\"seamless_blend_skirt\":0.1,\"bump_strength\":8.0,\"script\":null)
 "
 nodes/vertex/0/position = Vector2(528, 144)
 nodes/vertex/2/node = SubResource("VisualShaderNodeInput_g5ukx")
 nodes/vertex/2/position = Vector2(-1216, 512)
 nodes/vertex/3/node = SubResource("VisualShaderNodeVectorDecompose_h57j8")
 nodes/vertex/3/position = Vector2(-880, 496)
-nodes/vertex/4/node = SubResource("VisualShaderNodeFloatFunc_njuvn")
-nodes/vertex/4/position = Vector2(-624, 496)
 nodes/vertex/5/node = SubResource("VisualShaderNodeInput_50faj")
 nodes/vertex/5/position = Vector2(-352, -96)
 nodes/vertex/6/node = SubResource("VisualShaderNodeVectorOp_fgftx")
@@ -105,7 +106,9 @@ nodes/vertex/14/node = SubResource("VisualShaderNodeVectorCompose_nd06r")
 nodes/vertex/14/position = Vector2(-1888, -320)
 nodes/vertex/15/node = SubResource("VisualShaderNodeVectorOp_tta1v")
 nodes/vertex/15/position = Vector2(-1632, -352)
-nodes/vertex/connections = PackedInt32Array(2, 0, 3, 0, 3, 1, 4, 0, 5, 0, 6, 0, 7, 0, 8, 2, 8, 0, 9, 0, 4, 0, 9, 1, 9, 0, 6, 1, 10, 0, 8, 0, 6, 0, 0, 0, 12, 0, 13, 0, 13, 0, 14, 0, 13, 2, 14, 1, 14, 0, 15, 0, 11, 0, 15, 1, 15, 0, 10, 2)
+nodes/vertex/16/node = SubResource("VisualShaderNodeFloatFunc_rbryy")
+nodes/vertex/16/position = Vector2(-566.5999, 522.0695)
+nodes/vertex/connections = PackedInt32Array(2, 0, 3, 0, 7, 0, 8, 2, 8, 0, 9, 0, 10, 0, 8, 0, 6, 0, 0, 0, 12, 0, 13, 0, 13, 0, 14, 0, 13, 2, 14, 1, 14, 0, 15, 0, 11, 0, 15, 1, 15, 0, 10, 2, 3, 1, 16, 0, 16, 0, 9, 1, 5, 0, 6, 0, 9, 0, 6, 1)
 nodes/fragment/2/node = SubResource("VisualShaderNodeVectorCompose_rbryy")
 nodes/fragment/2/position = Vector2(96, 432)
 nodes/fragment/3/node = SubResource("VisualShaderNodeInput_nfrlf")

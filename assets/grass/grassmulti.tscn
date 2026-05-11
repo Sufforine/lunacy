@@ -115,6 +115,7 @@ shadow_enabled = true
 [node name="MultiMeshInstance3D2" type="MultiMeshInstance3D" parent="." unique_id=1853860438]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.719653, 0)
 material_override = SubResource("ShaderMaterial_abtqx")
+cast_shadow = 0
 multimesh = SubResource("MultiMesh_abtqx")
 
 [node name="polygrass1" parent="." unique_id=667370437 instance=ExtResource("1_hnc57")]
