@@ -1,0 +1,61 @@
+[gd_resource type="VisualShader" format=3 uid="uid://btguor2qs2puy"]
+
+[ext_resource type="Texture2D" uid="uid://brt0gn0uu4vnj" path="res://assets/vfx/dullbolt/T_VFX_Noi55.png" id="1_uidc7"]
+
+[sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_g8q4u"]
+parameter_name = "Color"
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_3a14k"]
+expanded_output_ports = [0]
+texture = ExtResource("1_uidc7")
+texture_type = 1
+
+[sub_resource type="Gradient" id="Gradient_imt56"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kkaac"]
+gradient = SubResource("Gradient_imt56")
+fill_to = Vector2(0, 1)
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_6r1y3"]
+texture = SubResource("GradientTexture2D_kkaac")
+texture_type = 1
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_ya8bi"]
+output_port_for_preview = 0
+operator = 1
+
+[sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_tf3ch"]
+
+[sub_resource type="VisualShaderNodeUVFunc" id="VisualShaderNodeUVFunc_lkfrl"]
+
+[sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_qhktw"]
+input_name = "time"
+
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_h30c0"]
+default_input_values = [0, Vector2(0, 0), 1, Vector2(0, 2)]
+op_type = 0
+operator = 2
+
+[resource]
+modes/cull = 2
+flags/unshaded = true
+flags/shadows_disabled = true
+flags/ambient_light_disabled = true
+flags/fog_disabled = true
+nodes/fragment/2/node = SubResource("VisualShaderNodeColorParameter_g8q4u")
+nodes/fragment/2/position = Vector2(-96, 144)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture_3a14k")
+nodes/fragment/3/position = Vector2(-1264, 192)
+nodes/fragment/4/node = SubResource("VisualShaderNodeTexture_6r1y3")
+nodes/fragment/4/position = Vector2(-1216, 608)
+nodes/fragment/5/node = SubResource("VisualShaderNodeFloatOp_ya8bi")
+nodes/fragment/5/position = Vector2(-640, 560)
+nodes/fragment/6/node = SubResource("VisualShaderNodeClamp_tf3ch")
+nodes/fragment/6/position = Vector2(-135.68802, 647.176)
+nodes/fragment/7/node = SubResource("VisualShaderNodeUVFunc_lkfrl")
+nodes/fragment/7/position = Vector2(-1824, 544)
+nodes/fragment/8/node = SubResource("VisualShaderNodeInput_qhktw")
+nodes/fragment/8/position = Vector2(-2368, 576)
+nodes/fragment/9/node = SubResource("VisualShaderNodeVectorOp_h30c0")
+nodes/fragment/9/position = Vector2(-2080, 560)
+nodes/fragment/connections = PackedInt32Array(2, 0, 0, 0, 3, 1, 5, 0, 4, 0, 5, 1, 5, 0, 6, 0, 6, 0, 0, 1, 7, 0, 3, 0, 8, 0, 9, 0, 9, 0, 7, 2)
