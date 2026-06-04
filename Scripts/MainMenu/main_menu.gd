@@ -2,7 +2,7 @@ extends Control
 
 
 func _on_debug_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/mission.tscn") # Replace with function body.
+	get_tree().change_scene_to_file("res://Scenes/Missions/mission.tscn") # Replace with function body.
 
 
 func _on_start_pressed() -> void:

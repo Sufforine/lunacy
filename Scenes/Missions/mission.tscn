@@ -1,10 +1,9 @@
 [gd_scene format=4 uid="uid://b3qxvv8cnwgxo"]
 
-[ext_resource type="Material" uid="uid://baw55o0rjh7cu" path="res://assets/materials/Mossy Dirt.material" id="1_0klfc"]
-[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://assets/grass/grass.tres" id="1_mh1hw"]
+[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://Assets/grass/grass.tres" id="1_mh1hw"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="2_bo1nx"]
 [ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_ebncj"]
-[ext_resource type="PackedScene" uid="uid://b7noapgqbs4wc" path="res://assets/grass/GrassMulti.fbx" id="2_mh1hw"]
+[ext_resource type="PackedScene" uid="uid://prd8mxg0sp6a" path="res://Assets/grass/GrassMulti.fbx" id="2_mh1hw"]
 [ext_resource type="PackedScene" uid="uid://c6imdrouks1q5" path="res://Scripts/Inventory/UI/InventoryUI.tscn" id="4_0mvd2"]
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="4_jjvhh"]
 
@@ -73,7 +72,6 @@ height = 3.4350586
 
 [node name="Ground" type="CSGBox3D" parent="Environment" unique_id=1765339458]
 transform = Transform3D(159.46626, 0, 0, 0, 0.109848976, 0, 0, 0, 159.46626, 0, -0.03935182, 0)
-material = ExtResource("1_0klfc")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Environment" unique_id=743627005]
 transform = Transform3D(1, 0, 0, 0, 0.54976654, 0.8353183, 0, -0.8353183, 0.54976654, 0, 9.144337, 0)
@@ -108,7 +106,7 @@ script = ExtResource("4_jjvhh")
 
 [node name="Dullahan" parent="Player" unique_id=1619511346 instance=ExtResource("2_ebncj")]
 
-[node name="Skeleton3D" parent="Player/Dullahan/Armature" parent_id_path=PackedInt32Array(1619511346, 1662008127) index="0" unique_id=307294080]
+[node name="Skeleton3D" parent="Player/Dullahan/Armature" parent_id_path=PackedInt32Array(1619511346, 1401524788) index="0" unique_id=302325563]
 bones/1/position = Vector3(-5.6424843e-09, 1.3942643, -0.037368476)
 bones/1/rotation = Quaternion(-0.0133971935, 3.178366e-08, 1.5970703e-09, 0.9999103)
 bones/2/position = Vector3(2.054671e-15, 1.6272229, -6.3245636e-08)

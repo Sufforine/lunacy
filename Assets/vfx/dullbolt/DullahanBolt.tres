@@ -1,6 +1,6 @@
 [gd_resource type="VisualShader" format=3 uid="uid://btguor2qs2puy"]
 
-[ext_resource type="Texture2D" uid="uid://brt0gn0uu4vnj" path="res://assets/vfx/dullbolt/T_VFX_Noi55.png" id="1_uidc7"]
+[ext_resource type="Texture2D" uid="uid://brt0gn0uu4vnj" path="res://Assets/vfx/dullbolt/T_VFX_Noi55.png" id="1_uidc7"]
 
 [sub_resource type="VisualShaderNodeColorParameter" id="VisualShaderNodeColorParameter_g8q4u"]
 parameter_name = "Color"

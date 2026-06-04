@@ -1,8 +1,8 @@
 [gd_scene format=4 uid="uid://c5rrnybgbbgop"]
 
-[ext_resource type="PackedScene" uid="uid://daedx8s3tcpo0" path="res://assets/grass/polygrass1.glb" id="1_hnc57"]
-[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://assets/grass/grass.tres" id="2_aepgr"]
-[ext_resource type="PackedScene" uid="uid://c710q3l5hvbsl" path="res://assets/grass/polygrass2.glb" id="3_aepgr"]
+[ext_resource type="PackedScene" uid="uid://daedx8s3tcpo0" path="res://Assets/grass/polygrass1.glb" id="1_hnc57"]
+[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://Assets/grass/grass.tres" id="2_aepgr"]
+[ext_resource type="PackedScene" uid="uid://c710q3l5hvbsl" path="res://Assets/grass/polygrass2.glb" id="3_aepgr"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="4_abtqx"]
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_aepgr"]

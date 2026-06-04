@@ -1,6 +1,6 @@
 [gd_resource type="VisualShader" format=3 uid="uid://coaocvbangnou"]
 
-[ext_resource type="Texture2D" uid="uid://ha7e1kcka6s6" path="res://assets/vfx/dullbolt/lightningtrail.png" id="1_tgsdi"]
+[ext_resource type="Texture2D" uid="uid://ha7e1kcka6s6" path="res://Assets/vfx/dullbolt/lightningtrail.png" id="1_tgsdi"]
 
 [sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_75jl1"]
 output_port_for_preview = 0

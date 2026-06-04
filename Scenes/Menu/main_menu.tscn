@@ -1,9 +1,12 @@
 [gd_scene format=3 uid="uid://bowkf26i4v23c"]
 
-[ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://Scripts/MainMenu/main_menu.gd" id="1_l6cm7"]
-[ext_resource type="VideoStream" uid="uid://b04xmwuac0o1k" path="res://assets/video/IMG_6853.ogv" id="2_ekxnf"]
+[ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://Scripts/MainMenu/main_menu.gd" id="1_tself"]
+[ext_resource type="VideoStream" uid="uid://b04xmwuac0o1k" path="res://Assets/video/IMG_6853.ogv" id="2_7jtkx"]
 
 [sub_resource type="FontFile" id="FontFile_vue75"]
+subpixel_positioning = 0
+msdf_pixel_range = 14
+msdf_size = 128
 cache/0/variation_coordinates = {}
 cache/0/face_index = 0
 cache/0/embolden = 0.0
@@ -32,7 +35,7 @@ anchor_bottom = 1.0
 offset_right = 3.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1_l6cm7")
+script = ExtResource("1_tself")
 
 [node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="." unique_id=908214786]
 layout_mode = 1
@@ -41,7 +44,7 @@ offset_top = 5.0
 offset_right = 1537.0
 offset_bottom = 1285.0
 scale = Vector2(0.5, 0.5)
-stream = ExtResource("2_ekxnf")
+stream = ExtResource("2_7jtkx")
 autoplay = true
 loop = true
 

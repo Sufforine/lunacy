@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://gryq1yi4cl72"]
 
-[ext_resource type="ArrayMesh" uid="uid://cahxu6h6nt4v2" path="res://assets/vfx/dullbolt/projectile_mesh.obj" id="1_d3pb3"]
-[ext_resource type="Shader" uid="uid://btguor2qs2puy" path="res://assets/vfx/dullbolt/DullahanBolt.tres" id="2_nc4et"]
-[ext_resource type="Shader" uid="uid://c5vuvueaioewy" path="res://assets/vfx/centerball.tres" id="3_xouuc"]
-[ext_resource type="Shader" uid="uid://coaocvbangnou" path="res://assets/vfx/lighningtrail.tres" id="4_b5dbf"]
-[ext_resource type="Texture2D" uid="uid://sfdgied8h1y2" path="res://assets/vfx/dullbolt/T_VFX_basic1.PNG" id="5_tngxr"]
+[ext_resource type="ArrayMesh" uid="uid://dcvhcm5iynt56" path="res://Assets/vfx/dullbolt/projectile_mesh.obj" id="1_d3pb3"]
+[ext_resource type="Shader" uid="uid://btguor2qs2puy" path="res://Assets/vfx/dullbolt/DullahanBolt.tres" id="2_nc4et"]
+[ext_resource type="Shader" uid="uid://c5vuvueaioewy" path="res://Assets/vfx/centerball.tres" id="3_xouuc"]
+[ext_resource type="Shader" uid="uid://coaocvbangnou" path="res://Assets/vfx/lighningtrail.tres" id="4_b5dbf"]
+[ext_resource type="Texture2D" uid="uid://sfdgied8h1y2" path="res://Assets/vfx/dullbolt/T_VFX_basic1.PNG" id="5_tngxr"]
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0iclo"]
 

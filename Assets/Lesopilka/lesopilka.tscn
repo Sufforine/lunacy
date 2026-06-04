@@ -1,12 +1,12 @@
 [gd_scene format=4 uid="uid://7vr58h6cjnve"]
 
-[ext_resource type="Texture2D" uid="uid://cwmceaexaql1r" path="res://assets/Lesopilka/Lesopilka.png" id="1_64y4p"]
+[ext_resource type="Texture2D" uid="uid://xnw443lkaj68" path="res://Assets/Lesopilka/Lesopilka.png" id="1_64y4p"]
 [ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_1ej5l"]
-[ext_resource type="PackedScene" uid="uid://b8lie2a7lxctc" path="res://assets/Lesopilka/Test_Landscape.glb" id="3_kvuw5"]
-[ext_resource type="Material" uid="uid://dj8rs6kjrmlef" path="res://assets/materials/Stylized Dirt.material" id="4_8wduy"]
-[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://assets/grass/grass.tres" id="4_i8bit"]
-[ext_resource type="PackedScene" uid="uid://b7noapgqbs4wc" path="res://assets/grass/GrassMulti.fbx" id="5_64y4p"]
-[ext_resource type="Material" uid="uid://baw55o0rjh7cu" path="res://assets/materials/Mossy Dirt.material" id="5_qmv7n"]
+[ext_resource type="PackedScene" uid="uid://dso6ubmk7qxai" path="res://Assets/Lesopilka/Test_Landscape.glb" id="3_kvuw5"]
+[ext_resource type="Material" uid="uid://dj8rs6kjrmlef" path="res://Assets/materials/Stylized Dirt.material" id="4_8wduy"]
+[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://Assets/grass/grass.tres" id="4_i8bit"]
+[ext_resource type="PackedScene" uid="uid://prd8mxg0sp6a" path="res://Assets/grass/GrassMulti.fbx" id="5_64y4p"]
+[ext_resource type="Material" uid="uid://baw55o0rjh7cu" path="res://Assets/materials/Mossy Dirt.material" id="5_qmv7n"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1ej5l"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
