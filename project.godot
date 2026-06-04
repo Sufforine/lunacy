@@ -22,6 +22,8 @@ PlayerStorage="*res://Scripts/Player/player_storage.gd"
 
 [display]
 
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 window/subwindows/embed_subwindows=false
 
 [input]

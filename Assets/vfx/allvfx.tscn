@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://gryq1yi4cl72"]
 
-[ext_resource type="ArrayMesh" uid="uid://dcvhcm5iynt56" path="res://Assets/vfx/dullbolt/projectile_mesh.obj" id="1_d3pb3"]
+[ext_resource type="ArrayMesh" uid="uid://bd0sldejdqxd5" path="res://Assets/vfx/dullbolt/projectile_mesh.obj" id="1_d3pb3"]
 [ext_resource type="Shader" uid="uid://btguor2qs2puy" path="res://Assets/vfx/dullbolt/DullahanBolt.tres" id="2_nc4et"]
 [ext_resource type="Shader" uid="uid://c5vuvueaioewy" path="res://Assets/vfx/centerball.tres" id="3_xouuc"]
 [ext_resource type="Shader" uid="uid://coaocvbangnou" path="res://Assets/vfx/lighningtrail.tres" id="4_b5dbf"]
@@ -21,7 +21,7 @@ shader_parameter/Color = Color(1.0768309, 0.973359, 2.534755, 1)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gamkd"]
 render_priority = 0
 shader = ExtResource("3_xouuc")
-shader_parameter/ballcoloe = Color(0.72530675, 0.59027535, 1.2904384, 1)
+shader_parameter/ballcoloe = Color(0, 0, 0, 1)
 
 [sub_resource type="Gradient" id="Gradient_27jsu"]
 offsets = PackedFloat32Array(0, 0.3576555, 0.70454544, 0.8504785)
@@ -86,7 +86,7 @@ mesh = ExtResource("1_d3pb3")
 surface_material_override/0 = SubResource("ShaderMaterial_ehasq")
 
 [node name="Nut" type="MeshInstance3D" parent="Fire" unique_id=1665411913]
-transform = Transform3D(1.1, 0, 0, 0, 1.2, 0, 0, 0, 1.2, -5.9604645e-08, 4.0783157, 0.4172418)
+transform = Transform3D(2.0477967, 0, 0, 0, 2.0436163, 0, 0, 0, 2.0096362, -5.9604645e-08, 4.0783157, 0.30252242)
 mesh = SubResource("SphereMesh_cf0eh")
 surface_material_override/0 = SubResource("ShaderMaterial_gamkd")
 

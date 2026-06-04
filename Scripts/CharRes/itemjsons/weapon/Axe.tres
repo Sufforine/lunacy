@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://qjpn86egrf6x"]
+
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/ItemData.gd" id="1_u6cb8"]
+
+[resource]
+script = ExtResource("1_u6cb8")
+physical_damage = 30
+metadata/_custom_type_script = "uid://c77evqxqq52db"
