@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cs0c4pqfplg4y"]
 
 [ext_resource type="Script" uid="uid://4wcfqadoo037" path="res://Scenes/Hub/merchant.gd" id="1_d1od2"]
+[ext_resource type="Script" uid="uid://bb6is2srtxwux" path="res://Scenes/Hub/hub.gd" id="1_ul5bn"]
 [ext_resource type="Script" uid="uid://bg726yf0y54c7" path="res://Scenes/Hub/runouts.gd" id="2_d1od2"]
 [ext_resource type="Script" uid="uid://df8jmdao754ak" path="res://Scenes/Hub/shop.gd" id="3_w6xti"]
 
@@ -37,15 +38,12 @@ albedo_color = Color(1.1012864, 0, 0, 1)
 size = Vector3(1.9815979, 0.55422974, 1.2089844)
 
 [node name="Hub" type="Node3D" unique_id=1911428736]
+script = ExtResource("1_ul5bn")
 
 [node name="Ground" type="Node3D" parent="." unique_id=825151784]
 
-[node name="Camera3D" type="Camera3D" parent="Ground" unique_id=60326794]
-transform = Transform3D(1, 0, 0, 0, 0.34845752, 0.9373246, 0, -0.9373246, 0.34845752, 0, 4.5969715, 3.0657911)
-current = true
-
 [node name="CSGBox3D" type="CSGBox3D" parent="Ground" unique_id=619018719]
-transform = Transform3D(14.829965, 0, 0, 0, 3.8891134, 0, 0, 0, 12.353228, 0.61094046, -0.19225323, 0)
+transform = Transform3D(47.314545, 0, 0, 0, 3.8891134, 0, 0, 0, 51.660942, 0.61094046, -0.19225323, 0)
 size = Vector3(1.3204346, 0.030822754, 1)
 material = SubResource("StandardMaterial3D_qssp3")
 

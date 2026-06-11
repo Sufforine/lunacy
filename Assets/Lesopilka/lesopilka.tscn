@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://xnw443lkaj68" path="res://Assets/Lesopilka/Lesopilka.png" id="1_64y4p"]
 [ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_1ej5l"]
-[ext_resource type="PackedScene" uid="uid://dso6ubmk7qxai" path="res://Assets/Lesopilka/Test_Landscape.glb" id="3_kvuw5"]
+[ext_resource type="PackedScene" uid="uid://dwk07ux4carcs" path="res://Assets/Lesopilka/Test_Landscape.glb" id="3_kvuw5"]
 [ext_resource type="Material" uid="uid://dj8rs6kjrmlef" path="res://Assets/materials/Stylized Dirt.material" id="4_8wduy"]
 [ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://Assets/grass/grass.tres" id="4_i8bit"]
 [ext_resource type="PackedScene" uid="uid://prd8mxg0sp6a" path="res://Assets/grass/GrassMulti.fbx" id="5_64y4p"]
@@ -93,19 +93,22 @@ mesh = SubResource("PlaneMesh_4cjy7")
 surface_material_override/0 = SubResource("StandardMaterial3D_06ffw")
 
 [node name="animsDull" parent="." unique_id=2855980 instance=ExtResource("2_1ej5l")]
-transform = Transform3D(5.2907243, 0, 0, 0, 1.0000006, 0, 0, 0, 5.571008, 0.7900242, 0, 5.082899)
+transform = Transform3D(9.524, 0, 0, 0, 1.8, 0, 0, 0, 10.028, 0.7900242, 0, 5.082899)
 
 [node name="Test_Landscape" parent="." unique_id=1114749865 instance=ExtResource("3_kvuw5")]
 transform = Transform3D(15.2778635, 0, 0, 0, 1.0000006, 0, 0, 0, 16.08723, 14.243141, 0, 4.6206117)
 
-[node name="Ground" parent="Test_Landscape" index="0" unique_id=1404010860]
+[node name="Ground" parent="Test_Landscape" index="0" unique_id=2078561279]
 transform = Transform3D(13.4795885, 0, 0, 0, 7.0338206, 0, 0, 0, 13.4795885, 0, 0, 0)
 surface_material_override/0 = ExtResource("4_8wduy")
 
-[node name="GrassLayer" parent="Test_Landscape" index="1" unique_id=79671566]
+[node name="GrassLayer" parent="Test_Landscape" index="1" unique_id=497608370]
 transform = Transform3D(7.0338206, 0, 0, 0, 7.0338206, 0, 0, 0, 7.0338206, -0.0329808, 0.13504982, -0.006232053)
 visible = false
 surface_material_override/0 = ExtResource("5_qmv7n")
+
+[node name="stairs" parent="Test_Landscape" index="2" unique_id=922534715]
+visible = false
 
 [node name="MultiMeshInstance3D" type="MultiMeshInstance3D" parent="Test_Landscape" unique_id=145240760]
 material_override = SubResource("ShaderMaterial_kvuw5")

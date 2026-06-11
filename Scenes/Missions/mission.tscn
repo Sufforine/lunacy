@@ -91,7 +91,7 @@ cast_shadow = 0
 multimesh = SubResource("MultiMesh_0klfc")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Environment" unique_id=76985009]
-transform = Transform3D(54.231747, 0, 0, 0, 1.0000014, 0, 0, 0, 57.23439, 0, 0, 0)
+transform = Transform3D(54.231747, 0, 0, 0, 1.0000014, 0, 0, 0, 57.23439, 149.51053, 7.6293945e-06, 20.389313)
 mesh = SubResource("PlaneMesh_mh1hw")
 
 [node name="GrassMulti" parent="Environment" unique_id=1726105993 instance=ExtResource("2_mh1hw")]

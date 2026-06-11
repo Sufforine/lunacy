@@ -7,14 +7,14 @@
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/ComponentStat.gd" id="5_qkcry"]
 [ext_resource type="Resource" uid="uid://qjpn86egrf6x" path="res://Scripts/CharRes/itemjsons/weapon/Axe.tres" id="6_thwtu"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/StatsComponent.gd" id="6_u5hdh"]
-[ext_resource type="Resource" uid="uid://duor5eblnert3" path="res://Scripts/CharRes/itemjsons/armor/DullahanCoat.tres" id="7_5d23u"]
-[ext_resource type="Resource" uid="uid://dica1x1bt5brk" path="res://Scripts/CharRes/itemjsons/trinkets/HealthCharm.tres" id="9_jwtc4"]
+[ext_resource type="Resource" uid="uid://h4fwpvqylkmb" path="res://Scripts/CharRes/itemjsons/trinkets/SpeedCharm.tres" id="7_thwtu"]
+[ext_resource type="Resource" uid="uid://bi1h5li2pa2x2" path="res://Scripts/CharRes/itemjsons/trinkets/DamageCharm.tres" id="9_xfaeu"]
 [ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://Scripts/CharRes/jsons/Dullahan.tres" id="11_5d23u"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 height = 3.4350586
 
-[node name="Player" type="CharacterBody3D" unique_id=1543238751]
+[node name="Dullahan" type="CharacterBody3D" unique_id=1543238751]
 script = ExtResource("1_7b1e3")
 
 [node name="Dullahan" parent="." unique_id=744316227 instance=ExtResource("2_ywgea")]
@@ -176,9 +176,8 @@ layout_side = 1
 [node name="EquipmentComponent" type="Node" parent="." unique_id=1759406755]
 script = ExtResource("5_qkcry")
 weapon = ExtResource("6_thwtu")
-armor = ExtResource("7_5d23u")
-trinket_1 = ExtResource("9_jwtc4")
-trinket_2 = ExtResource("9_jwtc4")
+armor = ExtResource("7_thwtu")
+trinket_2 = ExtResource("9_xfaeu")
 metadata/_custom_type_script = "uid://djbdlfj35305n"
 
 [node name="StatsComponent" type="Node" parent="." unique_id=2121796577]
