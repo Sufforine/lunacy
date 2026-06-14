@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" format=3 uid="uid://cqpxkun3n21o0"]
+[gd_resource type="VisualShader" load_steps=22 format=3 uid="uid://cqpxkun3n21o0"]
 
 [sub_resource type="VisualShaderNodeVectorCompose" id="VisualShaderNodeVectorCompose_rbryy"]
 default_input_values = [0, 0.0, 1, 1.0, 2, 0.0]
@@ -74,6 +74,119 @@ source = 5
 operator = 2
 
 [resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_disabled, diffuse_toon, specular_schlick_ggx;
+
+uniform sampler2D WindNoise;
+uniform vec4 BaseColor : source_color = vec4(0.054574, 0.054574, 0.054574, 1.000000);
+uniform vec4 GrassColor : source_color = vec4(0.396078, 0.650980, 0.211765, 1.000000);
+
+
+
+void vertex() {
+// Input:5
+	vec3 n_out5p0 = VERTEX;
+
+
+// Input:12
+	vec3 n_out12p0 = NODE_POSITION_WORLD;
+
+
+// VectorDecompose:13
+	float n_out13p0 = n_out12p0.x;
+	float n_out13p1 = n_out12p0.y;
+	float n_out13p2 = n_out12p0.z;
+
+
+// VectorCompose:14
+	vec2 n_out14p0 = vec2(n_out13p0, n_out13p2);
+
+
+// Input:11
+	float n_out11p0 = TIME;
+
+
+// VectorOp:15
+	vec2 n_out15p0 = n_out14p0 + vec2(n_out11p0);
+
+
+// UVFunc:10
+	vec2 n_in10p1 = vec2(0.10000, 0.10000);
+	vec2 n_out10p0 = n_out15p0 * n_in10p1 + UV;
+
+
+	vec4 n_out8p0;
+// Texture2D:8
+	n_out8p0 = texture(WindNoise, n_out10p0);
+
+
+// Input:2
+	vec2 n_out2p0 = UV;
+
+
+// VectorDecompose:3
+	float n_out3p0 = n_out2p0.x;
+	float n_out3p1 = n_out2p0.y;
+
+
+// FloatFunc:16
+	float n_out16p0 = 1.0 - n_out3p1;
+
+
+// VectorOp:9
+	vec3 n_out9p0 = vec3(n_out8p0.xyz) * vec3(n_out16p0);
+
+
+// VectorOp:6
+	vec3 n_out6p0 = n_out5p0 + n_out9p0;
+
+
+// Output:0
+	VERTEX = n_out6p0;
+
+
+}
+
+void fragment() {
+// ColorParameter:7
+	vec4 n_out7p0 = BaseColor;
+
+
+// ColorParameter:8
+	vec4 n_out8p0 = GrassColor;
+
+
+// Input:3
+	vec2 n_out3p0 = UV;
+
+
+// VectorDecompose:4
+	float n_out4p0 = n_out3p0.x;
+	float n_out4p1 = n_out3p0.y;
+
+
+// FloatFunc:5
+	float n_out5p0 = 1.0 - n_out4p1;
+
+
+// Mix:6
+	vec3 n_out6p0 = mix(vec3(n_out7p0.xyz), vec3(n_out8p0.xyz), vec3(n_out5p0));
+
+
+// VectorCompose:2
+	float n_in2p0 = 0.00000;
+	float n_in2p1 = 1.00000;
+	float n_in2p2 = 0.00000;
+	vec3 n_out2p0 = vec3(n_in2p0, n_in2p1, n_in2p2);
+
+
+// Output:0
+	ALBEDO = n_out6p0;
+	NORMAL = n_out2p0;
+
+
+}
+"
 modes/cull = 2
 modes/diffuse = 3
 preview_params/WindNoise = "Object(NoiseTexture2D,\"resource_local_to_scene\":false,\"resource_name\":\"\",\"width\":512,\"height\":512,\"generate_mipmaps\":true,\"noise\":Object(FastNoiseLite,\"resource_local_to_scene\":false,\"resource_name\":\"\",\"noise_type\":1,\"seed\":0,\"frequency\":0.01,\"offset\":Vector3(0, 0, 0),\"fractal_type\":1,\"fractal_octaves\":5,\"fractal_lacunarity\":2.0,\"fractal_gain\":0.5,\"fractal_weighted_strength\":0.0,\"fractal_ping_pong_strength\":2.0,\"cellular_distance_function\":0,\"cellular_jitter\":1.0,\"cellular_return_type\":1,\"domain_warp_enabled\":false,\"domain_warp_type\":0,\"domain_warp_amplitude\":30.0,\"domain_warp_frequency\":0.05,\"domain_warp_fractal_type\":1,\"domain_warp_fractal_octaves\":5,\"domain_warp_fractal_lacunarity\":6.0,\"domain_warp_fractal_gain\":0.5,\"script\":null)

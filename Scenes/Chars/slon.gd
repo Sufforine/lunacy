@@ -1,36 +1,23 @@
 extends CharacterBody3D
-class_name Player
+class_name Slon
 
 @export var ease_speed: float = 5.0
 
 @onready var camera_rig = $CameraRig
-@onready var dullahan: Node3D = $Dullahan
-@onready var animation_player: AnimationPlayer = $Dullahan/AnimationPlayer
+#@onready var dullahan: Node3D = $Slon
+#@onready var animation_player: AnimationPlayer = $Dullahan/AnimationPlayer
 
 @onready var stats: StatsComponent = $StatsComponent
 @onready var stats_label: Label = $CanvasLayer/StatsLabel
 
 
-func _enter_tree():
-	set_multiplayer_authority(name.to_int())
-	
 
-enum AnimationState {
-	IDLE,
-	WALK
-}
 
-var animation_state: AnimationState = AnimationState.IDLE
 
 
 func _process(_delta: float) -> void:
 
-#	match animation_state:
-		#AnimationState.IDLE:
-		#	animation_player.play("Armature|idle")
 
-		#AnimationState.WALK:
-		#	animation_player.play("Armature|run_f")
 
 	stats_label.text = \
 		"HP: " + str(stats.get_stat("health")) + "\n" + \
@@ -48,9 +35,6 @@ func _process(_delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	_handle_movement()
 	_handle_rotation(delta)
-	
-	if !is_multiplayer_authority():
-		return
 
 
 func _handle_movement() -> void:
@@ -64,10 +48,7 @@ func _handle_movement() -> void:
 	velocity.x = velocity_vector.x
 	velocity.z = velocity_vector.z
 
-	if input_dir.length() > 0:
-		animation_state = AnimationState.WALK
-	else:
-		animation_state = AnimationState.IDLE
+
 
 	move_and_slide()
 

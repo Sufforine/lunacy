@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://cs0c4pqfplg4y"]
+[gd_scene load_steps=15 format=3 uid="uid://cs0c4pqfplg4y"]
 
 [ext_resource type="Script" uid="uid://4wcfqadoo037" path="res://Scenes/Hub/merchant.gd" id="1_d1od2"]
-[ext_resource type="Script" uid="uid://bb6is2srtxwux" path="res://Scenes/Hub/hub.gd" id="1_ul5bn"]
 [ext_resource type="Script" uid="uid://bg726yf0y54c7" path="res://Scenes/Hub/runouts.gd" id="2_d1od2"]
 [ext_resource type="Script" uid="uid://df8jmdao754ak" path="res://Scenes/Hub/shop.gd" id="3_w6xti"]
+[ext_resource type="PackedScene" uid="uid://by00rv04vp2h0" path="res://Scenes/Menu/character_select.tscn" id="5_ami6s"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qssp3"]
 albedo_color = Color(0.28985527, 0.41622728, 0.27746338, 1)
@@ -37,89 +37,97 @@ albedo_color = Color(1.1012864, 0, 0, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_bfqb0"]
 size = Vector3(1.9815979, 0.55422974, 1.2089844)
 
-[node name="Hub" type="Node3D" unique_id=1911428736]
-script = ExtResource("1_ul5bn")
+[node name="Hub" type="Node3D"]
 
-[node name="Ground" type="Node3D" parent="." unique_id=825151784]
+[node name="Ground" type="Node3D" parent="."]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="Ground" unique_id=619018719]
+[node name="CSGBox3D" type="CSGBox3D" parent="Ground"]
 transform = Transform3D(47.314545, 0, 0, 0, 3.8891134, 0, 0, 0, 51.660942, 0.61094046, -0.19225323, 0)
 size = Vector3(1.3204346, 0.030822754, 1)
 material = SubResource("StandardMaterial3D_qssp3")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Ground" unique_id=63609339]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Ground"]
 transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
 light_color = Color(0.76558864, 0.72944033, 0.548492, 1)
 shadow_enabled = true
 
-[node name="Merchant" type="StaticBody3D" parent="." unique_id=1777797438]
+[node name="Merchant" type="StaticBody3D" parent="."]
 script = ExtResource("1_d1od2")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant" unique_id=962645088]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
 shape = SubResource("BoxShape3D_qssp3")
 
-[node name="CSGBox3D" type="CSGBox3D" parent="Merchant" unique_id=1244990541]
+[node name="CSGBox3D" type="CSGBox3D" parent="Merchant"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
 material = SubResource("StandardMaterial3D_hcxm3")
 
-[node name="GlowRing" type="MeshInstance3D" parent="Merchant" unique_id=1490451642]
+[node name="GlowRing" type="MeshInstance3D" parent="Merchant"]
 transform = Transform3D(2.5485697, 0, 0, 0, 0.010874152, 0, 0, 0, 2.537507, 0, 0, 0)
 mesh = SubResource("CylinderMesh_qssp3")
 surface_material_override/0 = SubResource("StandardMaterial3D_d1od2")
 
-[node name="Area3D" type="Area3D" parent="Merchant" unique_id=1426996179]
+[node name="Area3D" type="Area3D" parent="Merchant"]
 input_capture_on_drag = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant/Area3D" unique_id=1976103615]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant/Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
 shape = SubResource("BoxShape3D_hcxm3")
 
-[node name="runouts" type="StaticBody3D" parent="." unique_id=1688305351]
+[node name="runouts" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3989148, 0, 0)
 script = ExtResource("2_d1od2")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="runouts" unique_id=357602585]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="runouts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
 shape = SubResource("BoxShape3D_qssp3")
 
-[node name="CSGBox3D" type="CSGBox3D" parent="runouts" unique_id=1568500255]
+[node name="CSGBox3D" type="CSGBox3D" parent="runouts"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
 material = SubResource("StandardMaterial3D_w6xti")
 
-[node name="GlowRing" type="MeshInstance3D" parent="runouts" unique_id=884700525]
+[node name="GlowRing" type="MeshInstance3D" parent="runouts"]
 transform = Transform3D(2.5485697, 0, 0, 0, 0.010874152, 0, 0, 0, 2.537507, 0, 0, 0)
 mesh = SubResource("CylinderMesh_qssp3")
 surface_material_override/0 = SubResource("StandardMaterial3D_d1od2")
 
-[node name="Area3D" type="Area3D" parent="runouts" unique_id=1124535455]
+[node name="Area3D" type="Area3D" parent="runouts"]
 input_capture_on_drag = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="runouts/Area3D" unique_id=95793132]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="runouts/Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
 shape = SubResource("BoxShape3D_hcxm3")
 
-[node name="Shop" type="StaticBody3D" parent="." unique_id=1326832413]
+[node name="Shop" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.921526, 0, -2.0107474)
 script = ExtResource("3_w6xti")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop" unique_id=748959407]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.032945156, 0.38234925, 0)
 shape = SubResource("BoxShape3D_d1od2")
 
-[node name="CSGBox3D" type="CSGBox3D" parent="Shop" unique_id=1704275935]
+[node name="CSGBox3D" type="CSGBox3D" parent="Shop"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.03112793, 0.38247132, 0)
 size = Vector3(1.8430176, 0.40478516, 1)
 material = SubResource("StandardMaterial3D_7wvbm")
 
-[node name="GlowRing" type="MeshInstance3D" parent="Shop" unique_id=224891096]
+[node name="GlowRing" type="MeshInstance3D" parent="Shop"]
 transform = Transform3D(3, 0, 0, 0, 0.013, 0, 0, 0, 2.987, 0, 0, 0)
 mesh = SubResource("CylinderMesh_qssp3")
 surface_material_override/0 = SubResource("StandardMaterial3D_d1od2")
 
-[node name="Area3D" type="Area3D" parent="Shop" unique_id=1750650747]
+[node name="Area3D" type="Area3D" parent="Shop"]
 input_capture_on_drag = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop/Area3D" unique_id=1077910719]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Shop/Area3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.044021606, 0.38154054, 0)
 shape = SubResource("BoxShape3D_bfqb0")
+
+[node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("..")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="CharacterSelect" parent="CanvasLayer" instance=ExtResource("5_ami6s")]
+offset_right = -1507.0
+offset_bottom = -652.0

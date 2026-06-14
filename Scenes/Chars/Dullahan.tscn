@@ -1,12 +1,12 @@
-[gd_scene format=3 uid="uid://c72rgvrvlejj0"]
+[gd_scene load_steps=13 format=3 uid="uid://c72rgvrvlejj0"]
 
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="1_7b1e3"]
 [ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_ywgea"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="3_qkcry"]
 [ext_resource type="PackedScene" uid="uid://c6imdrouks1q5" path="res://Scripts/Inventory/UI/InventoryUI.tscn" id="4_u5hdh"]
-[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/ComponentStat.gd" id="5_qkcry"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/ComponentStat.gd" id="5_qkcry"]
 [ext_resource type="Resource" uid="uid://qjpn86egrf6x" path="res://Scripts/CharRes/itemjsons/weapon/Axe.tres" id="6_thwtu"]
-[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/StatsComponent.gd" id="6_u5hdh"]
+[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="6_u5hdh"]
 [ext_resource type="Resource" uid="uid://h4fwpvqylkmb" path="res://Scripts/CharRes/itemjsons/trinkets/SpeedCharm.tres" id="7_thwtu"]
 [ext_resource type="Resource" uid="uid://bi1h5li2pa2x2" path="res://Scripts/CharRes/itemjsons/trinkets/DamageCharm.tres" id="9_xfaeu"]
 [ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://Scripts/CharRes/jsons/Dullahan.tres" id="11_5d23u"]
@@ -14,12 +14,17 @@
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 height = 3.4350586
 
-[node name="Dullahan" type="CharacterBody3D" unique_id=1543238751]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_thwtu"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="Dullahan" type="CharacterBody3D"]
 script = ExtResource("1_7b1e3")
 
-[node name="Dullahan" parent="." unique_id=744316227 instance=ExtResource("2_ywgea")]
+[node name="Dullahan" parent="." instance=ExtResource("2_ywgea")]
 
-[node name="Skeleton3D" parent="Dullahan/Armature" parent_id_path=PackedInt32Array(744316227, 742241344) index="0" unique_id=868098719]
+[node name="Skeleton3D" parent="Dullahan/Armature" index="0"]
 bones/1/position = Vector3(-5.6424843e-09, 1.3942643, -0.037368476)
 bones/1/rotation = Quaternion(-0.0133971935, 3.178366e-08, 1.5970703e-09, 0.9999103)
 bones/2/position = Vector3(2.054671e-15, 1.6272229, -6.3245636e-08)
@@ -155,14 +160,14 @@ bones/59/position = Vector3(3.4058212e-07, 1.8338844, -1.442677e-07)
 bones/59/rotation = Quaternion(-5.9603735e-05, -6.879122e-08, 0.003235534, 0.99999475)
 bones/59/scale = Vector3(1.0000001, 1, 1)
 
-[node name="Collision" type="CollisionShape3D" parent="." unique_id=611547556]
+[node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 2.0564578, 0.014858723)
 shape = SubResource("CapsuleShape3D_g75yn")
 
-[node name="CameraRig" parent="." unique_id=985392794 node_paths=PackedStringArray("player") instance=ExtResource("3_qkcry")]
+[node name="CameraRig" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_qkcry")]
 player = NodePath("..")
 
-[node name="InventoryUi" parent="." unique_id=309938120 instance=ExtResource("4_u5hdh")]
+[node name="InventoryUi" parent="." instance=ExtResource("4_u5hdh")]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -173,23 +178,26 @@ grow_vertical = 0
 columns = 2
 layout_side = 1
 
-[node name="EquipmentComponent" type="Node" parent="." unique_id=1759406755]
+[node name="EquipmentComponent" type="Node" parent="."]
 script = ExtResource("5_qkcry")
 weapon = ExtResource("6_thwtu")
 armor = ExtResource("7_thwtu")
 trinket_2 = ExtResource("9_xfaeu")
 metadata/_custom_type_script = "uid://djbdlfj35305n"
 
-[node name="StatsComponent" type="Node" parent="." unique_id=2121796577]
+[node name="StatsComponent" type="Node" parent="."]
 script = ExtResource("6_u5hdh")
 base_stats = ExtResource("11_5d23u")
 metadata/_custom_type_script = "uid://6u724dpa4ia2"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1440409389]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="StatsLabel" type="Label" parent="CanvasLayer" unique_id=867355603]
+[node name="StatsLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 23.0
 metadata/_edit_use_anchors_ = true
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_thwtu")
 
 [editable path="Dullahan"]

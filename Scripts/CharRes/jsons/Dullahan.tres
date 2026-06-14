@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="HeroStat" format=3 uid="uid://cctlboe5gxkyn"]
 
-[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/HeroStat.gd" id="1_tauoo"]
+[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/components/HeroStat.gd" id="1_tauoo"]
 
 [resource]
 script = ExtResource("1_tauoo")

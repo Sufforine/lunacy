@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://bi4c5nkadivvh"]
+[gd_scene load_steps=9 format=3 uid="uid://bi4c5nkadivvh"]
 
-[ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="1_nqh3e"]
-[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/ComponentStat.gd" id="3_4o0kv"]
-[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/StatsComponent.gd" id="4_miqe7"]
-[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/HeroStat.gd" id="5_4o0kv"]
+[ext_resource type="Script" uid="uid://b3vr157yiarav" path="res://Scenes/Chars/slon.gd" id="1_4o0kv"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/ComponentStat.gd" id="3_4o0kv"]
+[ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="4_gh6cj"]
+[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="4_miqe7"]
+[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/components/HeroStat.gd" id="5_4o0kv"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_h8stw"]
 
@@ -13,33 +14,31 @@
 script = ExtResource("5_4o0kv")
 metadata/_custom_type_script = "uid://bl1a2yvhckgo4"
 
-[node name="Slon" type="CharacterBody3D" unique_id=1790989362]
-script = ExtResource("1_nqh3e")
-metadata/_custom_type_script = "uid://ifo3cnqiqti7"
+[node name="Slon" type="CharacterBody3D"]
+script = ExtResource("1_4o0kv")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=223685879]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 2.309445, 0, 0, 0, 1, 0, 1.0505399, 0)
 mesh = SubResource("BoxMesh_h8stw")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2020400861]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8883058, 0)
 shape = SubResource("CapsuleShape3D_nqh3e")
 
-[node name="EquipmentComponent" type="Node" parent="." unique_id=1424578293]
+[node name="EquipmentComponent" type="Node" parent="."]
 script = ExtResource("3_4o0kv")
 metadata/_custom_type_script = "uid://djbdlfj35305n"
 
-[node name="StatsComponent" type="Node" parent="." unique_id=1317304111]
+[node name="StatsComponent" type="Node" parent="."]
 script = ExtResource("4_miqe7")
 base_stats = SubResource("Resource_miqe7")
 metadata/_custom_type_script = "uid://6u724dpa4ia2"
 
-[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1926925788]
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="StatsLabel" type="Label" parent="CanvasLayer" unique_id=1957119638]
+[node name="StatsLabel" type="Label" parent="CanvasLayer"]
 offset_right = 40.0
 offset_bottom = 23.0
 metadata/_edit_use_anchors_ = true
 
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1418549587]
-transform = Transform3D(-0.0066845356, 0.87611043, -0.482064, 0, 0.4820748, 0.87613004, 0.99997765, 0.0058565224, -0.0032224462, -5.7463923, 14.0014515, 0)
+[node name="CameraRig" parent="." instance=ExtResource("4_gh6cj")]

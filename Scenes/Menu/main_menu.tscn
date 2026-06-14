@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://bowkf26i4v23c"]
+[gd_scene load_steps=4 format=3 uid="uid://bowkf26i4v23c"]
 
 [ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://Scripts/MainMenu/main_menu.gd" id="1_tself"]
 [ext_resource type="VideoStream" uid="uid://b04xmwuac0o1k" path="res://Assets/video/IMG_6853.ogv" id="2_7jtkx"]
@@ -7,15 +7,6 @@
 subpixel_positioning = 0
 msdf_pixel_range = 14
 msdf_size = 128
-cache/0/variation_coordinates = {}
-cache/0/face_index = 0
-cache/0/embolden = 0.0
-cache/0/transform = Transform2D(1, 0, 0, 1, 0, 0)
-cache/0/spacing_top = 0
-cache/0/spacing_bottom = 0
-cache/0/spacing_space = 0
-cache/0/spacing_glyph = 0
-cache/0/baseline_offset = 0.0
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
 cache/0/16/0/underline_position = 0.0
@@ -27,7 +18,7 @@ cache/0/50/0/underline_position = 0.0
 cache/0/50/0/underline_thickness = 0.0
 cache/0/50/0/scale = 1.0
 
-[node name="Main_Menu" type="Control" unique_id=330657710]
+[node name="Main_Menu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -37,7 +28,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_tself")
 
-[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="." unique_id=908214786]
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
 layout_mode = 1
 offset_left = 257.0
 offset_top = 5.0
@@ -48,7 +39,7 @@ stream = ExtResource("2_7jtkx")
 autoplay = true
 loop = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1153336140]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -62,19 +53,19 @@ offset_bottom = 80.6371
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Start" type="Button" parent="VBoxContainer" unique_id=638077575]
+[node name="Start" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Start game"
 
-[node name="Options" type="Button" parent="VBoxContainer" unique_id=454955286]
+[node name="Options" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Options"
 
-[node name="Exit" type="Button" parent="VBoxContainer" unique_id=1931846576]
+[node name="Exit" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 text = "Exit"
 
-[node name="Label" type="Label" parent="." unique_id=985789367]
+[node name="Label" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
@@ -93,7 +84,7 @@ text = "Lunacy"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="debug" type="Button" parent="." unique_id=1329413541]
+[node name="debug" type="Button" parent="."]
 layout_mode = 0
 offset_left = 296.0
 offset_top = 247.0

@@ -6,5 +6,5 @@ func _on_debug_pressed() -> void:
 
 
 func _on_start_pressed() -> void:
-		get_tree().change_scene_to_file("res://Scenes/Menu/character_select.tscn") # Replace with function body.
+		get_tree().change_scene_to_file("res://Scenes/Hub/hub.tscn") # Replace with function body.
  # Replace with function body.

@@ -1,7 +1,6 @@
 extends Control
 
 @onready var character_selection_box = $VBoxContainer/HBoxContainer
-
 func _input(event):
 	if event is InputEventMouseButton && event.button_index == 1 && event.is_pressed():
 		var charNode = _get_char_node()
@@ -22,9 +21,3 @@ func _set_char_selected(charNode):
 	for node in character_selection_box.get_children():
 		var isSelected = charNode == node
 		node.set_selected(isSelected)
-
-
-func _on_select_pressed() -> void:
-	if not GlobalData.playerCharPath: return
-	
-	get_tree().change_scene_to_file("res://Scenes/Hub/hub.tscn")

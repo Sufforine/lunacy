@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Lunacy"
 run/main_scene="uid://bowkf26i4v23c"
-config/features=PackedStringArray("4.6", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 
 [autoload]
 
@@ -26,6 +26,14 @@ GlobalData="*uid://cybmg38mhgqvy"
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/subwindows/embed_subwindows=false
+
+[file_customization]
+
+folder_colors={
+"res://Scripts/CharRes/jsons/": "red",
+"res://Scripts/MainMenu/": "green",
+"res://Scripts/Netcons/": "blue"
+}
 
 [input]
 

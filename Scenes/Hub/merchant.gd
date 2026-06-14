@@ -38,4 +38,4 @@ func _on_mouse_exited():
 
 func _on_input_event(camera, event, position, normal, shape_idx):
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
-		get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+		get_tree().change_scene_to_file("res://Scenes/Menu/character_select.tscn")
