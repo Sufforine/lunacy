@@ -4,10 +4,10 @@ class_name SellCard
 @export var card_frame: TextureRect
 
 ## Set by Shop after instantiate — the inventory that receives purchases.
-var inventory: Inventory
+#var inventory: Inventory
 
 ## World/stack item this card sells; passed to Inventory.add_item (that call frees it).
-@onready var item_to_sell: Item = $Item
+#@onready var item_to_sell: Item = $Item
 
 var hovering: bool
 

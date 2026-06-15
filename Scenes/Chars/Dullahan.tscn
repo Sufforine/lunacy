@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="1_7b1e3"]
 [ext_resource type="PackedScene" uid="uid://crm16gox67iu4" path="res://Scripts/Player/animsDull.fbx" id="2_ywgea"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="3_qkcry"]
-[ext_resource type="PackedScene" uid="uid://c6imdrouks1q5" path="res://Scripts/Inventory/UI/InventoryUI.tscn" id="4_u5hdh"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/EquipmentComponent.gd" id="5_qkcry"]
 [ext_resource type="Resource" uid="uid://qjpn86egrf6x" path="res://Scripts/CharRes/itemjsons/weapon/Axe.tres" id="6_thwtu"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="6_u5hdh"]
@@ -11,6 +10,7 @@
 [ext_resource type="Resource" uid="uid://h4fwpvqylkmb" path="res://Scripts/CharRes/itemjsons/trinkets/SpeedCharm.tres" id="7_thwtu"]
 [ext_resource type="Resource" uid="uid://bi1h5li2pa2x2" path="res://Scripts/CharRes/itemjsons/trinkets/DamageCharm.tres" id="9_xfaeu"]
 [ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://Scripts/CharRes/jsons/Dullahan.tres" id="11_5d23u"]
+[ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://Scripts/CharRes/components/InventoryComponent.gd" id="11_xfaeu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 height = 3.4350586
@@ -168,17 +168,6 @@ shape = SubResource("CapsuleShape3D_g75yn")
 [node name="CameraRig" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_qkcry")]
 player = NodePath("..")
 
-[node name="InventoryUi" parent="." instance=ExtResource("4_u5hdh")]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 0
-grow_vertical = 0
-columns = 2
-layout_side = 1
-
 [node name="EquipmentComponent" type="Node" parent="."]
 script = ExtResource("5_qkcry")
 weapon = ExtResource("6_thwtu")
@@ -191,6 +180,9 @@ metadata/_custom_type_script = "uid://djbdlfj35305n"
 script = ExtResource("6_u5hdh")
 base_stats = ExtResource("11_5d23u")
 metadata/_custom_type_script = "uid://6u724dpa4ia2"
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("11_xfaeu")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 

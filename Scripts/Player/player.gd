@@ -10,14 +10,17 @@ class_name Player
 @onready var stats : StatsComponent = $StatsComponent
 @onready var equipment : EquipmentComponent = $EquipmentComponent
 @onready var stats_label: Label = $CanvasLayer/StatsLabel
+@onready var inventory: InventoryComponent = $InventoryComponent
 
 func _ready():
 	load_profile_equipment()
 	equipment.load_from_profile()
+	inventory.set_data(PlayerProfile.inventory)
 
 	stats.current_health = stats.get_stat("health")
 
 	stats.current_mana = stats.get_stat("mana")
+	print(inventory)
 
 func load_profile_equipment():
 	pass
@@ -117,3 +120,34 @@ func _handle_rotation(delta: float) -> void:
 			target_rot_y,
 			1.0 - pow(0.001, delta * ease_speed)
 		)
+		
+func _input(event):
+
+	if event is InputEventKey and event.pressed:
+
+		match event.keycode:
+
+			KEY_1:
+				inventory.use_item(0, self)
+
+			KEY_2:
+				inventory.use_item(1, self)
+
+			KEY_3:
+				inventory.use_item(2, self)
+
+			KEY_4:
+				inventory.use_item(3, self)
+
+			KEY_5:
+				inventory.use_item(4, self)
+
+			KEY_6:
+				inventory.use_item(5, self)
+				
+func save_inventory():
+	PlayerProfile.inventory = inventory.get_data()
+	SaveManager.save_profile()
+	
+func load_inventory(inv: InventoryComponent):
+	inv.set_data(PlayerProfile.inventory)
