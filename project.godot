@@ -19,7 +19,8 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 GlobalRefs="*uid://b6atbsuox4481"
 InputManager="*uid://syrhs8bs5ts4"
 PlayerStorage="*res://Scripts/Player/player_storage.gd"
-GlobalData="*uid://cybmg38mhgqvy"
+SaveManager="*res://Scripts/Netcons/globals/SaveManager.gd"
+PlayerProfile="*res://Scripts/Netcons/globals/PlayerProfile.gd"
 
 [display]
 
@@ -30,6 +31,7 @@ window/subwindows/embed_subwindows=false
 [file_customization]
 
 folder_colors={
+"res://Scripts/CharRes/itemjsons/": "purple",
 "res://Scripts/CharRes/jsons/": "red",
 "res://Scripts/MainMenu/": "green",
 "res://Scripts/Netcons/": "blue"

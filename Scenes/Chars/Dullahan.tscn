@@ -1,12 +1,13 @@
-[gd_scene load_steps=13 format=3 uid="uid://c72rgvrvlejj0"]
+[gd_scene load_steps=14 format=3 uid="uid://c72rgvrvlejj0"]
 
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="1_7b1e3"]
-[ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_ywgea"]
+[ext_resource type="PackedScene" uid="uid://crm16gox67iu4" path="res://Scripts/Player/animsDull.fbx" id="2_ywgea"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="3_qkcry"]
 [ext_resource type="PackedScene" uid="uid://c6imdrouks1q5" path="res://Scripts/Inventory/UI/InventoryUI.tscn" id="4_u5hdh"]
-[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/ComponentStat.gd" id="5_qkcry"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/EquipmentComponent.gd" id="5_qkcry"]
 [ext_resource type="Resource" uid="uid://qjpn86egrf6x" path="res://Scripts/CharRes/itemjsons/weapon/Axe.tres" id="6_thwtu"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="6_u5hdh"]
+[ext_resource type="Resource" uid="uid://duor5eblnert3" path="res://Scripts/CharRes/itemjsons/armor/DullahanCoat.tres" id="7_5d23u"]
 [ext_resource type="Resource" uid="uid://h4fwpvqylkmb" path="res://Scripts/CharRes/itemjsons/trinkets/SpeedCharm.tres" id="7_thwtu"]
 [ext_resource type="Resource" uid="uid://bi1h5li2pa2x2" path="res://Scripts/CharRes/itemjsons/trinkets/DamageCharm.tres" id="9_xfaeu"]
 [ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://Scripts/CharRes/jsons/Dullahan.tres" id="11_5d23u"]
@@ -181,7 +182,8 @@ layout_side = 1
 [node name="EquipmentComponent" type="Node" parent="."]
 script = ExtResource("5_qkcry")
 weapon = ExtResource("6_thwtu")
-armor = ExtResource("7_thwtu")
+armor = ExtResource("7_5d23u")
+trinket_1 = ExtResource("7_thwtu")
 trinket_2 = ExtResource("9_xfaeu")
 metadata/_custom_type_script = "uid://djbdlfj35305n"
 

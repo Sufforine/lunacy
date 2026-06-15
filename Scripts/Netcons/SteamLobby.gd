@@ -6,11 +6,24 @@ var peer : SteamMultiplayerPeer
 var is_host : bool = false
 var is_joining : bool = false
 @onready var id_prompt = $"../VBoxContainer/id_prompt"
+
+
 func _ready():
-	print("Steam initialized: ", Steam.steamInit(480,true))
+
+	var init_result = Steam.steamInit(480, true)
+
+	print(
+		"Steam initialized: ",
+		init_result
+	)
+
+	await get_tree().process_frame
+	print("Steam ID: ", Steam.getSteamID())
+	SaveManager.load_profile()
 	Steam.initRelayNetworkAccess()
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_joned)
+	print("Loaded hero: ",PlayerProfile.hero_scene) #Отображение че загрузилось то
 	
 func host_lobby():
 	Steam.createLobby(Steam.LobbyType.LOBBY_TYPE_PUBLIC, 4)
@@ -48,10 +61,27 @@ func _on_lobby_joned(lobby_id : int, permissions : int, locket : bool, response 
 	is_joining = false
 	
 func _add_player(id : int = 1):
-	var playerCharPath = GlobalData.playerCharPath
-	var player = load(playerCharPath).instantiate()
-	player.name = str(id)
-	call_deferred("add_child", player)
+	if PlayerProfile.hero_scene.is_empty():
+		push_error("No hero selected!")
+		return
+
+	var hero_scene = load(PlayerProfile.hero_scene)
+	if hero_scene == null:
+		push_error(
+			"Failed to load hero: " +
+			PlayerProfile.hero_scene
+		)
+		return
+
+	var hero = hero_scene.instantiate()
+	hero.name = str(id)
+	call_deferred("add_child", hero)
+	print(
+		"Spawned hero ",
+		PlayerProfile.hero_scene,
+		" for peer ",
+		id
+	)
 	
 func _remove_player(id : int):
 	if !self.has_node(str(id)):

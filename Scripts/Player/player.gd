@@ -7,9 +7,20 @@ class_name Player
 @onready var dullahan: Node3D = $Dullahan
 @onready var animation_player: AnimationPlayer = $Dullahan/AnimationPlayer
 
-@onready var stats: StatsComponent = $StatsComponent
+@onready var stats : StatsComponent = $StatsComponent
+@onready var equipment : EquipmentComponent = $EquipmentComponent
 @onready var stats_label: Label = $CanvasLayer/StatsLabel
 
+func _ready():
+	load_profile_equipment()
+	equipment.load_from_profile()
+
+	stats.current_health = stats.get_stat("health")
+
+	stats.current_mana = stats.get_stat("mana")
+
+func load_profile_equipment():
+	pass
 
 func _enter_tree():
 	set_multiplayer_authority(name.to_int())

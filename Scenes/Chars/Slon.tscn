@@ -1,7 +1,7 @@
 [gd_scene load_steps=9 format=3 uid="uid://bi4c5nkadivvh"]
 
 [ext_resource type="Script" uid="uid://b3vr157yiarav" path="res://Scenes/Chars/slon.gd" id="1_4o0kv"]
-[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/ComponentStat.gd" id="3_4o0kv"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/EquipmentComponent.gd" id="3_4o0kv"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="4_gh6cj"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="4_miqe7"]
 [ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/components/HeroStat.gd" id="5_4o0kv"]
