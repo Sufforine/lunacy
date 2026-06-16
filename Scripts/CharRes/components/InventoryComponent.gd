@@ -1,91 +1,141 @@
-class_name InventoryComponent
+# InventoryComponent.gd
+# Нода-компонент на игроке. Хранит предметы как ItemData (Resource).
 extends Node
+class_name InventoryComponent
+
+signal changed
 
 const SLOT_COUNT := 6
 
-var items: Array = []
+# Слоты: массив из ItemData или null
+var slots: Array = []
 
 
-func _ready():
-	# инициализация 6 слотов
-	if items.is_empty():
-		items.resize(SLOT_COUNT)
-		for i in SLOT_COUNT:
-			items[i] = null
+func _ready() -> void:
+	slots.resize(SLOT_COUNT)
+	for i in SLOT_COUNT:
+		slots[i] = null
 
 
-# ----------------------------
-# ДОБАВИТЬ ПРЕДМЕТ
-# ----------------------------
-func add_item(item_id: String):
+# =========================================================
+# ADD
+# =========================================================
+func add_item(item: ItemData) -> bool:
+
+	if item == null:
+		push_warning("InventoryComponent: попытка добавить null")
+		return false
 
 	for i in SLOT_COUNT:
-		if items[i] == null:
-			items[i] = item_id
+		if slots[i] == null:
+			slots[i] = item
+			changed.emit()
+			print("InventoryComponent: добавлен '%s' в слот %d" % [item.id, i])
 			return true
 
-	return false # инвентарь полный
+	print("InventoryComponent: инвентарь полон, '%s' не добавлен" % item.id)
+	return false
 
 
-# ----------------------------
-# УДАЛИТЬ ПРЕДМЕТ
-# ----------------------------
-func remove_item(slot: int) -> void:
+# =========================================================
+# REMOVE
+# =========================================================
+func remove_item(slot_index: int) -> void:
 
-	if slot < 0 or slot >= SLOT_COUNT:
+	if not _valid(slot_index):
 		return
 
-	items[slot] = null
+	var id = slots[slot_index].id if slots[slot_index] else "пусто"
+	slots[slot_index] = null
+	changed.emit()
+	print("InventoryComponent: удалён '%s' из слота %d" % [id, slot_index])
 
 
-# ----------------------------
-# ИСПОЛЬЗОВАТЬ ПРЕДМЕТ
-# ----------------------------
-func use_item(slot: int, owner: Node):
+# =========================================================
+# MOVE (drag & drop между слотами)
+# =========================================================
+func move_item(from_index: int, to_index: int) -> void:
 
-	if slot < 0 or slot >= SLOT_COUNT:
+	if not _valid(from_index) or not _valid(to_index):
+		return
+	if from_index == to_index:
 		return
 
-	var item_id = items[slot]
+	var tmp = slots[to_index]
+	slots[to_index] = slots[from_index]
+	slots[from_index] = tmp
+	changed.emit()
 
-	if item_id == null:
+
+# =========================================================
+# USE
+# =========================================================
+func use_item(slot_index: int, player: Node) -> void:
+
+	if not _valid(slot_index):
 		return
 
-	_apply_item_effect(item_id, owner)
+	var item: ItemData = slots[slot_index]
+	if item == null:
+		return
 
-	# если предмет одноразовый — удаляем
-	items[slot] = null
+	var used := item.use(player)
 
-
-# ----------------------------
-# ЭФФЕКТЫ ПРЕДМЕТОВ
-# ----------------------------
-func _apply_item_effect(item_id: String, owner: Node):
-
-	match item_id:
-
-		"health_potion":
-			if owner.has_method("heal"):
-				owner.heal(50)
-
-		"mana_potion":
-			if owner.has_method("restore_mana"):
-				owner.restore_mana(30)
-
-		"bomb":
-			print("BOOM!")
-
-		_:
-			print("Unknown item:", item_id)
+	if used and item.is_consumable:
+		remove_item(slot_index)
 
 
-# ----------------------------
-# СЕТЕВОЙ/СЕЙВ ВЫВОД
-# ----------------------------
+# =========================================================
+# GET
+# =========================================================
+func get_item(slot_index: int) -> ItemData:
+
+	if not _valid(slot_index):
+		return null
+	return slots[slot_index]
+
+
+func is_empty(slot_index: int) -> bool:
+	return get_item(slot_index) == null
+
+
+# =========================================================
+# SERIALISATION  (PlayerProfile хранит массив id строк)
+# =========================================================
 func get_data() -> Array:
-	return items
+	var data: Array = []
+	for slot in slots:
+		data.append(slot.id if slot != null else "")
+	return data
 
 
 func set_data(data: Array) -> void:
-	items = data.duplicate(true)
-	items.resize(SLOT_COUNT)
+
+	for i in SLOT_COUNT:
+		slots[i] = null
+
+	if data == null or data.is_empty():
+		changed.emit()
+		return
+
+	for i in min(data.size(), SLOT_COUNT):
+		var id: String = data[i]
+		if id.is_empty():
+			continue
+		var item = ItemLibrary.get_item(id)
+		if item != null:
+			slots[i] = item
+		else:
+			push_warning("InventoryComponent: set_data — неизвестный id '%s'" % id)
+
+	changed.emit()
+
+
+# =========================================================
+# INTERNAL
+# =========================================================
+func _valid(index: int) -> bool:
+	if index < 0 or index >= SLOT_COUNT:
+		push_warning("InventoryComponent: неверный индекс %d" % index)
+		return false
+	return true

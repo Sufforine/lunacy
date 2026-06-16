@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://dica1x1bt5brk"]
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://dica1x1bt5brk"]
 
-[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/components/ItemData.gd" id="1_6wie7"]
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/ItemDataProcess/ItemData.gd" id="1_6wie7"]
 
 [resource]
 script = ExtResource("1_6wie7")
-health = 50
+id = "hp"
+item_name = "hpc"
+slot = 3
+bonus_health = 99
 metadata/_custom_type_script = "uid://c77evqxqq52db"

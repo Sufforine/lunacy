@@ -30,11 +30,11 @@ script = ExtResource("1_tself")
 
 [node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="."]
 layout_mode = 1
-offset_left = 257.0
-offset_top = 5.0
-offset_right = 1537.0
-offset_bottom = 1285.0
-scale = Vector2(1.1103022, 0.85097456)
+offset_left = 386.0
+offset_top = 67.99997
+offset_right = 1666.0
+offset_bottom = 1348.0
+scale = Vector2(0.29426703, 0.2960883)
 stream = ExtResource("2_7jtkx")
 autoplay = true
 loop = true

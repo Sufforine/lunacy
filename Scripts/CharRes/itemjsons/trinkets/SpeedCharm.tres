@@ -1,8 +1,11 @@
-[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://h4fwpvqylkmb"]
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3 uid="uid://h4fwpvqylkmb"]
 
-[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/components/ItemData.gd" id="1_7v3em"]
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/ItemDataProcess/ItemData.gd" id="1_7v3em"]
 
 [resource]
 script = ExtResource("1_7v3em")
-move_speed = 50.0
+id = "spd"
+item_name = "speedc"
+slot = 3
+bonus_move_speed = 50.0
 metadata/_custom_type_script = "uid://c77evqxqq52db"

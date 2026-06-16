@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://c43v6gtwq8mqg"]
+
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/ItemDataProcess/ItemData.gd" id="1_bls7b"]
+[ext_resource type="Texture2D" uid="uid://jc1diekt5c3y" path="res://Icons/coin.png" id="1_dm8cm"]
+
+[resource]
+script = ExtResource("1_bls7b")
+id = "mpot"
+item_name = "mana Potion"
+icon = ExtResource("1_dm8cm")
+is_consumable = true
+heal_mana = 50
+metadata/_custom_type_script = "uid://c77evqxqq52db"
