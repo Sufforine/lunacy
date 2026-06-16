@@ -48,10 +48,10 @@ func _init_inventory() -> void:
  
 	inventory.add_item(ItemLibrary.get_item("hpot"))
 	inventory.add_item(ItemLibrary.get_item("mpot"))
-	inventory.add_item(ItemLibrary.get_item("bpot"))
 	inventory.add_item(ItemLibrary.get_item("hpot"))
 	inventory.add_item(ItemLibrary.get_item("coat"))
 	inventory.add_item(ItemLibrary.get_item("axe"))
+	inventory.add_item(ItemLibrary.get_item("spd"))
 
 
 
@@ -176,3 +176,17 @@ func save_game():
 	PlayerProfile.inventory = inventory.get_data()
 	equipment.save_to_profile()
 	SaveManager.save_profile()
+
+# Вызывать когда миссия завершена (из GameManager или аналога)
+func on_mission_complete() -> void:
+	if not is_multiplayer_authority():
+		return
+	SaveManager.save_player_state(inventory, equipment)
+ 
+ 
+# Вызывать при выходе из игры / возврате в лобби
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		if is_multiplayer_authority():
+			SaveManager.save_player_state(inventory, equipment)
+ 

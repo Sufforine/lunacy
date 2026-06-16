@@ -18,7 +18,7 @@ func _ready() -> void:
 		return
 
 	if equipment:
-		equipment.changed.connect(func(): stats_changed.emit())
+		equipment.changed.connect(_on_equipment_changed)
 
 	current_health = int(get_stat("health"))
 	current_mana   = int(get_stat("mana"))
@@ -57,3 +57,26 @@ func take_damage(amount: int) -> void:
 
 	if current_health == 0:
 		print("StatsComponent: '%s' погиб" % get_parent().name)
+
+# Пересчитать максимумы при смене снаряжения.
+# Текущие значения масштабируем чтобы не было мгновенного исцеления/смерти.
+func _on_equipment_changed() -> void:
+
+	var old_max_hp:   float = get_stat("health")
+	var old_max_mana: float = get_stat("mana")
+
+	# get_stat теперь вернёт новое значение (снаряжение уже сменилось)
+	var new_max_hp:   int = int(get_stat("health"))
+	var new_max_mana: int = int(get_stat("mana"))
+
+	# Масштабируем текущее HP пропорционально (надел броню — HP выросло)
+	if old_max_hp > 0:
+		current_health = int(float(current_health) / old_max_hp * float(new_max_hp))
+	current_health = clamp(current_health, 0, new_max_hp)
+
+	if old_max_mana > 0:
+		current_mana = int(float(current_mana) / old_max_mana * float(new_max_mana))
+	current_mana = clamp(current_mana, 0, new_max_mana)
+
+	stats_changed.emit()
+	print("StatsComponent: пересчёт статов — HP %d/%d  Mana %d/%d" % [current_health, new_max_hp, current_mana, new_max_mana])

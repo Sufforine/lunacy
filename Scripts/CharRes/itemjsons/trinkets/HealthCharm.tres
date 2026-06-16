@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/ItemDataProcess/ItemData.gd" id="1_6wie7"]
 
+
 [resource]
 script = ExtResource("1_6wie7")
 id = "hp"

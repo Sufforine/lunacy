@@ -1,11 +1,11 @@
 # ItemData.gd
 # Единый класс для всех предметов игры.
 # Расходники: slot = NONE, is_consumable = true
-# Снаряжение: slot = WEAPON / ARMOR / TRINKET_1 / TRINKET_2
+# Снаряжение: slot = WEAPON / ARMOR / TRINKET_1 / SCROLL
 extends Resource
 class_name ItemData
 
-enum Slot { NONE, WEAPON, ARMOR, TRINKET_1, TRINKET_2 }
+enum Slot { NONE, WEAPON, ARMOR, TRINKET_1, SCROLL }
 
 @export var id: String = ""
 @export var item_name: String = ""

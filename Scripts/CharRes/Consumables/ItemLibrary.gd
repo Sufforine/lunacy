@@ -19,6 +19,9 @@ func _ready() -> void:
 		preload("res://Scripts/CharRes/Consumables/health_potion.tres"),
 		preload("res://Scripts/CharRes/Consumables/mana_potion.tres"),
 		preload("res://Scripts/CharRes/Consumables/big_potion.tres"),
+		preload("res://Scripts/CharRes/itemjsons/armor/DullahanCoat.tres"),
+		preload("res://Scripts/CharRes/itemjsons/trinkets/SpeedCharm.tres"),
+		preload("res://Scripts/CharRes/itemjsons/weapon/Axe.tres"),
 	])
 
 

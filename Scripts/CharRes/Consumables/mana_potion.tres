@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://Scripts/CharRes/ItemDataProcess/ItemData.gd" id="1_bls7b"]
 [ext_resource type="Texture2D" uid="uid://jc1diekt5c3y" path="res://Icons/coin.png" id="1_dm8cm"]
 
+
 [resource]
 script = ExtResource("1_bls7b")
 id = "mpot"

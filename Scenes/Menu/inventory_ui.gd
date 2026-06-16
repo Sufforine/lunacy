@@ -13,7 +13,7 @@
 #           ├── WeaponRow   (HBoxContainer) → Label + SlotWeapon   (Button → Icon)
 #           ├── ArmorRow    (HBoxContainer) → Label + SlotArmor    (Button → Icon)
 #           ├── Trinket1Row (HBoxContainer) → Label + SlotTrinket1 (Button → Icon)
-#           └── Trinket2Row (HBoxContainer) → Label + SlotTrinket2 (Button → Icon)
+#           └── ScrollRow (HBoxContainer) → Label + SlotScroll (Button → Icon)
 
 extends Control
 class_name InventoryUI
@@ -24,7 +24,7 @@ class_name InventoryUI
 @onready var slot_weapon: Button        = $EquipmentPanel/SlotsContainer/WeaponRow/SlotWeapon
 @onready var slot_armor: Button         = $EquipmentPanel/SlotsContainer/ArmorRow/SlotArmor
 @onready var slot_trinket1: Button      = $EquipmentPanel/SlotsContainer/Trinket1Row/SlotTrinket1
-@onready var slot_trinket2: Button      = $EquipmentPanel/SlotsContainer/Trinket2Row/SlotTrinket2
+@onready var slot_scroll: Button      = $EquipmentPanel/SlotsContainer/ScrollRow/SlotScroll
 
 # ── компоненты игрока ───────────────────────────────────
 var _inventory:  InventoryComponent  = null
@@ -35,7 +35,7 @@ var _inv_buttons: Array[Button]      = []
 var _inv_icons:   Array[TextureRect] = []
 
 # ── слоты экипировки (порядок = ItemData.Slot enum) ─
-var _eq_buttons:  Array[Button]      = []   # [WEAPON, ARMOR, TRINKET_1, TRINKET_2]
+var _eq_buttons:  Array[Button]      = []   # [WEAPON, ARMOR, TRINKET_1, SCROLL]
 var _eq_icons:    Array[TextureRect] = []
 
 # ── drag state ───────────────────────────────────────────
@@ -133,10 +133,10 @@ func _collect_inventory_slots() -> void:
 
 func _collect_equipment_slots() -> void:
 
-	_eq_buttons = [slot_weapon, slot_armor, slot_trinket1, slot_trinket2]
+	_eq_buttons = [slot_weapon, slot_armor, slot_trinket1, slot_scroll]
 	_eq_icons.clear()
 
-	var labels := ["Оружие", "Броня", "Тринкет 1", "Тринкет 2"]
+	var labels := ["Оружие", "Броня", "Тринкет 1", "Свиток"]
 
 	for i in _eq_buttons.size():
 		var btn := _eq_buttons[i]
@@ -170,7 +170,7 @@ func _refresh_equipment() -> void:
 		_equipment.weapon,
 		_equipment.armor,
 		_equipment.trinket_1,
-		_equipment.trinket_2,
+		_equipment.scroll,
 	]
 	for i in items.size():
 		var eq: ItemData = items[i]
@@ -268,12 +268,16 @@ func _drop_on_inventory(to_idx: int) -> void:
 			_use_inventory_item(from)
 
 	elif src == DragSource.EQUIPMENT:
-		# снимаем экипировку → кладём в инвентарь
+		# снимаем экипировку → кладём в конкретный слот инвентаря
 		var item := _eq_slot_item(from)
-		if item == null:
+		if item == null or _inventory == null:
 			return
-		if _inventory and _inventory.add_item_data_as_equipment(item, to_idx):
-			_equipment.unequip(_eq_enum(from))
+		var displaced := _inventory.get_item(to_idx)
+		_inventory.slots[to_idx] = item
+		_equipment.unequip(_eq_enum(from))
+		if displaced != null:
+			_inventory.add_item(displaced)
+		_inventory.changed.emit()
 
 
 # ════════════════════════════════════════════════════════
@@ -362,7 +366,7 @@ func _eq_slot_item(idx: int) -> ItemData:
 		0: return _equipment.weapon
 		1: return _equipment.armor
 		2: return _equipment.trinket_1
-		3: return _equipment.trinket_2
+		3: return _equipment.scroll
 	return null
 
 
@@ -371,7 +375,7 @@ func _eq_enum(idx: int) -> ItemData.Slot:
 		0: return ItemData.Slot.WEAPON
 		1: return ItemData.Slot.ARMOR
 		2: return ItemData.Slot.TRINKET_1
-		3: return ItemData.Slot.TRINKET_2
+		3: return ItemData.Slot.SCROLL
 	return ItemData.Slot.WEAPON
 
 
