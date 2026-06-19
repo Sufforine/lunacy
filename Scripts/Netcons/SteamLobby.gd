@@ -4,13 +4,15 @@
 # хост рассылает всем полный список — все видят всех.
 extends Node
 
+signal lobby_ready(lobby_id: int)
+signal players_updated(players: Array)
+
 var lobby_id: int = 0
 var peer: SteamMultiplayerPeer
 var is_host: bool = false
 var is_joining: bool = false
 
 @export var player_scene: PackedScene  # не используется — берём из PlayerState
-@onready var id_prompt = $"../VBoxContainer/id_prompt"
 
 # peer_id → PlayerState. Хранится только на хосте.
 var _player_states: Dictionary = {}
@@ -59,6 +61,7 @@ func _on_lobby_created(result: int, id: int) -> void:
 
 	# Заспавнить самого хоста (peer_id = 1)
 	_spawn_local_player(1)
+	lobby_ready.emit(lobby_id)
 	print("SteamLobby: лобби создано ", lobby_id)
 
 
@@ -81,6 +84,7 @@ func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) 
 	peer.create_client(Steam.getLobbyOwner(lobby_id))
 	multiplayer.multiplayer_peer = peer
 	is_joining = false
+	lobby_ready.emit(lobby_id)
 
 	# Отправить свой PlayerState хосту как только подключимся
 	multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
@@ -107,6 +111,7 @@ func _on_peer_disconnected(id: int) -> void:
 	_despawn_player(id)
 	# Уведомить остальных
 	_rpc_despawn_player.rpc(id)
+	_broadcast_player_list()
 
 
 # =========================================================
@@ -135,6 +140,8 @@ func _rpc_send_state(state_data: Dictionary) -> void:
 			continue
 		var existing_data := _state_to_dict(_player_states[existing_id])
 		_rpc_spawn_player.rpc_id(sender_id, existing_data)
+
+	_broadcast_player_list()
 
 
 # =========================================================
@@ -195,6 +202,7 @@ func _spawn_local_player(peer_id: int) -> void:
 
 	# Хост спавнит у себя и рассылает всем подключённым
 	_rpc_spawn_player.rpc(state_data)
+	_broadcast_player_list()
 
 
 # =========================================================
@@ -211,6 +219,7 @@ func _state_to_dict(state: PlayerState) -> Dictionary:
 	return {
 		"peer_id":    state.peer_id,
 		"steam_id":   state.steam_id,
+		"nickname":   state.nickname,
 		"hero_scene": state.hero_scene,
 		"level":      state.level,
 		"experience": state.experience,
@@ -221,7 +230,8 @@ func _state_to_dict(state: PlayerState) -> Dictionary:
 
 func _dict_to_state(data: Dictionary, state: PlayerState) -> void:
 	state.peer_id    = data.get("peer_id",    0)
-	state.steam_id   = data.get("steam_id",   0)
+	state.steam_id    = data.get("steam_id",   0)
+	state.nickname    = data.get("nickname",   "Игрок")
 	state.hero_scene = data.get("hero_scene", "")
 	state.level      = data.get("level",      1)
 	state.experience = data.get("experience", 0)
@@ -230,10 +240,54 @@ func _dict_to_state(data: Dictionary, state: PlayerState) -> void:
 
 
 # =========================================================
-# UI КНОПКИ
+# СПИСОК ИГРОКОВ ДЛЯ UI ЛОББИ
+# Хост рассылает всем краткую инфу: peer_id, nickname, hero_scene
 # =========================================================
-func _on_host_button_pressed() -> void:
-	host_lobby()
+func _broadcast_player_list() -> void:
 
-func _on_join_pressed() -> void:
-	join_lobby(id_prompt.text.to_int())
+	var list: Array = []
+	for peer_id in _player_states:
+		var state: PlayerState = _player_states[peer_id]
+		list.append({
+			"peer_id":    state.peer_id,
+			"nickname":   state.nickname,
+			"hero_scene": state.hero_scene,
+		})
+
+	_rpc_player_list.rpc(list)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_player_list(list: Array) -> void:
+	players_updated.emit(list)
+
+
+# =========================================================
+# СМЕНА ГЕРОЯ В ЛОББИ
+# Вызывается из lobby_menu.gd при выборе героя
+# =========================================================
+func notify_hero_changed() -> void:
+
+	if multiplayer.is_server():
+		var my_id := multiplayer.get_unique_id()
+		if _player_states.has(my_id):
+			_player_states[my_id].hero_scene = PlayerProfile.hero_scene
+			_broadcast_player_list()
+	else:
+		_rpc_update_hero.rpc_id(1, PlayerProfile.hero_scene)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_update_hero(hero_scene: String) -> void:
+
+	if not multiplayer.is_server():
+		return
+
+	var sender_id := multiplayer.get_remote_sender_id()
+	if _player_states.has(sender_id):
+		_player_states[sender_id].hero_scene = hero_scene
+		_broadcast_player_list()
+
+
+# UI-обработчики (Host/Join) перенесены в lobby_menu.gd —
+# он вызывает host_lobby() / join_lobby() напрямую.

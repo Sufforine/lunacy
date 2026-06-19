@@ -5,7 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="3_qkcry"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/EquipmentComponent.gd" id="5_qkcry"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="6_u5hdh"]
-[ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://Scripts/CharRes/jsons/Dullahan.tres" id="11_5d23u"]
+[ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://Scripts/CharRes/herojsons/Dullahan/Dullahan_Stat.tres" id="11_5d23u"]
 [ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://Scripts/CharRes/components/InventoryComponent.gd" id="11_xfaeu"]
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://Scenes/Menu/inventory_ui.tscn" id="12_xfaeu"]
 

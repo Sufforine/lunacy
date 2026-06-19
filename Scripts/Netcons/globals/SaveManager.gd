@@ -1,9 +1,9 @@
 # SaveManager.gd — Autoload
-# Каждый игрок хранит свой файл сохранения по Steam ID.
-# Формат: user://saves/<steam_id>.json
 #
-# Инвентарь сохраняется как массив item id строк.
-# Снаряжение сохраняется как словарь slot → resource_path к .tres файлу.
+# По умолчанию сохранение привязано к Steam ID: user://saves/<steam_id>.json
+# Игрок может создать ИМЕНОВАННЫЕ сохранения и переключаться между ними:
+#   user://saves/<steam_id>__<custom_name>.json
+# Текущий активный файл хранится в _active_save_name (пусто = дефолтный по Steam ID).
 extends Node
 
 const SAVE_DIR := "res://Saves/"
@@ -15,6 +15,9 @@ const EMPTY_EQUIPMENT := {
 	"scroll":   "",
 }
 
+# Имя текущего активного именованного сохранения. Пусто = сохранение по умолчанию (steam_id.json)
+var _active_save_name: String = ""
+
 
 # =========================================================
 # ПУТЬ К ФАЙЛУ
@@ -22,17 +25,89 @@ const EMPTY_EQUIPMENT := {
 func get_save_path() -> String:
 
 	var steam_id: int = Steam.getSteamID()
+	var prefix: String = str(steam_id) if steam_id != 0 else "offline"
 
-	if steam_id == 0:
-		push_warning("SaveManager: Steam не инициализирован, используется offline.json")
-		return SAVE_DIR + "offline.json"
+	if _active_save_name.is_empty():
+		return SAVE_DIR + prefix + ".json"
 
-	return SAVE_DIR + str(steam_id) + ".json"
+	return SAVE_DIR + prefix + "__" + _active_save_name + ".json"
+
+
+func get_active_save_name() -> String:
+	return _active_save_name if not _active_save_name.is_empty() else "По умолчанию"
+
+
+# =========================================================
+# СПИСОК ВСЕХ СОХРАНЕНИЙ ТЕКУЩЕГО ИГРОКА
+# Возвращает массив { "name": String, "path": String, "is_default": bool }
+# =========================================================
+func list_saves() -> Array:
+
+	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+
+	var steam_id: int = Steam.getSteamID()
+	var prefix: String = str(steam_id) if steam_id != 0 else "offline"
+
+	var result: Array = []
+	var dir := DirAccess.open(SAVE_DIR)
+	if dir == null:
+		return result
+
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while file_name != "":
+		if file_name.ends_with(".json") and file_name.begins_with(prefix):
+			var path := SAVE_DIR + file_name
+			if file_name == prefix + ".json":
+				result.append({"name": "По умолчанию", "path": path, "is_default": true})
+			elif file_name.begins_with(prefix + "__"):
+				var custom_name := file_name.trim_prefix(prefix + "__").trim_suffix(".json")
+				result.append({"name": custom_name, "path": path, "is_default": false})
+		file_name = dir.get_next()
+	dir.list_dir_end()
+
+	return result
+
+
+# =========================================================
+# СОЗДАТЬ НОВОЕ ИМЕНОВАННОЕ СОХРАНЕНИЕ
+# =========================================================
+func create_named_save(save_name: String) -> bool:
+
+	var clean := save_name.strip_edges()
+	if clean.is_empty():
+		push_warning("SaveManager: имя сохранения не может быть пустым")
+		return false
+
+	# Убрать символы недопустимые в именах файлов
+	clean = clean.validate_filename()
+
+	_active_save_name = clean
+
+	# Сбросить профиль на значения по умолчанию для нового сохранения
+	PlayerProfile.hero_scene = ""
+	PlayerProfile.level = 1
+	PlayerProfile.experience = 0
+	PlayerProfile.inventory = []
+	PlayerProfile.equipment = EMPTY_EQUIPMENT.duplicate()
+
+	save_profile()
+	print("SaveManager: создано новое сохранение '%s'" % clean)
+	return true
+
+
+# =========================================================
+# ВЫБРАТЬ АКТИВНОЕ СОХРАНЕНИЕ И ЗАГРУЗИТЬ ЕГО
+# =========================================================
+func select_save(save_info: Dictionary) -> void:
+
+	_active_save_name = "" if save_info.get("is_default", true) else save_info.get("name", "")
+	load_profile()
+	print("SaveManager: выбрано сохранение '%s'" % get_active_save_name())
 
 
 # =========================================================
 # СОХРАНЕНИЕ
-# Вызывать после миссии или при выходе из лобби.
 # =========================================================
 func save_profile() -> void:
 
@@ -42,9 +117,7 @@ func save_profile() -> void:
 		"hero_scene": PlayerProfile.hero_scene,
 		"level":      PlayerProfile.level,
 		"experience": PlayerProfile.experience,
-		# Инвентарь — массив id строк (пустой слот = "")
 		"inventory":  _serialize_inventory(),
-		# Снаряжение — словарь slot → resource_path
 		"equipment":  _serialize_equipment(),
 	}
 
@@ -60,7 +133,6 @@ func save_profile() -> void:
 
 # =========================================================
 # ЗАГРУЗКА
-# Вызывать при старте игры (в SteamLobby._ready или главном меню).
 # =========================================================
 func load_profile() -> void:
 
@@ -86,15 +158,9 @@ func load_profile() -> void:
 	PlayerProfile.hero_scene = data.get("hero_scene", "")
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
-
-	# Инвентарь: массив id строк → PlayerProfile хранит их,
-	# InventoryComponent.set_data() восстановит ItemData через ItemLibrary
 	PlayerProfile.inventory  = data.get("inventory", [])
-
-	# Снаряжение: словарь slot → resource_path
 	PlayerProfile.equipment  = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
 
-	# Миграция: старые сохранения могут иметь trinket_2 вместо scroll
 	if PlayerProfile.equipment.has("trinket_2"):
 		PlayerProfile.equipment["scroll"] = PlayerProfile.equipment["trinket_2"]
 		PlayerProfile.equipment.erase("trinket_2")
@@ -104,7 +170,6 @@ func load_profile() -> void:
 
 # =========================================================
 # СОХРАНИТЬ СОСТОЯНИЕ ИГРОКА ПОСЛЕ МИССИИ
-# Вызывать из player.gd когда миссия завершена или игрок выходит.
 # =========================================================
 func save_player_state(inventory: InventoryComponent, equipment: EquipmentComponent) -> void:
 
@@ -125,21 +190,15 @@ func save_player_state(inventory: InventoryComponent, equipment: EquipmentCompon
 # СЕРИАЛИЗАЦИЯ
 # =========================================================
 func _serialize_inventory() -> Array:
-
-	# PlayerProfile.inventory может быть уже массивом id строк
-	# (если set_data ещё не вызывался) или пустым
 	if PlayerProfile.inventory is Array:
 		return PlayerProfile.inventory
 	return []
 
 
 func _serialize_equipment() -> Dictionary:
-
 	if PlayerProfile.equipment is Dictionary:
-		# Убедиться что все ключи присутствуют
 		var result := EMPTY_EQUIPMENT.duplicate()
 		for key in PlayerProfile.equipment:
 			result[key] = PlayerProfile.equipment[key]
 		return result
-
 	return EMPTY_EQUIPMENT.duplicate()

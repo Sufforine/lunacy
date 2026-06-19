@@ -2,6 +2,7 @@ class_name PlayerState #Жизнь игрока на миссии
 
 var peer_id: int = 0
 var steam_id: int = 0
+var nickname: String = ""
 
 var hero_scene: String = ""
 
@@ -16,7 +17,7 @@ var equipment: Dictionary = {
 	"weapon": "",
 	"armor": "",
 	"trinket_1": "",
-	"trinket_2": ""
+	"scroll": ""
 }
 
 # --- временные данные миссии ---
@@ -38,6 +39,8 @@ func from_profile(profile) -> void:
 	experience = profile.experience
 	inventory = profile.inventory.duplicate(true)
 	equipment = profile.equipment.duplicate(true)
+	nickname = Steam.getPersonaName()
+	steam_id = Steam.getSteamID()
 
 # APPLY BACK TO PROFILE (после миссии)
 func apply_to_profile(profile) -> void:
@@ -50,6 +53,7 @@ func apply_to_profile(profile) -> void:
 func debug_print():
 	print("--- PlayerState ---")
 	print("peer:", peer_id)
+	print("nick:", nickname)
 	print("hero:", hero_scene)
 	print("lvl:", level)
 	print("xp:", experience)
