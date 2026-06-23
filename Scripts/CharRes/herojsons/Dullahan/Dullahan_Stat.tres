@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="HeroStat" format=3 uid="uid://cctlboe5gxkyn"]
+[gd_resource type="Resource" script_class="HeroStat" load_steps=2 format=3 uid="uid://cctlboe5gxkyn"]
 
 [ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/components/HeroStat.gd" id="1_tauoo"]
 

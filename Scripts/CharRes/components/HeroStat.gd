@@ -15,3 +15,7 @@ class_name HeroStat
 
 @export var crit_chance: float = 0.05
 @export var crit_damage: float = 1.5
+
+# Базовый боевой дух всегда 0 — бонусы дают только предметы снаряжения.
+# Не трогай это поле в инспекторе.
+var morale: int = 0

@@ -35,6 +35,7 @@ enum Slot { NONE, WEAPON, ARMOR, TRINKET_1, SCROLL }
 @export var bonus_attack_speed: float = 0.0
 @export var bonus_crit_chance: float = 0.0
 @export var bonus_crit_damage: float = 0.0
+@export var bonus_morale: int = 0
 
 
 func is_equipment() -> bool:
