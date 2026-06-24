@@ -1,0 +1,12 @@
+{
+	"equipment": {
+		"armor": "",
+		"scroll": "",
+		"trinket_1": "",
+		"weapon": ""
+	},
+	"experience": 0,
+	"hero_scene": "",
+	"inventory": [],
+	"level": 1
+}

@@ -1,0 +1,151 @@
+[gd_scene load_steps=11 format=3 uid="uid://dh21yjpmtljvf"]
+
+[ext_resource type="Texture2D" uid="uid://cf5u706rl13dc" path="res://Scenes/Missions/texture_10.png" id="1_m6f1c"]
+
+[sub_resource type="Gradient" id="Gradient_omm8y"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7k68e"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_qvwui"]
+noise = SubResource("FastNoiseLite_7k68e")
+color_ramp = SubResource("Gradient_omm8y")
+seamless = true
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_d2d45"]
+_shader_parameters = {
+&"bias_distance": null,
+&"blend_sharpness": null,
+&"depth_blur": null,
+&"enable_macro_variation": null,
+&"enable_projection": null,
+&"flat_terrain_normals": null,
+&"macro_variation1": null,
+&"macro_variation2": null,
+&"macro_variation_slope": null,
+&"mipmap_bias": null,
+&"noise1_angle": null,
+&"noise1_offset": null,
+&"noise1_scale": null,
+&"noise2_scale": null,
+&"noise_texture": SubResource("NoiseTexture2D_qvwui"),
+&"projection_threshold": null
+}
+show_checkered = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iaodp"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_gcn2f"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_iaodp")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_sraqn"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_gcn2f")])
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_omm8y"]
+albedo_texture = ExtResource("1_m6f1c")
+uv1_triplanar_sharpness = 6.06287
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7k68e"]
+albedo_texture = ExtResource("1_m6f1c")
+
+[node name="Lesopilka" type="Node3D"]
+
+[node name="Terrain3D" type="Terrain3D" parent="."]
+data_directory = "res://DataDirectory_T3D"
+material = SubResource("Terrain3DMaterial_d2d45")
+assets = SubResource("Terrain3DAssets_sraqn")
+show_checkered = true
+top_level = true
+metadata/_edit_lock_ = true
+
+[node name="Dalahans house" type="CSGCombiner3D" parent="."]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(0.27798027, 0, 2.6323247, 0, 5, 0, -0.11281392, 0, 6.4862056, 75.76133, 9.39969, 70.51416)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(0.27798027, 0, 2.6323247, 0, 5, 0, -0.11281392, 0, 6.4862056, 101.16344, 9.39969, 60.52796)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(-0.008461416, -2.59116, -6.4186115, 0.47786695, -0.042022366, -0.115228586, 0.0002889542, -6.380909, 2.6072295, 88.958084, 0.40175915, 65.7021)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(0.1085557, 0, -6.5256486, 0, 5, 0, 0.2796706, 0, 2.5329661, 83.669075, 9.40113, 53.084644)
+size = Vector3(4, 3.9990234, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(0.1085557, 0, -6.5256486, 0, 5, 0, 0.2796706, 0, 2.5329661, 93.79285, 9.40113, 77.81912)
+size = Vector3(4, 3.9990234, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="Door" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(0.82521045, 0, 0.5471625, 0, 2.352499, 0, -0.32895857, 0, 1.3725873, 104.52254, 5.847907, 68.69005)
+operation = 2
+size = Vector3(2.208496, 4, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Dalahans house"]
+transform = Transform3D(0.9044626, 0, 0.42655295, 0, 1, 0, -0.42655295, 0, 0.9044626, 90.68825, 10.004222, 78.957375)
+operation = 2
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_omm8y")
+
+[node name="research station" type="CSGCombiner3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.403156, 0.39557362, -197.1696)
+
+[node name="CSGBox3D" type="CSGBox3D" parent="research station"]
+transform = Transform3D(-2.1855694e-08, 0, 9, 0, 5, 0, -0.5, 0, -3.934025e-07, 12.436089, 9.592319, 0)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_7k68e")
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="research station"]
+transform = Transform3D(0.47417566, 0, 2.854997, 0, 5, 0, -0.15861094, 0, 8.535162, -11.476027, 9.609654, -15.573608)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_7k68e")
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="research station"]
+transform = Transform3D(0.108475365, 0, 8.785643, 0, 5, 0, -0.4880913, 0, 1.9525567, -0.37187576, 9.609654, -29.448166)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_7k68e")
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="research station"]
+transform = Transform3D(0.46277028, 0, 3.4078379, 0, 5.000001, 0, -0.18932432, 0, 8.329865, 22.919632, 9.609654, -14.685715)
+size = Vector3(4, 4, 4)
+material = SubResource("StandardMaterial3D_7k68e")
+
+[node name="Door2" type="CSGBox3D" parent="research station"]
+transform = Transform3D(1.5433013, 0, 0.60291684, 0, 2.352499, 0, -0.6152154, 0, 1.5124503, 26.440586, 4.9930077, -6.5025024)
+operation = 2
+size = Vector3(2.208496, 4, 4)
+material = SubResource("StandardMaterial3D_omm8y")

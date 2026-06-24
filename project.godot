@@ -23,6 +23,25 @@ PlayerStorage="*res://Scripts/Player/player_storage.gd"
 [display]
 
 window/subwindows/embed_subwindows=false
+<<<<<<< Updated upstream
+=======
+window/per_pixel_transparency/allowed=true
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/terrain_3d/plugin.cfg")
+
+[file_customization]
+
+folder_colors={
+"res://Scenes/Menu/": "green",
+"res://Scripts/CharRes/ItemDataProcess/": "gray",
+"res://Scripts/CharRes/herojsons/": "red",
+"res://Scripts/CharRes/itemjsons/": "purple",
+"res://Scripts/MainMenu/": "green",
+"res://Scripts/Netcons/": "blue"
+}
+>>>>>>> Stashed changes
 
 [input]
 
