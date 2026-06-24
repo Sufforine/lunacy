@@ -27,11 +27,11 @@ extends Control
 
 # Окно выбора сохранения (отдельная всплывающая панель)
 @onready var save_picker: PopupPanel       = $SavePickerPopup
-@onready var save_picker_list: VBoxContainer = $SavePickerPopup/VBox/ScrollContainer/SaveListContainer
+@onready var save_picker_list: VBoxContainer = $SavePickerPopup/VBox/SaveListContainer
 @onready var save_name_input: LineEdit     = $SavePickerPopup/VBox/NewSaveRow/NameInput
 @onready var save_create_button: Button    = $SavePickerPopup/VBox/NewSaveRow/CreateButton
 
-@onready var steam_lobby = $SteamLobby  # поправь путь под свою сцену
+@onready var steam_lobby = $SteamLobby
 
 var _hero_buttons: Dictionary = {}  # id → Button
 
@@ -80,6 +80,12 @@ func _on_lobby_ready(lobby_id: int) -> void:
 	main_menu_panel.visible = false
 	lobby_panel.visible = true
 	code_label.text = "Код лобби: %d" % lobby_id
+
+	# Кнопки выбора сохранения — только для хоста
+	var is_host: bool = multiplayer.is_server()
+	save_select_button.visible = is_host
+	save_new_button.visible = is_host
+	save_label.visible = is_host
 
 
 # ════════════════════════════════════════════════════════
