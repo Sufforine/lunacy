@@ -59,8 +59,8 @@ func _on_lobby_created(result: int, id: int) -> void:
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
-	# Заспавнить самого хоста (peer_id = 1)
-	_spawn_local_player(1)
+	# Зарегистрировать хоста в _player_states без спавна сцены
+	_register_local_player(1)
 	lobby_ready.emit(lobby_id)
 	print("SteamLobby: лобби создано ", lobby_id)
 
@@ -91,7 +91,9 @@ func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) 
 
 
 func _on_connected_to_server() -> void:
-	# Сериализуем локальный профиль в словарь и шлём хосту
+	# Зарегистрировать себя локально чтобы сразу видеть себя в списке
+	_register_local_player(multiplayer.get_unique_id())
+	# Отправить свой state хосту
 	var state_data := _local_state_to_dict()
 	_rpc_send_state.rpc_id(1, state_data)
 	print("SteamLobby: отправлен PlayerState хосту")
@@ -185,7 +187,20 @@ func _despawn_player(peer_id: int) -> void:
 
 
 # =========================================================
-# ЛОКАЛЬНЫЙ СПАВН ХОСТА
+# РЕГИСТРАЦИЯ ХОСТА В ЛОББИ (без спавна сцены)
+# =========================================================
+func _register_local_player(peer_id: int) -> void:
+
+	var state := PlayerState.new()
+	state.from_profile(PlayerProfile)
+	state.peer_id = peer_id
+	_player_states[peer_id] = state
+
+	_broadcast_player_list()
+
+
+# =========================================================
+# СПАВН ХОСТА НА МИССИИ (вызывается из hub.gd при старте)
 # =========================================================
 func _spawn_local_player(peer_id: int) -> void:
 

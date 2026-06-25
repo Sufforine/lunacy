@@ -27,11 +27,11 @@ extends Control
 
 # Окно выбора сохранения (отдельная всплывающая панель)
 @onready var save_picker: PopupPanel       = $SavePickerPopup
-@onready var save_picker_list: VBoxContainer = $SavePickerPopup/VBox/SaveListContainer
+@onready var save_picker_list: VBoxContainer = $SavePickerPopup/VBox/ScrollContainer/SaveListContainer
 @onready var save_name_input: LineEdit     = $SavePickerPopup/VBox/NewSaveRow/NameInput
 @onready var save_create_button: Button    = $SavePickerPopup/VBox/NewSaveRow/CreateButton
 
-@onready var steam_lobby = $SteamLobby
+@onready var steam_lobby = $SteamLobby  # поправь путь под свою сцену
 
 var _hero_buttons: Dictionary = {}  # id → Button
 
@@ -81,11 +81,18 @@ func _on_lobby_ready(lobby_id: int) -> void:
 	lobby_panel.visible = true
 	code_label.text = "Код лобби: %d" % lobby_id
 
-	# Кнопки выбора сохранения — только для хоста
 	var is_host: bool = multiplayer.is_server()
+
+	# Кнопки выбора сохранения — только для хоста
 	save_select_button.visible = is_host
 	save_new_button.visible = is_host
 	save_label.visible = is_host
+
+	# Кнопка старта — только для хоста
+	ready_button.visible = is_host
+	if is_host:
+		ready_button.text = "Старт"
+		ready_button.pressed.connect(_on_start_pressed)
 
 
 # ════════════════════════════════════════════════════════
@@ -252,3 +259,26 @@ func _on_create_save_pressed() -> void:
 	_update_save_label()
 	_populate_hero_grid()
 	save_picker.hide()
+
+
+# ════════════════════════════════════════════════════════
+# СТАРТ — только хост
+# ════════════════════════════════════════════════════════
+func _on_start_pressed() -> void:
+
+	if not multiplayer.is_server():
+		return
+
+	# Проверить что хост выбрал героя
+	if PlayerProfile.hero_scene.is_empty():
+		push_warning("lobby_menu: хост не выбрал героя")
+		# TODO: показать сообщение об ошибке в UI
+		return
+
+	ready_button.disabled = true
+	_rpc_load_hub.rpc()
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_load_hub() -> void:
+	get_tree().change_scene_to_file("res://Scenes/Hub/hub.tscn")

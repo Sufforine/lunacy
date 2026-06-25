@@ -4,8 +4,8 @@ class_name Player
 @export var ease_speed: float = 5.0
 
 @onready var camera_rig          = $CameraRig
-@onready var dullahan: Node3D    = $Dullahan
-@onready var animation_player: AnimationPlayer = $Dullahan/AnimationPlayer
+@onready var model: Node3D           = $Model
+@onready var animation_player: AnimationPlayer = $Model/AnimationPlayer
 
 @onready var stats: StatsComponent         = $StatsComponent
 @onready var equipment: EquipmentComponent = $EquipmentComponent

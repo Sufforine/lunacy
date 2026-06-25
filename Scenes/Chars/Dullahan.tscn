@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://c72rgvrvlejj0"]
 
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://Scripts/Player/player.gd" id="1_7b1e3"]
-[ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_ywgea"]
+[ext_resource type="PackedScene" uid="uid://crm16gox67iu4" path="res://Scripts/Player/animsDull.fbx" id="2_ywgea"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://Scripts/Camera/camera.tscn" id="3_qkcry"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://Scripts/CharRes/components/EquipmentComponent.gd" id="5_qkcry"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://Scripts/CharRes/components/StatsComponent.gd" id="6_u5hdh"]
@@ -16,13 +16,16 @@ height = 3.4350586
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
 
 [node name="Dullahan" type="CharacterBody3D"]
 script = ExtResource("1_7b1e3")
 
-[node name="Dullahan" parent="." instance=ExtResource("2_ywgea")]
+[node name="Model" parent="." instance=ExtResource("2_ywgea")]
 
-[node name="Skeleton3D" parent="Dullahan/Armature" index="0"]
+[node name="Skeleton3D" parent="Model/Armature" index="0"]
 bones/1/position = Vector3(-5.6424843e-09, 1.3942643, -0.037368476)
 bones/1/rotation = Quaternion(-0.0133971935, 3.178366e-08, 1.5970703e-09, 0.9999103)
 bones/2/position = Vector3(2.054671e-15, 1.6272229, -6.3245636e-08)
@@ -200,4 +203,4 @@ grow_vertical = 2
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_thwtu")
 
-[editable path="Dullahan"]
+[editable path="Model"]
