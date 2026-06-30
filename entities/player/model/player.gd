@@ -55,11 +55,11 @@ func _finish_setup() -> void:
 			camera_rig.activate_for_local_player()
 		else:
 			camera_rig.deactivate()
-	else:
-		if not _saved_inventory_has_items():
-			_add_debug_starter_items()
-			SaveManager.save_player_state(inventory, equipment)
-		camera_rig.activate_for_local_player()
+	
+	if not _saved_inventory_has_items():
+		_add_debug_starter_items()
+		SaveManager.save_player_state(inventory, equipment)
+	camera_rig.activate_for_local_player()
 
 	_enable_persist()
 
