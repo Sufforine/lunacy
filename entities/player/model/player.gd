@@ -48,36 +48,42 @@ func _ready() -> void:
 func _finish_setup() -> void:
 	inventory_ui.bind(inventory, equipment)
 
-	if multiplayer.has_multiplayer_peer():
-		var is_local := is_multiplayer_authority()
-		$CanvasLayer.visible = is_local
-		if is_local:
-			camera_rig.activate_for_local_player()
-		else:
-			camera_rig.deactivate()
-	
-	if not _saved_inventory_has_items():
-		_add_debug_starter_items()
-		SaveManager.save_player_state(inventory, equipment)
-	camera_rig.activate_for_local_player()
+	var is_local := _is_local_player()
+
+	if is_local:
+		if _inventory_is_empty():
+			_ensure_starter_inventory()
+		_configure_as_local_player()
+	else:
+		_configure_as_remote_player()
 
 	_enable_persist()
 
 
-func _saved_inventory_has_items() -> bool:
-	for entry in PlayerProfile.inventory:
-		if entry is String and not entry.is_empty():
-			return true
-	return false
+func _is_local_player() -> bool:
+	return not multiplayer.has_multiplayer_peer() or is_multiplayer_authority()
 
 
-func _add_debug_starter_items() -> void:
-	inventory.add_item(ItemLibrary.get_item("hpot"))
-	inventory.add_item(ItemLibrary.get_item("mpot"))
-	inventory.add_item(ItemLibrary.get_item("hpot"))
-	inventory.add_item(ItemLibrary.get_item("coat"))
-	inventory.add_item(ItemLibrary.get_item("axe"))
-	inventory.add_item(ItemLibrary.get_item("spd"))
+func _inventory_is_empty() -> bool:
+	for slot in inventory.slots:
+		if slot != null:
+			return false
+	return true
+
+
+func _ensure_starter_inventory() -> void:
+	SaveManager.ensure_starter_inventory_if_empty()
+	inventory.set_data(PlayerProfile.inventory)
+
+
+func _configure_as_local_player() -> void:
+	$CanvasLayer.visible = true
+	camera_rig.activate_for_local_player()
+
+
+func _configure_as_remote_player() -> void:
+	$CanvasLayer.visible = false
+	camera_rig.deactivate()
 
 
 func _enable_persist() -> void:

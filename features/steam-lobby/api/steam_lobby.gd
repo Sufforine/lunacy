@@ -22,6 +22,10 @@ var _transport := NetSteamTransport.new()
 var _session := NetSession.new()
 var _spawner := NetSpawner.new()
 
+var _pending_hub: Node3D
+var _pending_spawns: Array = []
+var _spawn_sync_remaining: int = 0
+
 
 func _ready() -> void:
 	if not _steam_available():
@@ -113,11 +117,53 @@ func spawn_hub_players(hub: Node3D, spawn_points: Array) -> void:
 		push_error("SteamLobby: нет точек спавна в хабе")
 		return
 
+	_pending_hub = hub
+	_pending_spawns = spawn_points
+	_spawn_sync_remaining = _session.player_states.size()
+	_rpc_sync_profile_before_spawn.rpc()
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_sync_profile_before_spawn() -> void:
+	SaveManager.ensure_starter_inventory_if_empty()
+	var peer_id := multiplayer.get_unique_id()
+	var state_data := _session.register_local_player(peer_id)
+
+	if multiplayer.is_server():
+		_on_spawn_profile_sync_done()
+	else:
+		_rpc_spawn_profile_sync.rpc_id(1, state_data)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_spawn_profile_sync(state_data: Dictionary) -> void:
+	if not multiplayer.is_server():
+		return
+
+	var sender_id := multiplayer.get_remote_sender_id()
+	_session.register_remote_player(sender_id, state_data)
+	_on_spawn_profile_sync_done()
+
+
+func _on_spawn_profile_sync_done() -> void:
+	if not multiplayer.is_server():
+		return
+
+	_spawn_sync_remaining -= 1
+	if _spawn_sync_remaining > 0:
+		return
+
+	if _pending_hub == null or _pending_spawns.is_empty():
+		return
+
 	for peer_id in _session.player_states:
 		var state_data := _session.player_state_data(peer_id)
-		var spawn_index := int(peer_id) % spawn_points.size()
-		var spawn_pos: Vector3 = spawn_points[spawn_index].global_position
+		var spawn_index := int(peer_id) % _pending_spawns.size()
+		var spawn_pos: Vector3 = _pending_spawns[spawn_index].global_position
 		_rpc_spawn_hub_player.rpc(state_data, spawn_pos)
+
+	_pending_hub = null
+	_pending_spawns = []
 
 
 @rpc("authority", "call_local", "reliable")

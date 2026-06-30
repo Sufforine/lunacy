@@ -202,6 +202,23 @@ func save_player_state(inventory: InventoryComponent, equipment: EquipmentCompon
 # =========================================================
 # СЕРИАЛИЗАЦИЯ
 # =========================================================
+func ensure_starter_inventory_if_empty() -> void:
+	if _profile_has_inventory(PlayerProfile.inventory):
+		return
+	PlayerProfile.inventory = _normalize_inventory([
+		"hpot", "mpot", "hpot", "coat", "axe", "spd",
+	])
+	save_profile()
+	print("SaveManager: добавлен стартовый инвентарь")
+
+
+func _profile_has_inventory(raw: Array) -> bool:
+	for entry in raw:
+		if entry is String and not entry.is_empty():
+			return true
+	return false
+
+
 func _serialize_inventory() -> Array:
 	return _normalize_inventory(PlayerProfile.inventory if PlayerProfile.inventory is Array else [])
 

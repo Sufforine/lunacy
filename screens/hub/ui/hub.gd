@@ -23,9 +23,13 @@ func _spawn_solo() -> void:
 		push_warning("hub: герой не выбран")
 		return
 
+	SaveManager.ensure_starter_inventory_if_empty()
+
 	var spawn_pos: Vector3 = spawns[0].global_position if not spawns.is_empty() else Vector3.ZERO
 	var state_data := {
 		"peer_id": 1,
 		"hero_scene": PlayerProfile.hero_scene,
+		"inventory": PlayerProfile.inventory,
+		"equipment": PlayerProfile.equipment,
 	}
 	_spawner.spawn_player(self, state_data, spawn_pos)

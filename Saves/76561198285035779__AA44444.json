@@ -9,11 +9,11 @@
 	"hero_scene": "res://entities/hero/ui/Dullahan.tscn",
 	"inventory": [
 		"spd",
-		"hpot",
+		"mpot",
 		"hpot",
 		"coat",
-		"axe",
-		"mpot"
+		"hpot",
+		"axe"
 	],
 	"level": 1
 }
