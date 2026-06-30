@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bdofd3s0gtqo5"]
+
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/item_data.gd" id="1_8csc2"]
+[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="1_qa8ef"]
+
+
+[resource]
+script = ExtResource("1_8csc2")
+id = "hpot"
+item_name = "Health Potion"
+icon = ExtResource("1_qa8ef")
+is_consumable = true
+heal_hp = 50
+metadata/_custom_type_script = "uid://c77evqxqq52db"

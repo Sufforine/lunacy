@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="HeroStat" load_steps=2 format=3 uid="uid://3xe4irj5e7bl"]
+
+[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/hero/model/hero_stat.gd" id="1_vto27"]
+
+[resource]
+script = ExtResource("1_vto27")
+metadata/_custom_type_script = "uid://bl1a2yvhckgo4"

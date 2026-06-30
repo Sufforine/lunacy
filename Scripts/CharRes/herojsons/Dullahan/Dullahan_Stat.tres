@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="HeroStat" load_steps=2 format=3 uid="uid://cctlboe5gxkyn"]
-
-[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://Scripts/CharRes/components/HeroStat.gd" id="1_tauoo"]
-
-[resource]
-script = ExtResource("1_tauoo")
-crit_chance = 0.0
-metadata/_custom_type_script = "uid://bl1a2yvhckgo4"

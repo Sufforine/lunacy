@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="HeroDefinition" load_steps=4 format=3 uid="uid://c4sknu2qu1vjf"]
+
+[ext_resource type="Script" uid="uid://b7jvexmso6pys" path="res://entities/hero/model/hero_definition.gd" id="1_3uwu5"]
+[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="1_hwpmp"]
+[ext_resource type="PackedScene" uid="uid://bi4c5nkadivvh" path="res://entities/hero/ui/Slon.tscn" id="2_bjle8"]
+
+[resource]
+script = ExtResource("1_3uwu5")
+id = "slon"
+hero_name = "Слон"
+icon = ExtResource("1_hwpmp")
+scene = ExtResource("2_bjle8")
+metadata/_custom_type_script = "uid://b7jvexmso6pys"

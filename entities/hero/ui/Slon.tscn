@@ -1,0 +1,68 @@
+[gd_scene load_steps=12 format=3 uid="uid://bi4c5nkadivvh"]
+
+[ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://entities/player/model/player.gd" id="1_qrag8"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/equipment_component.gd" id="3_4o0kv"]
+[ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="4_gh6cj"]
+[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/hero/model/stats_component.gd" id="4_miqe7"]
+[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/hero/model/hero_stat.gd" id="5_4o0kv"]
+[ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="5_7mhq8"]
+[ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/inventory_component.gd" id="7_y5adv"]
+
+[sub_resource type="Resource" id="Resource_miqe7"]
+script = ExtResource("5_4o0kv")
+metadata/_custom_type_script = "uid://bl1a2yvhckgo4"
+
+[sub_resource type="BoxMesh" id="BoxMesh_h8stw"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nqh3e"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_6w854"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="Slon" type="CharacterBody3D"]
+script = ExtResource("1_qrag8")
+
+[node name="EquipmentComponent" type="Node" parent="."]
+script = ExtResource("3_4o0kv")
+metadata/_custom_type_script = "uid://djbdlfj35305n"
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("4_miqe7")
+base_stats = SubResource("Resource_miqe7")
+metadata/_custom_type_script = "uid://6u724dpa4ia2"
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="StatsLabel" type="Label" parent="CanvasLayer"]
+offset_right = 40.0
+offset_bottom = 23.0
+metadata/_edit_use_anchors_ = true
+
+[node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("5_7mhq8")]
+
+[node name="CameraRig" parent="." instance=ExtResource("4_gh6cj")]
+
+[node name="Model" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Model"]
+transform = Transform3D(1, 0, 0, 0, 2.309445, 0, 0, 0, 1, 0, 1.0505399, 0)
+mesh = SubResource("BoxMesh_h8stw")
+skeleton = NodePath("../..")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Model"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8883058, 0)
+shape = SubResource("CapsuleShape3D_nqh3e")
+
+[node name="InventoryComponent" type="Node" parent="."]
+script = ExtResource("7_y5adv")
+metadata/_custom_type_script = "uid://1bosx6ydwxhi"
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_6w854")

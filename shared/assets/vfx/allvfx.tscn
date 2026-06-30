@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://gryq1yi4cl72"]
+
+[ext_resource type="ArrayMesh" uid="uid://bd0sldejdqxd5" path="res://shared/assets/vfx/dullbolt/projectile_mesh.obj" id="1_d3pb3"]
+[ext_resource type="Shader" uid="uid://btguor2qs2puy" path="res://shared/assets/vfx/dullbolt/DullahanBolt.tres" id="2_nc4et"]
+[ext_resource type="Shader" uid="uid://c5vuvueaioewy" path="res://shared/assets/vfx/centerball.tres" id="3_xouuc"]
+[ext_resource type="Shader" uid="uid://coaocvbangnou" path="res://shared/assets/vfx/lighningtrail.tres" id="4_b5dbf"]
+[ext_resource type="Texture2D" uid="uid://sfdgied8h1y2" path="res://shared/assets/vfx/dullbolt/T_VFX_basic1.PNG" id="5_tngxr"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_0iclo"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1cj7t"]
+albedo_color = Color(0.3380998, 0.33809963, 0.33809966, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ehasq"]
+render_priority = 0
+shader = ExtResource("2_nc4et")
+shader_parameter/Color = Color(1.0768309, 0.973359, 2.534755, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_cf0eh"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gamkd"]
+render_priority = 0
+shader = ExtResource("3_xouuc")
+shader_parameter/ballcoloe = Color(0, 0, 0, 1)
+
+[sub_resource type="Gradient" id="Gradient_27jsu"]
+offsets = PackedFloat32Array(0, 0.3576555, 0.70454544, 0.8504785)
+colors = PackedColorArray(0, 0, 0, 0, 0.104620956, 0, 0.60536116, 1, 0.49717584, 0.0018810908, 0.7356497, 1, 0.50980395, 0, 0.7411765, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_b0aaw"]
+gradient = SubResource("Gradient_27jsu")
+use_hdr = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_qrb06"]
+render_priority = 0
+shader = ExtResource("4_b5dbf")
+shader_parameter/Color = SubResource("GradientTexture1D_b0aaw")
+shader_parameter/trialspeed = Vector2(1, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_bbv5y"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6m4dg"]
+blend_mode = 1
+cull_mode = 2
+shading_mode = 0
+disable_ambient_light = true
+disable_fog = true
+vertex_color_use_as_albedo = true
+vertex_color_is_srgb = true
+albedo_texture = ExtResource("5_tngxr")
+
+[sub_resource type="Curve" id="Curve_q1uj4"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.9908258, 0.11618471), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_vccb8"]
+curve = SubResource("Curve_q1uj4")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_xbyv4"]
+particle_flag_align_y = true
+emission_shape = 2
+emission_sphere_radius = 0.5
+direction = Vector3(-1, 0, 0)
+spread = 20.0
+initial_velocity_min = 4.25
+initial_velocity_max = 4.25
+radial_velocity_min = 0.99997765
+radial_velocity_max = 1.9999776
+gravity = Vector3(0, 0, 0)
+scale_curve = SubResource("CurveTexture_vccb8")
+color = Color(0.80363095, 0, 1, 1)
+
+[sub_resource type="QuadMesh" id="QuadMesh_kyjfw"]
+size = Vector2(0.1, 0.5)
+
+[node name="Allvfx" type="Node3D" unique_id=1058182298]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=402577949]
+transform = Transform3D(9.994063, 0, 0, 0, 1, 0, 0, 0, 9.994063, 0, 0.052793324, 0)
+mesh = SubResource("PlaneMesh_0iclo")
+surface_material_override/0 = SubResource("StandardMaterial3D_1cj7t")
+
+[node name="Fire" type="MeshInstance3D" parent="." unique_id=1932972048]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0.19023323, 0, 0.37862995)
+mesh = ExtResource("1_d3pb3")
+surface_material_override/0 = SubResource("ShaderMaterial_ehasq")
+
+[node name="Nut" type="MeshInstance3D" parent="Fire" unique_id=1665411913]
+transform = Transform3D(2.0477967, 0, 0, 0, 2.0436163, 0, 0, 0, 2.0096362, -5.9604645e-08, 4.0783157, 0.30252242)
+mesh = SubResource("SphereMesh_cf0eh")
+surface_material_override/0 = SubResource("ShaderMaterial_gamkd")
+
+[node name="Trial" type="MeshInstance3D" parent="Fire" unique_id=822467682]
+transform = Transform3D(-1.2116793e-07, 4.3711392e-08, -0.8632906, 1.2116796e-07, 1, 3.7735635e-08, 2.7719996, -4.3711378e-08, -3.773563e-08, 8.940697e-08, 4.100632, -1.997894)
+material_override = SubResource("ShaderMaterial_qrb06")
+mesh = SubResource("PlaneMesh_bbv5y")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="Fire" unique_id=1926589080]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, -5.9604645e-08, 3.9354305, 0.42666316)
+material_override = SubResource("StandardMaterial3D_6m4dg")
+cast_shadow = 0
+amount = 10
+process_material = SubResource("ParticleProcessMaterial_xbyv4")
+draw_pass_1 = SubResource("QuadMesh_kyjfw")

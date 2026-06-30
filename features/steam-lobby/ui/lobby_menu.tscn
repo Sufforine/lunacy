@@ -1,0 +1,212 @@
+[gd_scene load_steps=2 format=3 uid="uid://kw1joc0vf6x7"]
+
+[ext_resource type="Script" uid="uid://d03pje0if4i16" path="res://features/steam-lobby/ui/lobby_menu.gd" id="1"]
+
+[node name="LobbyMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="MainMenuPanel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -80.0
+offset_right = 150.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="MainMenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="HostButton" type="Button" parent="MainMenuPanel/VBox"]
+custom_minimum_size = Vector2(0, 36)
+layout_mode = 2
+text = "Host Server"
+
+[node name="JoinRow" type="HBoxContainer" parent="MainMenuPanel/VBox"]
+layout_mode = 2
+
+[node name="id_prompt" type="LineEdit" parent="MainMenuPanel/VBox/JoinRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Код лобби"
+
+[node name="JoinButton" type="Button" parent="MainMenuPanel/VBox/JoinRow"]
+layout_mode = 2
+text = "Join"
+
+[node name="LobbyPanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="LobbyCodeBox" type="PanelContainer" parent="LobbyPanel"]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 280.0
+offset_bottom = 56.0
+
+[node name="HBox" type="HBoxContainer" parent="LobbyPanel/LobbyCodeBox"]
+layout_mode = 2
+
+[node name="CodeLabel" type="Label" parent="LobbyPanel/LobbyCodeBox/HBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Код лобби: ..."
+vertical_alignment = 1
+
+[node name="CopyButton" type="Button" parent="LobbyPanel/LobbyCodeBox/HBox"]
+layout_mode = 2
+text = "Копировать"
+
+[node name="HeroSelectBox" type="PanelContainer" parent="LobbyPanel"]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 420.0
+grow_horizontal = 0
+
+[node name="VBox" type="VBoxContainer" parent="LobbyPanel/HeroSelectBox"]
+layout_mode = 2
+
+[node name="NicknameLabel" type="Label" parent="LobbyPanel/HeroSelectBox/VBox"]
+layout_mode = 2
+text = "Игрок"
+horizontal_alignment = 1
+
+[node name="HeroNameLabel" type="Label" parent="LobbyPanel/HeroSelectBox/VBox"]
+layout_mode = 2
+text = "Выберите героя"
+horizontal_alignment = 1
+
+[node name="HeroGrid" type="GridContainer" parent="LobbyPanel/HeroSelectBox/VBox"]
+layout_mode = 2
+columns = 4
+
+[node name="HSeparator" type="HSeparator" parent="LobbyPanel/HeroSelectBox/VBox"]
+layout_mode = 2
+
+[node name="PlayersLabel" type="Label" parent="LobbyPanel/HeroSelectBox/VBox"]
+layout_mode = 2
+text = "Игроки в лобби"
+horizontal_alignment = 1
+
+[node name="PlayersList" type="VBoxContainer" parent="LobbyPanel/HeroSelectBox/VBox"]
+layout_mode = 2
+
+[node name="SaveInfoBox" type="PanelContainer" parent="LobbyPanel"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -88.0
+offset_right = 340.0
+offset_bottom = -16.0
+grow_vertical = 0
+
+[node name="VBox" type="VBoxContainer" parent="LobbyPanel/SaveInfoBox"]
+layout_mode = 2
+
+[node name="SaveLabel" type="Label" parent="LobbyPanel/SaveInfoBox/VBox"]
+layout_mode = 2
+text = "Сохранение: По умолчанию"
+
+[node name="SaveButtons" type="HBoxContainer" parent="LobbyPanel/SaveInfoBox/VBox"]
+layout_mode = 2
+
+[node name="SelectSaveButton" type="Button" parent="LobbyPanel/SaveInfoBox/VBox/SaveButtons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Выбрать сохранение"
+
+[node name="NewSaveButton" type="Button" parent="LobbyPanel/SaveInfoBox/VBox/SaveButtons"]
+layout_mode = 2
+text = "Новое"
+
+[node name="ReadyButton" type="Button" parent="LobbyPanel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -60.0
+offset_top = -56.0
+offset_right = 60.0
+offset_bottom = -16.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Готов"
+
+[node name="SavePickerPopup" type="PopupPanel" parent="."]
+oversampling_override = 1.0
+size = Vector2i(280, 320)
+visible = true
+
+[node name="VBox" type="VBoxContainer" parent="SavePickerPopup"]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 276.0
+offset_bottom = 316.0
+
+[node name="Title" type="Label" parent="SavePickerPopup/VBox"]
+layout_mode = 2
+text = "Сохранения"
+horizontal_alignment = 1
+
+[node name="ScrollContainer" type="ScrollContainer" parent="SavePickerPopup/VBox"]
+custom_minimum_size = Vector2(0, 180)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="SaveListContainer" type="VBoxContainer" parent="SavePickerPopup/VBox/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HSeparator" type="HSeparator" parent="SavePickerPopup/VBox"]
+layout_mode = 2
+
+[node name="NewSaveLabel" type="Label" parent="SavePickerPopup/VBox"]
+layout_mode = 2
+text = "Создать новое:"
+
+[node name="NewSaveRow" type="HBoxContainer" parent="SavePickerPopup/VBox"]
+layout_mode = 2
+
+[node name="NameInput" type="LineEdit" parent="SavePickerPopup/VBox/NewSaveRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Название сохранения"
+
+[node name="CreateButton" type="Button" parent="SavePickerPopup/VBox/NewSaveRow"]
+layout_mode = 2
+text = "Создать"

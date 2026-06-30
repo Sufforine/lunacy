@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://64outvr4uc8i"]
+
+[ext_resource type="Script" uid="uid://db203ai8ow43x" path="res://screens/hub/ui/runouts-menu/back.gd" id="1_tvdyc"]
+[ext_resource type="Script" uid="uid://bvebx2jykvy2n" path="res://screens/hub/ui/runouts-menu/1mission.gd" id="2_hld3y"]
+
+[node name="RunoutsMenu" type="Control" unique_id=867179085]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="." unique_id=2014311877]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 47.0
+offset_right = 1090.0
+offset_bottom = 601.0
+
+[node name="Back" type="Button" parent="." unique_id=413654419]
+layout_mode = 0
+offset_left = 81.0
+offset_top = 543.0
+offset_right = 160.0
+offset_bottom = 585.0
+text = "Back
+"
+script = ExtResource("1_tvdyc")
+
+[node name="1mission" type="Button" parent="." unique_id=1346439647]
+layout_mode = 0
+offset_left = 216.0
+offset_top = 403.0
+offset_right = 312.0
+offset_bottom = 434.0
+text = "Mission 1
+"
+script = ExtResource("2_hld3y")
+
+[connection signal="pressed" from="Back" to="Back" method="_on_pressed"]
+[connection signal="pressed" from="1mission" to="1mission" method="_on_pressed"]

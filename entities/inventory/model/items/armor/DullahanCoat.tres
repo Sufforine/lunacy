@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://duor5eblnert3"]
+
+[ext_resource type="Texture2D" uid="uid://bwk7bvruu0dq7" path="res://Icons/error.png" id="1_72ls7"]
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/item_data.gd" id="1_f0jk2"]
+
+[resource]
+script = ExtResource("1_f0jk2")
+id = "coat"
+item_name = "coat"
+icon = ExtResource("1_72ls7")
+slot = 2
+bonus_health = 33
+metadata/_custom_type_script = "uid://c77evqxqq52db"

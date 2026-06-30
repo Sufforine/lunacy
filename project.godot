@@ -16,11 +16,12 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 
 [autoload]
 
-InputManager="*res://Scripts/Input/input_manager.gd"
-PlayerProfile="*res://Scripts/Netcons/globals/PlayerProfile.gd"
-SaveManager="*res://Scripts/Netcons/globals/SaveManager.gd"
-ItemLibrary="*res://Scripts/CharRes/Consumables/ItemLibrary.gd"
-HeroLibrary="*res://Scripts/Netcons/globals/HeroLibrary.gd"
+InputManager="*res://shared/input/input_manager.gd"
+PlayerProfile="*res://entities/player/model/player_profile.gd"
+SaveManager="*res://entities/player/model/save_manager.gd"
+ItemLibrary="*res://entities/inventory/model/item_library.gd"
+HeroLibrary="*res://entities/hero/model/hero_library.gd"
+SteamLobby="*res://features/steam-lobby/api/steam_lobby.gd"
 
 [display]
 
@@ -30,12 +31,12 @@ window/per_pixel_transparency/allowed=true
 [file_customization]
 
 folder_colors={
-"res://Scenes/Menu/": "green",
-"res://Scripts/CharRes/ItemDataProcess/": "gray",
-"res://Scripts/CharRes/herojsons/": "red",
-"res://Scripts/CharRes/itemjsons/": "purple",
-"res://Scripts/MainMenu/": "green",
-"res://Scripts/Netcons/": "blue"
+"res://app/": "blue",
+"res://entities/": "gray",
+"res://features/": "yellow",
+"res://features/net/": "teal",
+"res://screens/": "green",
+"res://shared/": "orange"
 }
 
 [input]
