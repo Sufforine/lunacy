@@ -171,7 +171,7 @@ func load_profile() -> void:
 	PlayerProfile.hero_scene = _migrate_resource_path(data.get("hero_scene", ""))
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
-	PlayerProfile.inventory  = data.get("inventory", [])
+	PlayerProfile.inventory  = _normalize_inventory(data.get("inventory", []))
 	PlayerProfile.equipment  = _migrate_equipment_paths(data.get("equipment", EMPTY_EQUIPMENT.duplicate()))
 
 	if PlayerProfile.equipment.has("trinket_2"):
@@ -203,9 +203,19 @@ func save_player_state(inventory: InventoryComponent, equipment: EquipmentCompon
 # СЕРИАЛИЗАЦИЯ
 # =========================================================
 func _serialize_inventory() -> Array:
-	if PlayerProfile.inventory is Array:
-		return PlayerProfile.inventory
-	return []
+	return _normalize_inventory(PlayerProfile.inventory if PlayerProfile.inventory is Array else [])
+
+
+func _normalize_inventory(raw: Array) -> Array:
+	const SLOT_COUNT := 6
+	var result: Array = []
+	result.resize(SLOT_COUNT)
+	for i in SLOT_COUNT:
+		result[i] = ""
+	for i in mini(raw.size(), SLOT_COUNT):
+		var entry: Variant = raw[i]
+		result[i] = entry if entry is String else ""
+	return result
 
 
 func _serialize_equipment() -> Dictionary:

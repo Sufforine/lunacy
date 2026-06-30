@@ -55,10 +55,14 @@ func get_all_items() -> Array[ItemData]:
 
 
 func load_from_profile() -> void:
-	weapon    = _load_item(PlayerProfile.equipment.get("weapon",    ""))
-	armor     = _load_item(PlayerProfile.equipment.get("armor",     ""))
-	trinket_1 = _load_item(PlayerProfile.equipment.get("trinket_1", ""))
-	scroll = _load_item(PlayerProfile.equipment.get("scroll", ""))
+	load_from_dict(PlayerProfile.equipment)
+
+
+func load_from_dict(equipment_data: Dictionary) -> void:
+	weapon    = _load_item(equipment_data.get("weapon",    ""))
+	armor     = _load_item(equipment_data.get("armor",     ""))
+	trinket_1 = _load_item(equipment_data.get("trinket_1", ""))
+	scroll    = _load_item(equipment_data.get("scroll",    ""))
 	changed.emit()
 
 

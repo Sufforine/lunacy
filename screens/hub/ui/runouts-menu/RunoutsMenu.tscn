@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://64outvr4uc8i"]
+[gd_scene load_steps=3 format=3 uid="uid://64outvr4uc8i"]
 
 [ext_resource type="Script" uid="uid://db203ai8ow43x" path="res://screens/hub/ui/runouts-menu/back.gd" id="1_tvdyc"]
 [ext_resource type="Script" uid="uid://bvebx2jykvy2n" path="res://screens/hub/ui/runouts-menu/1mission.gd" id="2_hld3y"]
 
-[node name="RunoutsMenu" type="Control" unique_id=867179085]
+[node name="RunoutsMenu" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -11,14 +11,14 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Panel" type="Panel" parent="." unique_id=2014311877]
+[node name="Panel" type="Panel" parent="."]
 layout_mode = 0
 offset_left = 62.0
 offset_top = 47.0
 offset_right = 1090.0
 offset_bottom = 601.0
 
-[node name="Back" type="Button" parent="." unique_id=413654419]
+[node name="Back" type="Button" parent="."]
 layout_mode = 0
 offset_left = 81.0
 offset_top = 543.0
@@ -28,7 +28,7 @@ text = "Back
 "
 script = ExtResource("1_tvdyc")
 
-[node name="1mission" type="Button" parent="." unique_id=1346439647]
+[node name="1mission" type="Button" parent="."]
 layout_mode = 0
 offset_left = 216.0
 offset_top = 403.0

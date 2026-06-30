@@ -267,9 +267,4 @@ func _on_start_pressed() -> void:
 		return
 
 	ready_button.disabled = true
-	_rpc_load_hub.rpc()
-
-
-@rpc("authority", "call_local", "reliable")
-func _rpc_load_hub() -> void:
-	get_tree().change_scene_to_file("res://screens/hub/ui/hub.tscn")
+	SteamLobby.start_game()

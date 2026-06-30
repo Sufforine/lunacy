@@ -18,36 +18,94 @@ class_name Player
 enum AnimationState { IDLE, WALK, DOWNED, DEAD }
 var animation_state: AnimationState = AnimationState.IDLE
 
+var _persist_player_data_enabled := false
+
 
 # ════════════════════════════════════════════════════════
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+	var network_state: Variant = get_meta("network_state") if has_meta("network_state") else null
 
-	equipment.load_from_profile()
-	inventory.set_data(PlayerProfile.inventory)
+	if network_state is Dictionary and not is_multiplayer_authority():
+		_apply_network_state(network_state)
+	else:
+		equipment.load_from_profile()
+		inventory.set_data(PlayerProfile.inventory)
 
 	stats.current_health = int(stats.get_stat("health"))
 	stats.current_mana   = int(stats.get_stat("mana"))
 
-	# Подписаться на сигналы состояния
 	stats.downed.connect(_on_downed)
 	stats.died.connect(_on_died)
 	stats.revived.connect(_on_revived)
 
-	call_deferred("_init_inventory")
+	call_deferred("_finish_setup")
 
 	print("Player ready:", name, " auth:", is_multiplayer_authority())
 
 
-func _init_inventory() -> void:
+func _finish_setup() -> void:
 	inventory_ui.bind(inventory, equipment)
+
+	if multiplayer.has_multiplayer_peer():
+		var is_local := is_multiplayer_authority()
+		camera_rig.enabled = is_local
+		$CanvasLayer.visible = is_local
+	
+	
+	if not _saved_inventory_has_items():
+		_add_debug_starter_items()
+		SaveManager.save_player_state(inventory, equipment)
+
+	_enable_persist()
+
+
+func _saved_inventory_has_items() -> bool:
+	print("Xddd")
+	for entry in PlayerProfile.inventory:
+		if entry is String and not entry.is_empty():
+			return true
+	return false
+
+
+func _add_debug_starter_items() -> void:
 	inventory.add_item(ItemLibrary.get_item("hpot"))
 	inventory.add_item(ItemLibrary.get_item("mpot"))
 	inventory.add_item(ItemLibrary.get_item("hpot"))
 	inventory.add_item(ItemLibrary.get_item("coat"))
 	inventory.add_item(ItemLibrary.get_item("axe"))
 	inventory.add_item(ItemLibrary.get_item("spd"))
+
+
+func _enable_persist() -> void:
+	_persist_player_data_enabled = true
+	if not _should_persist():
+		return
+
+	if not inventory.changed.is_connected(_on_player_data_changed):
+		inventory.changed.connect(_on_player_data_changed)
+	if not equipment.changed.is_connected(_on_player_data_changed):
+		equipment.changed.connect(_on_player_data_changed)
+
+
+func _should_persist() -> bool:
+	if not _persist_player_data_enabled:
+		return false
+	if multiplayer.has_multiplayer_peer():
+		return is_multiplayer_authority()
+	return true
+
+
+func _on_player_data_changed() -> void:
+	if not _should_persist():
+		return
+	SaveManager.save_player_state(inventory, equipment)
+
+
+func _apply_network_state(state_data: Dictionary) -> void:
+	equipment.load_from_dict(state_data.get("equipment", {}))
+	inventory.set_data(state_data.get("inventory", []))
 
 
 # ════════════════════════════════════════════════════════
