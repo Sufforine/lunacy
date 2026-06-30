@@ -32,9 +32,8 @@ func spawn_player(parent: Node, state_data: Dictionary, spawn_position: Vector3 
 
 	parent.add_child(hero)
 
-	if spawn_position != Vector3.ZERO:
-		if hero is Node3D:
-			(hero as Node3D).global_position = spawn_position
+	if hero is Node3D and spawn_position != Vector3.ZERO:
+		(hero as Node3D).global_position = spawn_position
 
 	print("NetSpawner: заспавнен герой для peer ", peer_id, " @ ", spawn_position)
 	return hero

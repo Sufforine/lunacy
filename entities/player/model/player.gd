@@ -50,19 +50,21 @@ func _finish_setup() -> void:
 
 	if multiplayer.has_multiplayer_peer():
 		var is_local := is_multiplayer_authority()
-		camera_rig.enabled = is_local
 		$CanvasLayer.visible = is_local
-	
-	
-	if not _saved_inventory_has_items():
-		_add_debug_starter_items()
-		SaveManager.save_player_state(inventory, equipment)
+		if is_local:
+			camera_rig.activate_for_local_player()
+		else:
+			camera_rig.deactivate()
+	else:
+		if not _saved_inventory_has_items():
+			_add_debug_starter_items()
+			SaveManager.save_player_state(inventory, equipment)
+		camera_rig.activate_for_local_player()
 
 	_enable_persist()
 
 
 func _saved_inventory_has_items() -> bool:
-	print("Xddd")
 	for entry in PlayerProfile.inventory:
 		if entry is String and not entry.is_empty():
 			return true
@@ -233,17 +235,20 @@ func _update_animation() -> void:
 
 	match animation_state:
 		AnimationState.IDLE:
-			if not animation_player.current_animation == "idle":
-				animation_player.play("idle")
+			_play_animation("idle")
 		AnimationState.WALK:
-			if not animation_player.current_animation == "walk":
-				animation_player.play("walk")
+			_play_animation("walk")
 		AnimationState.DOWNED:
-			if not animation_player.current_animation == "downed":
-				animation_player.play("downed")
+			_play_animation("downed")
 		AnimationState.DEAD:
-			if not animation_player.current_animation == "dead":
-				animation_player.play("dead")
+			_play_animation("dead")
+
+
+func _play_animation(anim_name: String) -> void:
+	if not animation_player.has_animation(anim_name):
+		return
+	if animation_player.current_animation != anim_name:
+		animation_player.play(anim_name)
 
 
 # ════════════════════════════════════════════════════════

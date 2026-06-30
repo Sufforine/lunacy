@@ -46,13 +46,28 @@ var _tween: Tween
 var _lookahead: Vector3 = Vector3.ZERO
 
 ## Calculare the base camera offset from the target
-func _calc_offset():
+func _calc_offset() -> void:
 	if not player:
 		printerr("Player is no assigned")
-		return	
-	var offset_x = global_position.x - player.position.x
-	var offset_z = global_position.z - player.position.z
+		return
+	var offset_x := global_position.x - player.global_position.x
+	var offset_z := global_position.z - player.global_position.z
 	_offset = Vector3(offset_x, 0, offset_z)
+
+
+func activate_for_local_player() -> void:
+	if not player:
+		return
+	enabled = true
+	_calc_offset()
+	if camera:
+		camera.make_current()
+
+
+func deactivate() -> void:
+	enabled = false
+	if camera:
+		camera.current = false
 
 func _ready():
 	_calc_offset()
