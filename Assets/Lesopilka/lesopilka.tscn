@@ -1,7 +1,7 @@
 [gd_scene format=4 uid="uid://7vr58h6cjnve"]
 
 [ext_resource type="Texture2D" uid="uid://xnw443lkaj68" path="res://Assets/Lesopilka/Lesopilka.png" id="1_64y4p"]
-[ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://Scripts/Player/animsDull.fbx" id="2_1ej5l"]
+[ext_resource type="PackedScene" uid="uid://vpusio3jposy" path="res://entities/player/assets/animsDull.fbx" id="2_1ej5l"]
 [ext_resource type="PackedScene" uid="uid://dwk07ux4carcs" path="res://Assets/Lesopilka/Test_Landscape.glb" id="3_kvuw5"]
 [ext_resource type="Material" uid="uid://dj8rs6kjrmlef" path="res://Assets/materials/Stylized Dirt.material" id="4_8wduy"]
 [ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://Assets/grass/grass.tres" id="4_i8bit"]

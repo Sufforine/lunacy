@@ -1,7 +1,8 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://bdofd3s0gtqo5"]
 
 [ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/item_data.gd" id="1_8csc2"]
-[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Icons/bandage.png" id="1_qa8ef"]
+[ext_resource type="Texture2D" uid="uid://3f36hvkiljuu" path="res://Assets/Icons/bandage.png" id="1_qa8ef"]
+
 
 
 [resource]

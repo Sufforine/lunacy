@@ -1,8 +1,8 @@
 [gd_scene load_steps=12 format=4 uid="uid://b3qxvv8cnwgxo"]
 
-[ext_resource type="Material" uid="uid://baw55o0rjh7cu" path="res://shared/assets/materials/Mossy Dirt.material" id="1_ga226"]
-[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://shared/assets/grass/grass.tres" id="1_mh1hw"]
-[ext_resource type="PackedScene" uid="uid://prd8mxg0sp6a" path="res://shared/assets/grass/GrassMulti.fbx" id="2_mh1hw"]
+[ext_resource type="Material" uid="uid://baw55o0rjh7cu" path="res://Assets/materials/Mossy Dirt.material" id="1_ga226"]
+[ext_resource type="Shader" uid="uid://cqpxkun3n21o0" path="res://Assets/grass/grass.tres" id="1_mh1hw"]
+[ext_resource type="PackedScene" uid="uid://prd8mxg0sp6a" path="res://Assets/grass/GrassMulti.fbx" id="2_mh1hw"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_mh1hw"]
 frequency = 0.0201

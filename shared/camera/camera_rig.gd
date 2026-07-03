@@ -1,21 +1,13 @@
 class_name CameraRig
 extends Node3D
 
-## The shifting part of the camera rig
-## that is moving toward cursor
 @onready var offset_rig = $OffsetRig
-## Active camera
 @onready var camera = $OffsetRig/Camera3D
-## Camera debug overlay
 @onready var camera_debug = $CameraDebug
-## Camera utils
 @onready var utils: CameraUtils = $CameraUtils
 
-## Camera target to focus on
 @export var player: Player
-## Enable following to the target
 @export var enabled: bool = false
-## Enable camera cursor shift
 @export var enable_cursor_shift: bool = false
 
 @export_group("Camera to cursor")
@@ -41,7 +33,6 @@ func activate_for_local_player() -> void:
 	enabled = true
 	_lookahead = Vector3.ZERO
 
-	# top_level rig must snap to the player before follow offset is calculated.
 	var rig_y := global_position.y
 	global_position = Vector3(player.global_position.x, rig_y, player.global_position.z)
 	_calc_offset()

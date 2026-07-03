@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bowkf26i4v23c"]
 
 [ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://screens/main-menu/ui/main_menu.gd" id="1_tself"]
-[ext_resource type="VideoStream" uid="uid://b04xmwuac0o1k" path="res://shared/assets/video/IMG_6853.ogv" id="2_7jtkx"]
+[ext_resource type="VideoStream" uid="uid://b04xmwuac0o1k" path="res://Assets/video/IMG_6853.ogv" id="2_7jtkx"]
 
 [sub_resource type="FontFile" id="FontFile_vue75"]
 subpixel_positioning = 0

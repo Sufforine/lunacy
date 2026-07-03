@@ -1,7 +1,7 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://h4fwpvqylkmb"]
 
 [ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/item_data.gd" id="1_7v3em"]
-[ext_resource type="Texture2D" uid="uid://kt8dxsshvfbe" path="res://shared/assets/vfx/dullbolt/T_VFX_basic1.PNG" id="1_20qnd"]
+[ext_resource type="Texture2D" uid="uid://kt8dxsshvfbe" path="res://Assets/vfx/dullbolt/T_VFX_basic1.PNG" id="1_20qnd"]
 
 [resource]
 script = ExtResource("1_7v3em")
