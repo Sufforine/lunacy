@@ -15,18 +15,6 @@ const EMPTY_EQUIPMENT := {
 	"scroll":   "",
 }
 
-const RESOURCE_PATH_MIGRATIONS := {
-	"res://Scenes/Chars/Dullahan.tscn": "res://entities/hero/ui/Dullahan.tscn",
-	"res://Scenes/Chars/Slon.tscn": "res://entities/hero/ui/Slon.tscn",
-	"res://Scripts/CharRes/Consumables/health_potion.tres": "res://entities/inventory/model/items/consumables/health_potion.tres",
-	"res://Scripts/CharRes/Consumables/mana_potion.tres": "res://entities/inventory/model/items/consumables/mana_potion.tres",
-	"res://Scripts/CharRes/Consumables/big_potion.tres": "res://entities/inventory/model/items/consumables/big_potion.tres",
-	"res://Scripts/CharRes/itemjsons/armor/DullahanCoat.tres": "res://entities/inventory/model/items/armor/DullahanCoat.tres",
-	"res://Scripts/CharRes/itemjsons/trinkets/SpeedCharm.tres": "res://entities/inventory/model/items/trinkets/SpeedCharm.tres",
-	"res://Scripts/CharRes/itemjsons/trinkets/HealthCharm.tres": "res://entities/inventory/model/items/trinkets/HealthCharm.tres",
-	"res://Scripts/CharRes/itemjsons/trinkets/DamageCharm.tres": "res://entities/inventory/model/items/trinkets/DamageCharm.tres",
-	"res://Scripts/CharRes/itemjsons/weapon/Axe.tres": "res://entities/inventory/model/items/weapon/Axe.tres",
-}
 
 # Имя текущего активного именованного сохранения. Пусто = сохранение по умолчанию (steam_id.json)
 var _active_save_name: String = ""
@@ -168,11 +156,11 @@ func load_profile() -> void:
 		push_error("SaveManager: повреждённый JSON в %s" % path)
 		return
 
-	PlayerProfile.hero_scene = _migrate_resource_path(data.get("hero_scene", ""))
+	PlayerProfile.hero_scene = data.get("hero_scene", "")
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
 	PlayerProfile.inventory  = _normalize_inventory(data.get("inventory", []))
-	PlayerProfile.equipment  = _migrate_equipment_paths(data.get("equipment", EMPTY_EQUIPMENT.duplicate()))
+	PlayerProfile.equipment  = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
 
 	if PlayerProfile.equipment.has("trinket_2"):
 		PlayerProfile.equipment["scroll"] = PlayerProfile.equipment["trinket_2"]
@@ -242,19 +230,6 @@ func _serialize_equipment() -> Dictionary:
 			result[key] = PlayerProfile.equipment[key]
 		return result
 	return EMPTY_EQUIPMENT.duplicate()
-
-
-func _migrate_equipment_paths(equipment: Dictionary) -> Dictionary:
-	var result := EMPTY_EQUIPMENT.duplicate()
-	for key in equipment:
-		result[key] = _migrate_resource_path(equipment[key])
-	return result
-
-
-func _migrate_resource_path(path: String) -> String:
-	if RESOURCE_PATH_MIGRATIONS.has(path):
-		return RESOURCE_PATH_MIGRATIONS[path]
-	return path
 
 
 func _steam_id() -> int:
