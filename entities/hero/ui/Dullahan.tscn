@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://c72rgvrvlejj0"]
 
-[ext_resource type="Script" uid="uid://c6n4pitamm0fi" path="res://entities/hero/model/dullahan.gd" id="1_7b1e3"]
+[ext_resource type="Script" uid="uid://c6n4pitamm0fi" path="res://entities/dullahan/dullahan.gd" id="1_7b1e3"]
 [ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_ywgea"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="3_qkcry"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/equipment_component.gd" id="5_qkcry"]

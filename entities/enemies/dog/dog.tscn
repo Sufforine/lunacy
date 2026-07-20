@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3 uid="uid://cj4hun1om8y7a"]
+
+[ext_resource type="Script" path="res://entities/enemies/dog/dog.gd" id="1_dog"]
+[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_model"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dog"]
+height = 3.4350586
+
+[node name="Dog" type="CharacterBody3D"]
+floor_snap_length = 0.3
+script = ExtResource("1_dog")
+
+[node name="Model" parent="." instance=ExtResource("2_model")]
+transform = Transform3D(-0.3, 0, -2.6226834e-08, 0, 0.3, 0, 2.6226834e-08, 0, -0.3, 0, 0, 0)
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 2.0564578, 0.014858723)
+shape = SubResource("CapsuleShape3D_dog")

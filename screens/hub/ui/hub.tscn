@@ -44,6 +44,7 @@ script = ExtResource("1_ami6s")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="Ground"]
 transform = Transform3D(47.314545, 0, 0, 0, 3.8891134, 0, 0, 0, 51.660942, 0.61094046, -0.19225323, 0)
+use_collision = true
 size = Vector3(1.3204346, 0.030822754, 1)
 material = SubResource("StandardMaterial3D_qssp3")
 

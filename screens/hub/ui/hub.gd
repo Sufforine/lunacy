@@ -1,6 +1,7 @@
 extends Node3D
 
 const NetSpawner := preload("res://features/net/spawn/net_spawner.gd")
+const DogScene := preload("res://entities/enemies/dog/dog.tscn")
 
 @onready var spawns = $SpawnPoints.get_children()
 
@@ -16,6 +17,8 @@ func _ready() -> void:
 		SteamLobby.spawn_hub_players(self, spawns)
 	else:
 		_spawn_solo()
+
+	_spawn_test_dog()
 
 
 func _spawn_solo() -> void:
@@ -33,3 +36,15 @@ func _spawn_solo() -> void:
 		"equipment": PlayerProfile.equipment,
 	}
 	_spawner.spawn_player(self, state_data, spawn_pos)
+
+
+func _spawn_test_dog() -> void:
+	if SteamLobby.is_session_active() and not multiplayer.is_server():
+		return
+
+	var spawn_pos: Vector3 = spawns[0].global_position if not spawns.is_empty() else Vector3.ZERO
+	spawn_pos += Vector3(-2.0, 0.0, 1.5)
+
+	var dog: Node3D = DogScene.instantiate()
+	add_child(dog)
+	dog.global_position = spawn_pos
