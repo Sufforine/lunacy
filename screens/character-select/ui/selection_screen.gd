@@ -2,13 +2,13 @@ extends Control
 
 
 func _on_dullahan_pressed():
-	PlayerProfile.hero_scene = "res://entities/hero/ui/Dullahan.tscn"
+	PlayerProfile.hero_scene = "res://entities/characters/dullahan/Dullahan.tscn"
 	SaveManager.save_profile()
 	get_tree().change_scene_to_file("res://screens/hub/ui/hub.tscn")
 
 
 func _on_slon_pressed():
-	PlayerProfile.hero_scene = "res://entities/hero/ui/Slon.tscn"
+	PlayerProfile.hero_scene = "res://entities/characters/slon/Slon.tscn"
 	SaveManager.save_profile()
 	get_tree().change_scene_to_file("res://screens/hub/ui/hub.tscn")
 

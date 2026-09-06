@@ -156,7 +156,8 @@ func load_profile() -> void:
 		push_error("SaveManager: повреждённый JSON в %s" % path)
 		return
 
-	PlayerProfile.hero_scene = data.get("hero_scene", "")
+	var saved_hero_scene: String = data.get("hero_scene", "")
+	PlayerProfile.hero_scene = _migrate_hero_scene_path(saved_hero_scene)
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
 	PlayerProfile.inventory  = _normalize_inventory(data.get("inventory", []))
@@ -230,6 +231,16 @@ func _serialize_equipment() -> Dictionary:
 			result[key] = PlayerProfile.equipment[key]
 		return result
 	return EMPTY_EQUIPMENT.duplicate()
+
+
+func _migrate_hero_scene_path(path: String) -> String:
+	match path:
+		"res://entities/hero/ui/Dullahan.tscn", "res://entities/dullahan/Dullahan.tscn":
+			return "res://entities/characters/dullahan/Dullahan.tscn"
+		"res://entities/hero/ui/Slon.tscn", "res://entities/slon/Slon.tscn":
+			return "res://entities/characters/slon/Slon.tscn"
+		_:
+			return path
 
 
 func _steam_id() -> int:

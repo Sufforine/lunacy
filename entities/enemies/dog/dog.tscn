@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://cj4hun1om8y7a"]
 
 [ext_resource type="Script" path="res://entities/enemies/dog/dog.gd" id="1_dog"]
-[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://cv2bf6r8glbic" path="res://entities/characters/dullahan/assets/Dull.glb" id="2_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dog"]
 height = 3.4350586

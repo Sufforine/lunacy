@@ -1,11 +1,18 @@
 extends CharacterBody3D
 class_name Player
 
+@export var definition: HeroDefinition
 @export var ease_speed: float = 5.0
 
+@export_group("Animations")
+@export var idle_animation: StringName = &"idle"
+@export var run_animation: StringName = &"walk"
+@export var downed_animation: StringName = &"downed"
+@export var death_animation: StringName = &"dead"
+
 @onready var camera_rig          = $CameraRig
-@onready var model: Node3D           = $Model
-@onready var animation_player: AnimationPlayer = $Model/AnimationPlayer
+@onready var model: Node3D = $Model
+@onready var animation_player: AnimationPlayer = _find_animation_player()
 
 @onready var stats: StatsComponent         = $StatsComponent
 @onready var equipment: EquipmentComponent = $EquipmentComponent
@@ -17,6 +24,7 @@ class_name Player
 # ── состояния анимации ───────────────────────────────────
 enum AnimationState { IDLE, WALK, DOWNED, DEAD }
 var animation_state: AnimationState = AnimationState.IDLE
+var _action_locked := false
 
 var _persist_player_data_enabled := false
 
@@ -25,6 +33,10 @@ var _persist_player_data_enabled := false
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+	if definition == null:
+		push_error("Player: character definition is not assigned")
+		return
+
 	var network_state: Variant = get_meta("network_state") if has_meta("network_state") else null
 
 	if network_state is Dictionary and not is_multiplayer_authority():
@@ -33,12 +45,15 @@ func _ready() -> void:
 		equipment.load_from_profile()
 		inventory.set_data(PlayerProfile.inventory)
 
-	stats.current_health = int(stats.get_stat("health"))
-	stats.current_mana   = int(stats.get_stat("mana"))
+	stats.configure(definition)
 
 	stats.downed.connect(_on_downed)
 	stats.died.connect(_on_died)
 	stats.revived.connect(_on_revived)
+	if animation_player != null:
+		animation_player.animation_finished.connect(_on_action_animation_finished)
+	else:
+		push_warning("Player: AnimationPlayer was not found below Model")
 
 	call_deferred("_finish_setup")
 
@@ -87,9 +102,9 @@ func _configure_as_remote_player() -> void:
 
 
 func _enable_persist() -> void:
-	_persist_player_data_enabled = true
-	if not _should_persist():
+	if not _is_local_player():
 		return
+	_persist_player_data_enabled = true
 
 	if not inventory.changed.is_connected(_on_player_data_changed):
 		inventory.changed.connect(_on_player_data_changed)
@@ -98,11 +113,7 @@ func _enable_persist() -> void:
 
 
 func _should_persist() -> bool:
-	if not _persist_player_data_enabled:
-		return false
-	if multiplayer.has_multiplayer_peer():
-		return is_multiplayer_authority()
-	return true
+	return _persist_player_data_enabled
 
 
 func _on_player_data_changed() -> void:
@@ -235,26 +246,50 @@ func _on_revived() -> void:
 # АНИМАЦИИ
 # ════════════════════════════════════════════════════════
 func _update_animation() -> void:
-
-	if animation_player == null:
+	if animation_player == null or _action_locked:
 		return
 
 	match animation_state:
 		AnimationState.IDLE:
-			_play_animation("idle")
+			_play_loop(idle_animation)
 		AnimationState.WALK:
-			_play_animation("walk")
+			_play_loop(run_animation)
 		AnimationState.DOWNED:
-			_play_animation("downed")
+			_play_loop(downed_animation)
 		AnimationState.DEAD:
-			_play_animation("dead")
+			_play_loop(death_animation)
 
 
-func _play_animation(anim_name: String) -> void:
+func _play_loop(anim_name: StringName) -> void:
 	if not animation_player.has_animation(anim_name):
 		return
 	if animation_player.current_animation != anim_name:
 		animation_player.play(anim_name)
+
+
+func _play_action(anim_name: StringName) -> bool:
+	if animation_player == null or _action_locked:
+		return false
+	if not animation_player.has_animation(anim_name):
+		push_warning("Player: animation '%s' was not found" % anim_name)
+		return false
+
+	_action_locked = true
+	animation_player.play(anim_name)
+	return true
+
+
+func _on_action_animation_finished(_anim_name: StringName) -> void:
+	if not _action_locked:
+		return
+	_action_locked = false
+	_update_animation()
+
+
+func _find_animation_player() -> AnimationPlayer:
+	if model == null:
+		return null
+	return model.find_child("AnimationPlayer", true, false) as AnimationPlayer
 
 
 # ════════════════════════════════════════════════════════
@@ -304,6 +339,5 @@ func on_mission_complete() -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_PREDELETE:
-		if is_multiplayer_authority():
-			SaveManager.save_player_state(inventory, equipment)
+	if what == NOTIFICATION_PREDELETE and _persist_player_data_enabled:
+		SaveManager.save_player_state(inventory, equipment)

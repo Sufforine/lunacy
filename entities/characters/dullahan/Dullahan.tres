@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="HeroDefinition" load_steps=2 format=3 uid="uid://btqphceeadax2"]
+
+[ext_resource type="Script" uid="uid://corp3g2a5okp" path="res://entities/characters/model/hero_definition.gd" id="2_ua3af"]
+
+[resource]
+script = ExtResource("2_ua3af")
+id = &"dullahan"
+hero_name = "dullahan"
+scene_path = "res://entities/characters/dullahan/Dullahan.tscn"
+metadata/_custom_type_script = "uid://corp3g2a5okp"

@@ -3,10 +3,11 @@
 [ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://entities/player/model/player.gd" id="1_qrag8"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/equipment_component.gd" id="3_4o0kv"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="4_gh6cj"]
-[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/hero/model/stats_component.gd" id="4_miqe7"]
-[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/hero/model/hero_stat.gd" id="5_4o0kv"]
+[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/characters/stats_component.gd" id="4_miqe7"]
+[ext_resource type="Script" path="res://entities/characters/dullahan/hero_stat.gd" id="5_4o0kv"]
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="5_7mhq8"]
 [ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/inventory_component.gd" id="7_y5adv"]
+
 
 [sub_resource type="Resource" id="Resource_miqe7"]
 script = ExtResource("5_4o0kv")

@@ -6,13 +6,13 @@
 		"weapon": ""
 	},
 	"experience": 0,
-	"hero_scene": "res://entities/hero/ui/Dullahan.tscn",
+	"hero_scene": "res://entities/characters/dullahan/Dullahan.tscn",
 	"inventory": [
-		"spd",
-		"hpot",
+		"axe",
 		"hpot",
 		"coat",
-		"axe",
+		"spd",
+		"hpot",
 		"mpot"
 	],
 	"level": 1

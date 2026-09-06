@@ -1,13 +1,13 @@
 [gd_scene load_steps=11 format=3 uid="uid://c72rgvrvlejj0"]
 
-[ext_resource type="Script" uid="uid://c6n4pitamm0fi" path="res://entities/dullahan/dullahan.gd" id="1_7b1e3"]
-[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_ywgea"]
-[ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="3_qkcry"]
-[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/equipment_component.gd" id="5_qkcry"]
-[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/hero/model/stats_component.gd" id="6_u5hdh"]
-[ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://entities/hero/model/definitions/Dullahan/Dullahan_Stat.tres" id="11_5d23u"]
-[ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/inventory_component.gd" id="11_xfaeu"]
-[ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="12_xfaeu"]
+[ext_resource type="Script" uid="uid://c6n4pitamm0fi" path="res://entities/characters/dullahan/dullahan.gd" id="1_cxls0"]
+[ext_resource type="PackedScene" uid="uid://cv2bf6r8glbic" path="res://entities/characters/dullahan/assets/Dull.glb" id="2_24737"]
+[ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="3_qsm5a"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/equipment_component.gd" id="4_sygon"]
+[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/characters/model/stats_component.gd" id="5_25b0r"]
+[ext_resource type="Resource" uid="uid://btqphceeadax2" path="res://entities/characters/dullahan/Dullahan.tres" id="6_oa4qp"]
+[ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/inventory_component.gd" id="7_blykd"]
+[ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="8_uopme"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 height = 3.4350586
@@ -22,29 +22,33 @@ properties/1/replication_mode = 1
 
 [node name="Dullahan" type="CharacterBody3D"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
-script = ExtResource("1_7b1e3")
+script = ExtResource("1_cxls0")
+definition = ExtResource("6_oa4qp")
+idle_animation = &"T"
+run_animation = &"Run"
+downed_animation = &"Crawl"
+death_animation = &"T"
 
-[node name="Model" parent="." instance=ExtResource("2_ywgea")]
+[node name="Model" parent="." instance=ExtResource("2_24737")]
 transform = Transform3D(-0.3, 0, -2.6226834e-08, 0, 0.3, 0, 2.6226834e-08, 0, -0.3, 0, 0, 0)
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 2.0564578, 0.014858723)
 shape = SubResource("CapsuleShape3D_g75yn")
 
-[node name="CameraRig" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_qkcry")]
+[node name="CameraRig" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_qsm5a")]
 player = NodePath("..")
 
 [node name="EquipmentComponent" type="Node" parent="."]
-script = ExtResource("5_qkcry")
+script = ExtResource("4_sygon")
 metadata/_custom_type_script = "uid://djbdlfj35305n"
 
 [node name="StatsComponent" type="Node" parent="."]
-script = ExtResource("6_u5hdh")
-base_stats = ExtResource("11_5d23u")
+script = ExtResource("5_25b0r")
 metadata/_custom_type_script = "uid://6u724dpa4ia2"
 
 [node name="InventoryComponent" type="Node" parent="."]
-script = ExtResource("11_xfaeu")
+script = ExtResource("7_blykd")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -53,7 +57,7 @@ offset_right = 40.0
 offset_bottom = 23.0
 metadata/_edit_use_anchors_ = true
 
-[node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("12_xfaeu")]
+[node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("8_uopme")]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5

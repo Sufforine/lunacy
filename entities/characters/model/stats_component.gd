@@ -1,6 +1,20 @@
 extends Node
 class_name StatsComponent
 
+const BASE_STAT_FIELDS := {
+	"health": &"base_health",
+	"mana": &"base_mana",
+	"physical_damage": &"base_ad",
+	"magical_damage": &"base_ap",
+	"physical_resistance": &"base_ar",
+	"magical_resistance": &"base_mr",
+	"move_speed": &"move_speed",
+	"attack_speed": &"attack_speed",
+	"crit_chance": &"base_cc",
+	"crit_damage": &"base_cd",
+	"morale": &"morale",
+}
+
 # ── сигналы ─────────────────────────────────────────────
 signal stats_changed
 signal downed                  # HP упал до 0, начата агония
@@ -8,7 +22,7 @@ signal died                    # агония завершилась смерт�
 signal revived                 # подняли союзники до конца агонии
 
 # ── базовые статы ────────────────────────────────────────
-@export var base_stats: HeroStat
+var base_stats: HeroDefinition
 
 @onready var equipment: EquipmentComponent = $"../EquipmentComponent"
 
@@ -24,23 +38,33 @@ var current_morale: int = 0
 var is_downed: bool  = false
 var is_dead: bool    = false
 var _agony_timer: float = 0.0   # сколько секунд осталось в агонии
+var _last_max_health: float = 0.0
+var _last_max_mana: float = 0.0
+var _last_max_morale: int = 0
 
 
 # ════════════════════════════════════════════════════════
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+	if equipment and not equipment.changed.is_connected(_on_equipment_changed):
+		equipment.changed.connect(_on_equipment_changed)
 
+
+func configure(definition: HeroDefinition) -> void:
+	base_stats = definition
 	if base_stats == null:
-		push_error("StatsComponent: base_stats не назначен в инспекторе")
+		push_error("StatsComponent: character definition is not assigned")
 		return
 
-	if equipment:
+	if equipment and not equipment.changed.is_connected(_on_equipment_changed):
 		equipment.changed.connect(_on_equipment_changed)
 
 	current_health = int(get_stat("health"))
 	current_mana   = int(get_stat("mana"))
 	current_morale = int(get_stat("morale"))  # 0 + bonus_morale от снаряжения
+	_cache_maximums()
+	stats_changed.emit()
 
 
 # ════════════════════════════════════════════════════════
@@ -69,9 +93,14 @@ func get_stat(stat_name: String) -> float:
 		push_error("StatsComponent.get_stat: base_stats == null")
 		return 0.0
 
-	var base: Variant = base_stats.get(stat_name)
+	var definition_field: StringName = BASE_STAT_FIELDS.get(stat_name, &"")
+	if definition_field.is_empty():
+		push_warning("StatsComponent.get_stat: unknown stat '%s'" % stat_name)
+		return 0.0
+
+	var base: Variant = base_stats.get(definition_field)
 	if base == null:
-		push_warning("StatsComponent.get_stat: поле '%s' не найдено в HeroStat" % stat_name)
+		push_warning("StatsComponent.get_stat: field '%s' was not found in HeroDefinition" % definition_field)
 		return 0.0
 
 	var value := float(base)
@@ -188,10 +217,12 @@ func revive(revive_health: int = 1) -> void:
 # ПЕРЕСЧЁТ ПРИ СМЕНЕ СНАРЯЖЕНИЯ
 # ════════════════════════════════════════════════════════
 func _on_equipment_changed() -> void:
+	if base_stats == null:
+		return
 
-	var old_max_hp:   float = get_stat("health")
-	var old_max_mana: float = get_stat("mana")
-	var old_max_morale: int = int(get_stat("morale"))
+	var old_max_hp := _last_max_health
+	var old_max_mana := _last_max_mana
+	var old_max_morale := _last_max_morale
 
 	var new_max_hp:    int = int(get_stat("health"))
 	var new_max_mana:  int = int(get_stat("mana"))
@@ -209,4 +240,11 @@ func _on_equipment_changed() -> void:
 	var morale_penalty: int = old_max_morale - current_morale
 	current_morale = clamp(new_max_morale - morale_penalty, -100, 100)
 
+	_cache_maximums()
 	stats_changed.emit()
+
+
+func _cache_maximums() -> void:
+	_last_max_health = get_stat("health")
+	_last_max_mana = get_stat("mana")
+	_last_max_morale = int(get_stat("morale"))

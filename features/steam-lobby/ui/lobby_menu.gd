@@ -153,7 +153,7 @@ func _populate_hero_grid() -> void:
 
 
 func _on_hero_selected(hero: HeroDefinition) -> void:
-	PlayerProfile.hero_scene = hero.scene.resource_path
+	PlayerProfile.hero_scene = hero.scene_path
 	hero_name_label.text = hero.hero_name
 	_refresh_hero_selection_highlight()
 
@@ -167,7 +167,7 @@ func _refresh_hero_selection_highlight() -> void:
 	for id in _hero_buttons:
 		var btn: Button = _hero_buttons[id]
 		var hero: HeroDefinition = HeroLibrary.get_hero(id)
-		var selected := hero != null and hero.scene.resource_path == PlayerProfile.hero_scene
+		var selected := hero != null and hero.scene_path == PlayerProfile.hero_scene
 		btn.modulate = Color.WHITE if selected else Color(0.6, 0.6, 0.6, 1.0)
 
 		if selected:
@@ -203,8 +203,8 @@ func _on_players_updated(players: Array) -> void:
 func _find_hero_by_scene_path(path: String) -> HeroDefinition:
 	if path.is_empty():
 		return null
-	for hero in HeroLibrary.all_heroes():
-		if hero.scene and hero.scene.resource_path == path:
+	for hero: HeroDefinition in HeroLibrary.all_heroes():
+		if hero.scene_path == path:
 			return hero
 	return null
 
