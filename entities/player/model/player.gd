@@ -18,102 +18,37 @@ class_name Player
 enum AnimationState { IDLE, WALK, DOWNED, DEAD }
 var animation_state: AnimationState = AnimationState.IDLE
 
-var _persist_player_data_enabled := false
-
 
 # ════════════════════════════════════════════════════════
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
-	var network_state: Variant = get_meta("network_state") if has_meta("network_state") else null
 
-	if network_state is Dictionary and not is_multiplayer_authority():
-		_apply_network_state(network_state)
-	else:
-		equipment.load_from_profile()
-		inventory.set_data(PlayerProfile.inventory)
+	equipment.load_from_profile()
+	inventory.set_data(PlayerProfile.inventory)
 
 	stats.current_health = int(stats.get_stat("health"))
 	stats.current_mana   = int(stats.get_stat("mana"))
 
+	# Подписаться на сигналы состояния
 	stats.downed.connect(_on_downed)
 	stats.died.connect(_on_died)
 	stats.revived.connect(_on_revived)
 
-	call_deferred("_finish_setup")
+	call_deferred("_init_inventory")
 
 	print("Player ready:", name, " auth:", is_multiplayer_authority())
 
 
-func _finish_setup() -> void:
+func _init_inventory() -> void:
 	inventory_ui.bind(inventory, equipment)
-
-	var is_local := _is_local_player()
-
-	if is_local:
-		if _inventory_is_empty():
-			_ensure_starter_inventory()
-		_configure_as_local_player()
-	else:
-		_configure_as_remote_player()
-
-	_enable_persist()
-
-
-func _is_local_player() -> bool:
-	return not multiplayer.has_multiplayer_peer() or is_multiplayer_authority()
-
-
-func _inventory_is_empty() -> bool:
-	for slot in inventory.slots:
-		if slot != null:
-			return false
-	return true
-
-
-func _ensure_starter_inventory() -> void:
-	SaveManager.ensure_starter_inventory_if_empty()
-	inventory.set_data(PlayerProfile.inventory)
-
-
-func _configure_as_local_player() -> void:
-	$CanvasLayer.visible = true
-	camera_rig.activate_for_local_player()
-
-
-func _configure_as_remote_player() -> void:
-	$CanvasLayer.visible = false
-	camera_rig.deactivate()
-
-
-func _enable_persist() -> void:
-	_persist_player_data_enabled = true
-	if not _should_persist():
-		return
-
-	if not inventory.changed.is_connected(_on_player_data_changed):
-		inventory.changed.connect(_on_player_data_changed)
-	if not equipment.changed.is_connected(_on_player_data_changed):
-		equipment.changed.connect(_on_player_data_changed)
-
-
-func _should_persist() -> bool:
-	if not _persist_player_data_enabled:
-		return false
-	if multiplayer.has_multiplayer_peer():
-		return is_multiplayer_authority()
-	return true
-
-
-func _on_player_data_changed() -> void:
-	if not _should_persist():
-		return
-	SaveManager.save_player_state(inventory, equipment)
-
-
-func _apply_network_state(state_data: Dictionary) -> void:
-	equipment.load_from_dict(state_data.get("equipment", {}))
-	inventory.set_data(state_data.get("inventory", []))
+	inventory.set_quickslot_data(PlayerProfile.quickslots)
+	inventory.add_item(ItemLibrary.get_item("hpot"))
+	inventory.add_item(ItemLibrary.get_item("mpot"))
+	inventory.add_item(ItemLibrary.get_item("hpot"))
+	inventory.add_item(ItemLibrary.get_item("coat"))
+	inventory.add_item(ItemLibrary.get_item("axe"))
+	inventory.add_item(ItemLibrary.get_item("spd"))
 
 
 # ════════════════════════════════════════════════════════
@@ -201,6 +136,13 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
+		# Быстрый доступ Alt+1/2/3
+		if event.alt_pressed:
+			match event.keycode:
+				KEY_1: inventory.use_quickslot(0, self)
+				KEY_2: inventory.use_quickslot(1, self)
+				KEY_3: inventory.use_quickslot(2, self)
+			return
 		match event.keycode:
 			KEY_1: inventory.use_item(0, self)
 			KEY_2: inventory.use_item(1, self)
@@ -241,20 +183,17 @@ func _update_animation() -> void:
 
 	match animation_state:
 		AnimationState.IDLE:
-			_play_animation("idle")
+			if not animation_player.current_animation == "idle":
+				animation_player.play("idle")
 		AnimationState.WALK:
-			_play_animation("walk")
+			if not animation_player.current_animation == "walk":
+				animation_player.play("walk")
 		AnimationState.DOWNED:
-			_play_animation("downed")
+			if not animation_player.current_animation == "downed":
+				animation_player.play("downed")
 		AnimationState.DEAD:
-			_play_animation("dead")
-
-
-func _play_animation(anim_name: String) -> void:
-	if not animation_player.has_animation(anim_name):
-		return
-	if animation_player.current_animation != anim_name:
-		animation_player.play(anim_name)
+			if not animation_player.current_animation == "dead":
+				animation_player.play("dead")
 
 
 # ════════════════════════════════════════════════════════

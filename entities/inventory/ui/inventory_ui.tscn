@@ -3,178 +3,120 @@
 [ext_resource type="Script" uid="uid://n7y5c3yi750k" path="res://entities/inventory/ui/inventory_ui.gd" id="1_xe0tv"]
 
 [node name="InventoryUI" type="Control"]
-custom_minimum_size = Vector2(150, 100)
 layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xe0tv")
+
+[node name="QuickBarHUD" type="HBoxContainer" parent="."]
+layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 998.0
-offset_top = -121.0
-offset_right = 1148.0
-offset_bottom = -5.0
-grow_vertical = 0
-size_flags_horizontal = 0
-size_flags_vertical = 8
-script = ExtResource("1_xe0tv")
-
-[node name="Grid" type="GridContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-columns = 3
-
-[node name="Slot_1" type="Button" parent="Grid"]
-clip_contents = true
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-tooltip_text = "Слот 1"
-
-[node name="Icon" type="TextureRect" parent="Grid/Slot_1"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="Slot_2" type="Button" parent="Grid"]
-clip_contents = true
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-tooltip_text = "Слот 2"
-
-[node name="Icon" type="TextureRect" parent="Grid/Slot_2"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="Slot_3" type="Button" parent="Grid"]
-clip_contents = true
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-tooltip_text = "Слот 3"
-
-[node name="Icon" type="TextureRect" parent="Grid/Slot_3"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="Slot_4" type="Button" parent="Grid"]
-clip_contents = true
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-tooltip_text = "Слот 4"
-
-[node name="Icon" type="TextureRect" parent="Grid/Slot_4"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="Slot_5" type="Button" parent="Grid"]
-clip_contents = true
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-tooltip_text = "Слот 5"
-
-[node name="Icon" type="TextureRect" parent="Grid/Slot_5"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="Slot_6" type="Button" parent="Grid"]
-clip_contents = true
-custom_minimum_size = Vector2(40, 40)
-layout_mode = 2
-tooltip_text = "Слот 6"
-
-[node name="Icon" type="TextureRect" parent="Grid/Slot_6"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="EquipmentPanel" type="Panel" parent="."]
-layout_mode = 1
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -212.0
-offset_top = -345.0
-offset_right = -12.0
-offset_bottom = -125.0
-grow_horizontal = 0
+offset_left = 12.0
+offset_top = -58.0
+offset_right = 158.0
+offset_bottom = -12.0
 grow_vertical = 0
 
-[node name="Title" type="Label" parent="EquipmentPanel"]
+[node name="QSlot_1" type="Button" parent="QuickBarHUD"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Alt+1"
+
+[node name="Icon" type="TextureRect" parent="QuickBarHUD/QSlot_1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="QSlot_2" type="Button" parent="QuickBarHUD"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Alt+2"
+
+[node name="Icon" type="TextureRect" parent="QuickBarHUD/QSlot_2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="QSlot_3" type="Button" parent="QuickBarHUD"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Alt+3"
+
+[node name="Icon" type="TextureRect" parent="QuickBarHUD/QSlot_3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="MainPanel" type="Panel" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -260.0
+offset_right = 320.0
+offset_bottom = 260.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Title" type="Label" parent="MainPanel"]
 layout_mode = 0
-offset_left = 8.0
 offset_top = 6.0
-offset_right = 192.0
-offset_bottom = 28.0
-text = "Экипировка  [I]"
+offset_right = 640.0
+offset_bottom = 26.0
+text = "Инвентарь  [I]"
 horizontal_alignment = 1
 
-[node name="SlotsContainer" type="VBoxContainer" parent="EquipmentPanel"]
+[node name="TopRow" type="HBoxContainer" parent="MainPanel"]
 layout_mode = 0
 offset_left = 8.0
 offset_top = 32.0
-offset_right = 192.0
-offset_bottom = 212.0
+offset_right = 632.0
+offset_bottom = 148.0
 
-[node name="WeaponRow" type="HBoxContainer" parent="EquipmentPanel/SlotsContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="EquipmentPanel/SlotsContainer/WeaponRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="EquipmentSection" type="VBoxContainer" parent="MainPanel/TopRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Оружие"
-vertical_alignment = 1
 
-[node name="SlotWeapon" type="Button" parent="EquipmentPanel/SlotsContainer/WeaponRow"]
+[node name="Row1" type="HBoxContainer" parent="MainPanel/TopRow/EquipmentSection"]
+layout_mode = 2
+
+[node name="SlotWeapon" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
 clip_contents = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 tooltip_text = "Оружие"
 
-[node name="Icon" type="TextureRect" parent="EquipmentPanel/SlotsContainer/WeaponRow/SlotWeapon"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotWeapon"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -185,23 +127,13 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="ArmorRow" type="HBoxContainer" parent="EquipmentPanel/SlotsContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="EquipmentPanel/SlotsContainer/ArmorRow"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Броня"
-vertical_alignment = 1
-
-[node name="SlotArmor" type="Button" parent="EquipmentPanel/SlotsContainer/ArmorRow"]
+[node name="SlotHelmet" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
 clip_contents = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-tooltip_text = "Броня"
+tooltip_text = "Шлем"
 
-[node name="Icon" type="TextureRect" parent="EquipmentPanel/SlotsContainer/ArmorRow/SlotArmor"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotHelmet"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -212,23 +144,13 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="Trinket1Row" type="HBoxContainer" parent="EquipmentPanel/SlotsContainer"]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="EquipmentPanel/SlotsContainer/Trinket1Row"]
-custom_minimum_size = Vector2(90, 0)
-layout_mode = 2
-size_flags_horizontal = 3
-text = "Тринкет 1"
-vertical_alignment = 1
-
-[node name="SlotTrinket1" type="Button" parent="EquipmentPanel/SlotsContainer/Trinket1Row"]
+[node name="SlotChestplate" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
 clip_contents = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-tooltip_text = "Тринкет 1"
+tooltip_text = "Доспех"
 
-[node name="Icon" type="TextureRect" parent="EquipmentPanel/SlotsContainer/Trinket1Row/SlotTrinket1"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotChestplate"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -239,23 +161,757 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="ScrollRow" type="HBoxContainer" parent="EquipmentPanel/SlotsContainer"]
+[node name="SlotLeggings" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Поножи"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotLeggings"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Row2" type="HBoxContainer" parent="MainPanel/TopRow/EquipmentSection"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="EquipmentPanel/SlotsContainer/ScrollRow"]
-custom_minimum_size = Vector2(90, 0)
+[node name="SlotCloak" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-size_flags_horizontal = 3
-text = "Свиток"
-vertical_alignment = 1
+tooltip_text = "Плащ"
 
-[node name="SlotScroll" type="Button" parent="EquipmentPanel/SlotsContainer/ScrollRow"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotCloak"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="SlotTrinket1" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Тринкет"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="SlotScroll" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
 clip_contents = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 tooltip_text = "Свиток"
 
-[node name="Icon" type="TextureRect" parent="EquipmentPanel/SlotsContainer/ScrollRow/SlotScroll"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotScroll"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Spacer" type="Control" parent="MainPanel/TopRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="QuickSlotsSection" type="VBoxContainer" parent="MainPanel/TopRow"]
+layout_mode = 2
+
+[node name="QLabel" type="Label" parent="MainPanel/TopRow/QuickSlotsSection"]
+layout_mode = 2
+text = "Быстрый доступ"
+horizontal_alignment = 1
+
+[node name="QRow" type="HBoxContainer" parent="MainPanel/TopRow/QuickSlotsSection"]
+layout_mode = 2
+
+[node name="QSlot_1" type="Button" parent="MainPanel/TopRow/QuickSlotsSection/QRow"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Alt+1"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/QuickSlotsSection/QRow/QSlot_1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="QSlot_2" type="Button" parent="MainPanel/TopRow/QuickSlotsSection/QRow"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Alt+2"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/QuickSlotsSection/QRow/QSlot_2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="QSlot_3" type="Button" parent="MainPanel/TopRow/QuickSlotsSection/QRow"]
+clip_contents = true
+custom_minimum_size = Vector2(44, 44)
+layout_mode = 2
+tooltip_text = "Alt+3"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/QuickSlotsSection/QRow/QSlot_3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="InventorySection" type="VBoxContainer" parent="MainPanel"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 156.0
+offset_right = 632.0
+offset_bottom = 512.0
+
+[node name="InvGrid" type="GridContainer" parent="MainPanel/InventorySection"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 9
+
+[node name="Slot_1" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 1"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_2" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 2"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_3" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 3"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_4" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 4"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_4"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_5" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 5"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_5"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_6" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 6"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_6"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_7" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 7"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_7"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_8" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 8"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_8"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_9" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 9"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_9"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_10" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 10"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_10"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_11" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 11"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_11"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_12" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 12"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_12"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_13" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 13"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_13"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_14" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 14"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_14"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_15" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 15"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_15"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_16" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 16"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_16"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_17" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 17"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_17"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_18" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 18"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_18"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_19" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 19"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_19"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_20" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 20"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_20"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_21" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 21"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_21"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_22" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 22"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_22"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_23" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 23"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_23"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_24" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 24"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_24"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_25" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 25"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_25"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_26" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 26"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_26"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_27" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 27"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_27"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_28" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 28"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_28"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_29" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 29"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_29"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_30" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 30"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_30"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_31" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 31"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_31"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_32" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 32"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_32"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_33" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 33"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_33"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_34" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 34"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_34"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_35" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 35"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_35"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="Slot_36" type="Button" parent="MainPanel/InventorySection/InvGrid"]
+clip_contents = true
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+tooltip_text = "Слот 36"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/InventorySection/InvGrid/Slot_36"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0

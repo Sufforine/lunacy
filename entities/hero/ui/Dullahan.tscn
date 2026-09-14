@@ -54,17 +54,6 @@ offset_bottom = 23.0
 metadata/_edit_use_anchors_ = true
 
 [node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("12_xfaeu")]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = 423.0
-offset_top = 221.0
-offset_right = 573.0
-offset_bottom = 321.0
-grow_horizontal = 2
-grow_vertical = 2
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_thwtu")

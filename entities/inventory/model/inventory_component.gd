@@ -5,16 +5,21 @@ class_name InventoryComponent
 
 signal changed
 
-const SLOT_COUNT := 6
+const SLOT_COUNT := 36
+const QUICKSLOT_COUNT := 3
 
 # Слоты: массив из ItemData или null
 var slots: Array = []
+var quickslots: Array = []  # 3 слота быстрого доступа
 
 
 func _ready() -> void:
 	slots.resize(SLOT_COUNT)
 	for i in SLOT_COUNT:
 		slots[i] = null
+	quickslots.resize(QUICKSLOT_COUNT)
+	for i in QUICKSLOT_COUNT:
+		quickslots[i] = null
 
 
 # =========================================================
@@ -107,6 +112,46 @@ func get_data() -> Array:
 	for slot in slots:
 		data.append(slot.id if slot != null else "")
 	return data
+
+
+func get_quickslot_data() -> Array:
+	var data: Array = []
+	for slot in quickslots:
+		data.append(slot.id if slot != null else "")
+	return data
+
+
+func set_quickslot_data(data: Array) -> void:
+	for i in QUICKSLOT_COUNT:
+		quickslots[i] = null
+	if data == null or data.is_empty():
+		return
+	for i in min(data.size(), QUICKSLOT_COUNT):
+		var id: String = data[i]
+		if id.is_empty():
+			continue
+		quickslots[i] = ItemLibrary.get_item(id)
+
+
+func use_quickslot(slot_index: int, player: Node) -> void:
+	if slot_index < 0 or slot_index >= QUICKSLOT_COUNT:
+		return
+	var item: ItemData = quickslots[slot_index]
+	if item == null:
+		return
+	var used := item.use(player)
+	if used and item.is_consumable:
+		quickslots[slot_index] = null
+		changed.emit()
+
+
+func move_to_quickslot(inv_idx: int, qs_idx: int) -> void:
+	if qs_idx < 0 or qs_idx >= QUICKSLOT_COUNT:
+		return
+	var displaced: ItemData = quickslots[qs_idx]
+	quickslots[qs_idx] = slots[inv_idx]
+	slots[inv_idx] = displaced
+	changed.emit()
 
 
 func set_data(data: Array) -> void:

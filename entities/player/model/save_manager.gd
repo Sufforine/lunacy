@@ -6,15 +6,17 @@
 # Текущий активный файл хранится в _active_save_name (пусто = дефолтный по Steam ID).
 extends Node
 
-const SAVE_DIR := "res://Saves/"
+const SAVE_DIR := "user://saves/"
 
 const EMPTY_EQUIPMENT := {
-	"weapon":   "",
-	"armor":    "",
-	"trinket_1": "",
-	"scroll":   "",
+	"weapon":     "",
+	"helmet":     "",
+	"chestplate": "",
+	"leggings":   "",
+	"cloak":      "",
+	"trinket_1":  "",
+	"scroll":     "",
 }
-
 
 # Имя текущего активного именованного сохранения. Пусто = сохранение по умолчанию (steam_id.json)
 var _active_save_name: String = ""
@@ -25,7 +27,7 @@ var _active_save_name: String = ""
 # =========================================================
 func get_save_path() -> String:
 
-	var steam_id: int = _steam_id()
+	var steam_id: int = Steam.getSteamID()
 	var prefix: String = str(steam_id) if steam_id != 0 else "offline"
 
 	if _active_save_name.is_empty():
@@ -46,7 +48,7 @@ func list_saves() -> Array:
 
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
 
-	var steam_id: int = _steam_id()
+	var steam_id: int = Steam.getSteamID()
 	var prefix: String = str(steam_id) if steam_id != 0 else "offline"
 
 	var result: Array = []
@@ -119,6 +121,7 @@ func save_profile() -> void:
 		"level":      PlayerProfile.level,
 		"experience": PlayerProfile.experience,
 		"inventory":  _serialize_inventory(),
+		"quickslots": _serialize_quickslots(),
 		"equipment":  _serialize_equipment(),
 	}
 
@@ -159,7 +162,8 @@ func load_profile() -> void:
 	PlayerProfile.hero_scene = data.get("hero_scene", "")
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
-	PlayerProfile.inventory  = _normalize_inventory(data.get("inventory", []))
+	PlayerProfile.inventory  = data.get("inventory", [])
+	PlayerProfile.quickslots = data.get("quickslots", ["" ,"", ""])
 	PlayerProfile.equipment  = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
 
 	if PlayerProfile.equipment.has("trinket_2"):
@@ -175,6 +179,7 @@ func load_profile() -> void:
 func save_player_state(inventory: InventoryComponent, equipment: EquipmentComponent) -> void:
 
 	PlayerProfile.inventory = inventory.get_data()
+	PlayerProfile.quickslots = inventory.get_quickslot_data()
 
 	PlayerProfile.equipment = {
 		"weapon":    equipment.weapon.resource_path    if equipment.weapon    else "",
@@ -190,37 +195,10 @@ func save_player_state(inventory: InventoryComponent, equipment: EquipmentCompon
 # =========================================================
 # СЕРИАЛИЗАЦИЯ
 # =========================================================
-func ensure_starter_inventory_if_empty() -> void:
-	if _profile_has_inventory(PlayerProfile.inventory):
-		return
-	PlayerProfile.inventory = _normalize_inventory([
-		"hpot", "mpot", "hpot", "coat", "axe", "spd",
-	])
-	save_profile()
-	print("SaveManager: добавлен стартовый инвентарь")
-
-
-func _profile_has_inventory(raw: Array) -> bool:
-	for entry in raw:
-		if entry is String and not entry.is_empty():
-			return true
-	return false
-
-
 func _serialize_inventory() -> Array:
-	return _normalize_inventory(PlayerProfile.inventory if PlayerProfile.inventory is Array else [])
-
-
-func _normalize_inventory(raw: Array) -> Array:
-	const SLOT_COUNT := 6
-	var result: Array = []
-	result.resize(SLOT_COUNT)
-	for i in SLOT_COUNT:
-		result[i] = ""
-	for i in mini(raw.size(), SLOT_COUNT):
-		var entry: Variant = raw[i]
-		result[i] = entry if entry is String else ""
-	return result
+	if PlayerProfile.inventory is Array:
+		return PlayerProfile.inventory
+	return []
 
 
 func _serialize_equipment() -> Dictionary:
@@ -231,9 +209,40 @@ func _serialize_equipment() -> Dictionary:
 		return result
 	return EMPTY_EQUIPMENT.duplicate()
 
+func _serialize_quickslots() -> Array:
+	if PlayerProfile.quickslots is Array:
+		return PlayerProfile.quickslots
+	return ["", "", ""]
 
-func _steam_id() -> int:
-	var steam = Engine.get_singleton("Steam")
-	if steam == null:
-		return 0
-	return steam.getSteamID()
+
+# =========================================================
+# СТАРТОВЫЙ ИНВЕНТАРЬ
+# Вызывается из hub.gd перед спавном соло-игрока.
+# Если инвентарь пустой — выдаёт базовый набор предметов.
+# =========================================================
+func ensure_starter_inventory_if_empty() -> void:
+
+	# Проверяем что хотя бы один слот непустой
+	var has_items := false
+	for id in PlayerProfile.inventory:
+		if id != "":
+			has_items = true
+			break
+
+	if has_items:
+		return
+
+	# Выдать стартовый набор — поправь id под свои предметы в ItemLibrary
+	var starter_ids := ["health_potion", "mana_potion", "health_potion"]
+
+	var filled: Array = []
+	for id in starter_ids:
+		filled.append(id)
+
+	# Остальные слоты пустые
+	while filled.size() < 36:
+		filled.append("")
+
+	PlayerProfile.inventory = filled
+	save_profile()
+	print("SaveManager: выдан стартовый инвентарь")

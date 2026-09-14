@@ -3,7 +3,7 @@ extends Node3D
 const NetSpawner := preload("res://features/net/spawn/net_spawner.gd")
 const DogScene := preload("res://entities/enemies/dog/dog.tscn")
 
-@onready var spawns = $SpawnPoints.get_children()
+var spawns: Array = []
 
 var _spawner := NetSpawner.new()
 
@@ -12,6 +12,12 @@ func _ready() -> void:
 	# Дождаться полной инициализации сцены после change_scene.
 	await get_tree().process_frame
 	await get_tree().process_frame
+
+	var spawn_node := get_node_or_null("SpawnPoints")
+	if spawn_node == null:
+		push_error("hub: нода SpawnPoints не найдена")
+		return
+	spawns = spawn_node.get_children()
 
 	if SteamLobby.is_session_active():
 		SteamLobby.spawn_hub_players(self, spawns)
