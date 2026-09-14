@@ -1,13 +1,14 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://h4fwpvqylkmb"]
 
 [ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/item_data.gd" id="1_7v3em"]
-[ext_resource type="Texture2D" uid="uid://kt8dxsshvfbe" path="res://Assets/vfx/dullbolt/T_VFX_basic1.PNG" id="1_20qnd"]
+[ext_resource type="Texture2D" uid="uid://dc3vyewnbjxmc" path="res://Assets/Icons/WoW Icon Pack/Trade/05.png" id="1_8afxa"]
 
 [resource]
 script = ExtResource("1_7v3em")
 id = "spd"
 item_name = "speedc"
-icon = ExtResource("1_20qnd")
+icon = ExtResource("1_8afxa")
+description = "скорост"
 slot = 3
 bonus_move_speed = 50.0
 metadata/_custom_type_script = "uid://c77evqxqq52db"
