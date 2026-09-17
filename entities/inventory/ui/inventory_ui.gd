@@ -21,11 +21,11 @@ class_name InventoryUI
 
 # Экипировка
 # Экипировка
-@onready var slot_weapon:     Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotWeapon
+@onready var slot_weapon:     Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotWeapon
 @onready var slot_helmet:     Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotHelmet
 @onready var slot_chestplate: Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotChestplate
 @onready var slot_leggings:   Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotLeggings
-@onready var slot_cloak:      Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotCloak
+@onready var slot_cloak:      Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotCloak
 @onready var slot_trinket1:   Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket1
 @onready var slot_trinket2:     Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket2
 

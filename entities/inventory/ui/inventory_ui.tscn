@@ -109,13 +109,13 @@ layout_mode = 2
 [node name="Row1" type="HBoxContainer" parent="MainPanel/TopRow/EquipmentSection"]
 layout_mode = 2
 
-[node name="SlotWeapon" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
+[node name="SlotCloak" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
 clip_contents = true
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 tooltip_text = "Оружие"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotWeapon"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotCloak"]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 1
 anchors_preset = 15
@@ -184,13 +184,13 @@ stretch_mode = 6
 [node name="Row2" type="HBoxContainer" parent="MainPanel/TopRow/EquipmentSection"]
 layout_mode = 2
 
-[node name="SlotCloak" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+[node name="SlotWeapon" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
 clip_contents = true
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 tooltip_text = "Плащ"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotCloak"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotWeapon"]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 1
 anchors_preset = 15
@@ -201,6 +201,10 @@ grow_vertical = 2
 mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
+
+[node name="Control" type="Control" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
 
 [node name="SlotTrinket1" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
 clip_contents = true
