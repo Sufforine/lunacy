@@ -5,23 +5,27 @@
 # КАК ДОБАВИТЬ НОВЫЙ ПРЕДМЕТ:
 # 1. Создай файл: res://Items/my_item.tres (New Resource → ItemData)
 # 2. Заполни поля в инспекторе (id, item_name, icon, heal_hp и т.д.)
-# 3. Добавь строку ниже в _ready()
+# 3. Добавь строку ниже в _init()
 extends Node
 
 # Все предметы игры. Ключ — id предмета (String).
 var _items: Dictionary = {}
 
 
-func _ready() -> void:
-	# Регистрируем предметы.
+func _init() -> void:
+	# _init() выполняется раньше _ready() любой сцены —
+	# поэтому предметы доступны сразу при первом get_item().
 	# Пути к .tres файлам — поправь под свою структуру папок.
 	_register_all([
 		preload("res://entities/inventory/model/items/consumables/health_potion.tres"),
 		preload("res://entities/inventory/model/items/consumables/mana_potion.tres"),
 		preload("res://entities/inventory/model/items/consumables/big_potion.tres"),
-		preload("res://entities/inventory/model/items/armor/DullahanCoat.tres"),
+		preload("res://entities/inventory/model/items/trinkets/DamageCharm.tres"),
 		preload("res://entities/inventory/model/items/trinkets/SpeedCharm.tres"),
 		preload("res://entities/inventory/model/items/weapon/Axe.tres"),
+		preload("res://entities/inventory/model/items/armor/DullahanCoat.tres"),
+		preload("res://entities/inventory/model/items/consumables/mana_potion.tres"),
+		preload("res://entities/inventory/model/items/consumables/big_potion.tres"),
 	])
 
 

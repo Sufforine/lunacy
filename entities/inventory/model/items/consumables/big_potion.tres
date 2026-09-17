@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("1_agtse")
 id = "bpot"
-item_name = "Bih Potion"
+item_name = "bpot"
 icon = ExtResource("1_60psu")
 is_consumable = true
 metadata/_custom_type_script = "uid://c77evqxqq52db"

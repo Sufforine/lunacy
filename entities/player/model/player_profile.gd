@@ -18,7 +18,7 @@ var equipment: Dictionary = {
 	"leggings":   "",
 	"cloak":      "",
 	"trinket_1":  "",
-	"scroll":     "",
+	"trinket_2":  "",
 }
 
 func mark_dirty():

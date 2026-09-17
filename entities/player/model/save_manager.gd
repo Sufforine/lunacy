@@ -15,7 +15,7 @@ const EMPTY_EQUIPMENT := {
 	"leggings":   "",
 	"cloak":      "",
 	"trinket_1":  "",
-	"scroll":     "",
+	"trinket_2":  "",
 }
 
 # Имя текущего активного именованного сохранения. Пусто = сохранение по умолчанию (steam_id.json)
@@ -166,9 +166,7 @@ func load_profile() -> void:
 	PlayerProfile.quickslots = data.get("quickslots", ["" ,"", ""])
 	PlayerProfile.equipment  = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
 
-	if PlayerProfile.equipment.has("trinket_2"):
-		PlayerProfile.equipment["scroll"] = PlayerProfile.equipment["trinket_2"]
-		PlayerProfile.equipment.erase("trinket_2")
+
 
 	print("SaveManager: загружено ← %s" % path)
 

@@ -5,8 +5,8 @@
 
 [resource]
 script = ExtResource("1_bls7b")
-id = "mpot"
-item_name = "mana Potion"
+id = "mana_potion"
+item_name = "mpot"
 icon = ExtResource("1_gaksg")
 is_consumable = true
 heal_mana = 50

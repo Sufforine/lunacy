@@ -220,13 +220,13 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="SlotScroll" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+[node name="SlotTrinket2" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
 clip_contents = true
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 tooltip_text = "Свиток"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotScroll"]
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket2"]
 custom_minimum_size = Vector2(60, 60)
 layout_mode = 1
 anchors_preset = 15

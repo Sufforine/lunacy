@@ -9,6 +9,6 @@ id = "spd"
 item_name = "speedc"
 icon = ExtResource("1_8afxa")
 description = "скорост"
-slot = 3
+slot = 6
 bonus_move_speed = 50.0
 metadata/_custom_type_script = "uid://c77evqxqq52db"

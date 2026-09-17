@@ -9,7 +9,7 @@ var chestplate: ItemData = null
 var leggings:   ItemData = null
 var cloak:      ItemData = null
 var trinket_1:  ItemData = null
-var scroll:     ItemData = null
+var trinket_2:  ItemData = null
 
 
 func equip(item: ItemData) -> void:
@@ -24,8 +24,11 @@ func equip(item: ItemData) -> void:
 		ItemData.Slot.CHESTPLATE: chestplate = item
 		ItemData.Slot.LEGGINGS:   leggings   = item
 		ItemData.Slot.CLOAK:      cloak      = item
-		ItemData.Slot.TRINKET_1:  trinket_1  = item
-		ItemData.Slot.SCROLL:     scroll     = item
+		ItemData.Slot.TRINKET:
+			if trinket_1 == null:
+				trinket_1 = item
+			else:
+				trinket_2 = item
 
 	changed.emit()
 	print("EquipmentComponent: надет '%s'" % item.id)
@@ -39,8 +42,11 @@ func unequip(slot: ItemData.Slot) -> void:
 		ItemData.Slot.CHESTPLATE: chestplate = null
 		ItemData.Slot.LEGGINGS:   leggings   = null
 		ItemData.Slot.CLOAK:      cloak      = null
-		ItemData.Slot.TRINKET_1:  trinket_1  = null
-		ItemData.Slot.SCROLL:     scroll     = null
+		ItemData.Slot.TRINKET:
+			if trinket_1 != null:
+				trinket_1 = null
+			else:
+				trinket_2 = null
 
 	changed.emit()
 
@@ -52,8 +58,7 @@ func get_slot_item(slot: ItemData.Slot) -> ItemData:
 		ItemData.Slot.CHESTPLATE: return chestplate
 		ItemData.Slot.LEGGINGS:   return leggings
 		ItemData.Slot.CLOAK:      return cloak
-		ItemData.Slot.TRINKET_1:  return trinket_1
-		ItemData.Slot.SCROLL:     return scroll
+		ItemData.Slot.TRINKET: return trinket_1
 	return null
 
 
@@ -65,7 +70,7 @@ func get_all_items() -> Array[ItemData]:
 	if leggings:   items.append(leggings)
 	if cloak:      items.append(cloak)
 	if trinket_1:  items.append(trinket_1)
-	if scroll:     items.append(scroll)
+	if trinket_2:  items.append(trinket_2)
 	return items
 
 
@@ -76,7 +81,7 @@ func load_from_profile() -> void:
 	leggings   = _load_item(PlayerProfile.equipment.get("leggings",   ""))
 	cloak      = _load_item(PlayerProfile.equipment.get("cloak",      ""))
 	trinket_1  = _load_item(PlayerProfile.equipment.get("trinket_1",  ""))
-	scroll     = _load_item(PlayerProfile.equipment.get("scroll",     ""))
+	trinket_2  = _load_item(PlayerProfile.equipment.get("trinket_2",  ""))
 	changed.emit()
 
 
@@ -88,7 +93,7 @@ func save_to_profile() -> void:
 		"leggings":   leggings.resource_path   if leggings   else "",
 		"cloak":      cloak.resource_path      if cloak      else "",
 		"trinket_1":  trinket_1.resource_path  if trinket_1  else "",
-		"scroll":     scroll.resource_path     if scroll     else "",
+		"trinket_2":  trinket_2.resource_path  if trinket_2  else "",
 	}
 	SaveManager.save_profile()
 
@@ -101,3 +106,23 @@ func _load_item(path: String) -> ItemData:
 		push_warning("EquipmentComponent: '%s' не является снаряжением" % path)
 		return null
 	return res as ItemData
+
+# Надеть предмет в конкретный слот по индексу UI (0-6).
+# Используется при drag & drop чтобы точно выбрать trinket_1 или trinket_2.
+func equip_to_slot(item: ItemData, slot_idx: int) -> void:
+
+	# item == null означает очистить слот (например при swap с пустым)
+	if item != null and not item.is_equipment():
+		return
+
+	match slot_idx:
+		0: weapon     = item
+		1: helmet     = item
+		2: chestplate = item
+		3: leggings   = item
+		4: cloak      = item
+		5: trinket_1  = item
+		6: trinket_2  = item
+
+	changed.emit()
+	print("EquipmentComponent: слот %d → '%s'" % [slot_idx, item.id if item else "пусто"])

@@ -9,6 +9,6 @@ id = "hp"
 item_name = "hpc"
 icon = ExtResource("1_wu7wl")
 description = "123123"
-slot = 3
+slot = 6
 bonus_health = 99
 metadata/_custom_type_script = "uid://c77evqxqq52db"

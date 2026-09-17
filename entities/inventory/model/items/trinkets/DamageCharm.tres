@@ -8,6 +8,6 @@ script = ExtResource("1_gl03h")
 id = "dmg"
 item_name = "dmgc"
 icon = ExtResource("1_fxqgg")
-slot = 3
+slot = 6
 bonus_physical_damage = 123
 metadata/_custom_type_script = "uid://c77evqxqq52db"

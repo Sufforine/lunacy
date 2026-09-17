@@ -5,8 +5,8 @@
 
 [resource]
 script = ExtResource("1_8csc2")
-id = "hpot"
-item_name = "Health Potion"
+id = "health_potion"
+item_name = "hpot"
 icon = ExtResource("1_hhahq")
 is_consumable = true
 heal_hp = 50
