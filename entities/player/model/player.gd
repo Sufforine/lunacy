@@ -46,9 +46,6 @@ func _init_inventory() -> void:
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("mana_potion"))
-	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("axe"))
 	inventory.add_item(ItemLibrary.get_item("coat"))
 	inventory.add_item(ItemLibrary.get_item("spd"))
@@ -221,8 +218,8 @@ func _update_stats_ui() -> void:
 	) % [
 		stats.current_health, int(stats.get_stat("health")),
 		stats.current_mana,   int(stats.get_stat("mana")),
-		int(stats.get_stat("physical_resistance")),
-		int(stats.get_stat("magical_resistance")),
+		int(stats.get_stat("armor")),
+		int(stats.get_stat("magic_resistance")),
 		stats.get_stat("move_speed"),
 		stats.get_stat("crit_chance") * 100.0,
 		stats.current_morale,

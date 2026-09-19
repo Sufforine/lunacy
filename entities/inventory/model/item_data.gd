@@ -24,17 +24,25 @@ enum Slot { NONE, WEAPON, HELMET, CHESTPLATE, LEGGINGS, CLOAK, TRINKET }
 @export var heal_mana: int = 0
 
 # Бонусы к статам (снаряжение)
+@export_group("Characteristic Bonuses")
+@export var bonus_strength: int = 0
+@export var bonus_agility: int = 0
+@export var bonus_intellect: int = 0
+@export var bonus_wisdom: int = 0
+
 @export_group("Stat Bonuses")
 @export var bonus_health: int = 0
 @export var bonus_mana: int = 0
-@export var bonus_physical_damage: int = 0
-@export var bonus_magical_damage: int = 0
-@export var bonus_physical_resistance: int = 0
-@export var bonus_magical_resistance: int = 0
-@export var bonus_move_speed: float = 0.0
+@export var bonus_armor: int = 0
+@export var bonus_magic_resistance: int = 0
 @export var bonus_attack_speed: float = 0.0
+@export var bonus_physical_damage_bonus: float = 0.0
+@export var bonus_magical_damage_bonus: float = 0.0
+@export var bonus_move_speed: float = 0.0
 @export var bonus_crit_chance: float = 0.0
-@export var bonus_crit_damage: float = 0.0
+@export var bonus_crit_multiplier: float = 0.0
+@export var bonus_duration: float = 0.0
+@export var bonus_radius: float = 0.0
 @export var bonus_morale: int = 0
 
 
