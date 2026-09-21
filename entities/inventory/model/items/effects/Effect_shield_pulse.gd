@@ -1,12 +1,15 @@
 # effect_shield_pulse.gd
-# Пример кастомного эффекта: раз в N секунд (задаётся tick_interval
-# в самом EffectData) даёт герою щит, поглощающий урон.
+# Раз в N секунд (tick_interval из EffectData) даёт герою щит.
 #
-# Как использовать:
-# 1. Создай EffectData.tres, назначь этот скрипт в effect_script
-# 2. duration = -1 (работает пока предмет надет)
-# 3. tick_interval = 10 (раз в 10 секунд)
-# 4. Назначь этот EffectData в ItemData.passive_effect у нужного предмета
+# Настройка EffectData.tres:
+#   duration = -1            (работает пока предмет надет)
+#   tick_interval = 10       (раз в 10 секунд)
+#   effect_script = effect_shield_pulse.gd   ← эта логика
+#   visual_script = shield_visual.gd         ← отдельно отвечает за сферу
+#
+# Логика и визуал полностью независимы: этот файл ничего не знает
+# о том как щит выглядит, shield_visual.gd ничего не знает откуда
+# берётся щит — он просто следит за stats.current_shield.
 extends EffectLogic
 
 const SHIELD_AMOUNT := 30.0

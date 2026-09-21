@@ -38,3 +38,10 @@ class_name EffectData
 
 @export_group("Custom Logic")
 @export var effect_script: Script = null  # extends EffectLogic
+
+@export_group("Visual")
+# Скрипт визуала (extends Node3D), создаётся как ребёнок героя пока
+# эффект активен и удаляется когда эффект снят. Полностью самодостаточный —
+# сам решает как выглядеть и на что реагировать (см. shield_visual.gd).
+@export var visual_script: Script = null
+@export var visual_offset: Vector3 = Vector3.ZERO

@@ -1,8 +1,9 @@
-[gd_resource type="Resource" script_class="EffectData" load_steps=4 format=3 uid="uid://bft7rqa0kgp04"]
+[gd_resource type="Resource" script_class="EffectData" load_steps=5 format=3 uid="uid://bft7rqa0kgp04"]
 
 [ext_resource type="Script" uid="uid://hlyn4nxchpa4" path="res://entities/inventory/model/items/effects/Effect_shield_pulse.gd" id="1_f0ajd"]
 [ext_resource type="Script" uid="uid://0g55daeumfsi" path="res://entities/inventory/model/data/Effectdata.gd" id="1_m2jee"]
 [ext_resource type="Texture2D" uid="uid://b76r1cxvpj7y" path="res://Assets/Icons/WoW Icon Pack/Abilities/Eclipse.png" id="2_pafnq"]
+[ext_resource type="Script" uid="uid://cmbs78ei04fa3" path="res://entities/inventory/model/items/effects/Visual_shield_pulse.gd" id="4_pafnq"]
 
 [resource]
 script = ExtResource("1_m2jee")
@@ -12,4 +13,5 @@ icon = ExtResource("2_pafnq")
 duration = -1.0
 tick_interval = 10.0
 effect_script = ExtResource("1_f0ajd")
+visual_script = ExtResource("4_pafnq")
 metadata/_custom_type_script = "uid://0g55daeumfsi"

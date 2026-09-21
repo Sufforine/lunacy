@@ -24,6 +24,7 @@ class ActiveEffect:
 	var tick_timer: float = 0.0
 	var stacks: int = 1
 	var logic: EffectLogic = null  # инстанс effect_script, если есть
+	var visual_instance: Node3D = null  # инстанс visual_script, если есть
 
 
 var _active: Array[ActiveEffect] = []
@@ -90,6 +91,15 @@ func apply_effect(data: EffectData, source: Object = null) -> void:
 
 	if data.effect_script != null:
 		active.logic = data.effect_script.new()
+
+	if data.visual_script != null:
+		var visual = data.visual_script.new()
+		if visual is Node3D:
+			visual.position = data.visual_offset
+			get_parent().add_child(visual)
+			active.visual_instance = visual
+		else:
+			push_warning("EffectsComponent: visual_script '%s' должен наследовать Node3D" % data.id)
 
 	_active.append(active)
 
@@ -176,6 +186,9 @@ func _remove_active(index: int) -> void:
 
 	if active.logic:
 		active.logic.on_expire(get_parent(), stats, self)
+
+	if active.visual_instance != null and is_instance_valid(active.visual_instance):
+		active.visual_instance.queue_free()
 
 	_active.remove_at(index)
 	effect_removed.emit(active)
