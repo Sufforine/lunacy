@@ -9,6 +9,7 @@ class_name Player
 
 @onready var stats: StatsComponent         = $StatsComponent
 @onready var equipment: EquipmentComponent = $EquipmentComponent
+@onready var effects: EffectsComponent     = $EffectsComponent
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
 @onready var stats_label: Label            = $CanvasLayer/StatsLabel
@@ -46,9 +47,10 @@ func _init_inventory() -> void:
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("axe"))
-	inventory.add_item(ItemLibrary.get_item("coat"))
-	inventory.add_item(ItemLibrary.get_item("spd"))
+	inventory.add_item(ItemLibrary.get_item("mana_potion"))
+	inventory.add_item(ItemLibrary.get_item("health_potion"))
+	inventory.add_item(ItemLibrary.get_item("mana_potion"))
+	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
 
 
 # ════════════════════════════════════════════════════════

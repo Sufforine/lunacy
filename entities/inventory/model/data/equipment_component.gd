@@ -2,6 +2,8 @@ extends Node
 class_name EquipmentComponent
 
 signal changed
+signal item_equipped(item: ItemData)
+signal item_unequipped(item: ItemData)
 
 var weapon:     ItemData = null
 var helmet:     ItemData = null
@@ -31,24 +33,31 @@ func equip(item: ItemData) -> void:
 				trinket_2 = item
 
 	changed.emit()
+	item_equipped.emit(item)
 	print("EquipmentComponent: надет '%s'" % item.id)
 
 
 func unequip(slot: ItemData.Slot) -> void:
 
+	var removed: ItemData = null
+
 	match slot:
-		ItemData.Slot.WEAPON:     weapon     = null
-		ItemData.Slot.HELMET:     helmet     = null
-		ItemData.Slot.CHESTPLATE: chestplate = null
-		ItemData.Slot.LEGGINGS:   leggings   = null
-		ItemData.Slot.CLOAK:      cloak      = null
+		ItemData.Slot.WEAPON:     removed = weapon;     weapon     = null
+		ItemData.Slot.HELMET:     removed = helmet;     helmet     = null
+		ItemData.Slot.CHESTPLATE: removed = chestplate; chestplate = null
+		ItemData.Slot.LEGGINGS:   removed = leggings;   leggings   = null
+		ItemData.Slot.CLOAK:      removed = cloak;      cloak      = null
 		ItemData.Slot.TRINKET:
 			if trinket_1 != null:
+				removed = trinket_1
 				trinket_1 = null
 			else:
+				removed = trinket_2
 				trinket_2 = null
 
 	changed.emit()
+	if removed != null:
+		item_unequipped.emit(removed)
 
 
 func get_slot_item(slot: ItemData.Slot) -> ItemData:
@@ -83,6 +92,8 @@ func load_from_profile() -> void:
 	trinket_1  = _load_item(PlayerProfile.equipment.get("trinket_1",  ""))
 	trinket_2  = _load_item(PlayerProfile.equipment.get("trinket_2",  ""))
 	changed.emit()
+	for item in get_all_items():
+		item_equipped.emit(item)
 
 
 func save_to_profile() -> void:
@@ -115,14 +126,20 @@ func equip_to_slot(item: ItemData, slot_idx: int) -> void:
 	if item != null and not item.is_equipment():
 		return
 
+	var previous: ItemData = null
+
 	match slot_idx:
-		0: weapon     = item
-		1: helmet     = item
-		2: chestplate = item
-		3: leggings   = item
-		4: cloak      = item
-		5: trinket_1  = item
-		6: trinket_2  = item
+		0: previous = weapon;     weapon     = item
+		1: previous = helmet;     helmet     = item
+		2: previous = chestplate; chestplate = item
+		3: previous = leggings;   leggings   = item
+		4: previous = cloak;      cloak      = item
+		5: previous = trinket_1;  trinket_1  = item
+		6: previous = trinket_2;  trinket_2  = item
 
 	changed.emit()
+	if previous != null:
+		item_unequipped.emit(previous)
+	if item != null:
+		item_equipped.emit(item)
 	print("EquipmentComponent: слот %d → '%s'" % [slot_idx, item.id if item else "пусто"])

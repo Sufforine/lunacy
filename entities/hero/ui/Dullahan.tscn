@@ -1,12 +1,13 @@
-[gd_scene load_steps=11 format=3 uid="uid://c72rgvrvlejj0"]
+[gd_scene load_steps=12 format=3 uid="uid://c72rgvrvlejj0"]
 
 [ext_resource type="Script" uid="uid://c6n4pitamm0fi" path="res://entities/dullahan/dullahan.gd" id="1_7b1e3"]
 [ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_ywgea"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="3_qkcry"]
-[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/equipment_component.gd" id="5_qkcry"]
+[ext_resource type="Script" uid="uid://d01j10rnkd40j" path="res://entities/inventory/model/data/EffectComponent.gd" id="4_domh8"]
+[ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/data/equipment_component.gd" id="5_qkcry"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/hero/model/stats_component.gd" id="6_u5hdh"]
 [ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://entities/hero/model/definitions/Dullahan/Dullahan_Stat.tres" id="11_5d23u"]
-[ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/inventory_component.gd" id="11_xfaeu"]
+[ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/data/inventory_component.gd" id="11_xfaeu"]
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="12_xfaeu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
@@ -33,6 +34,9 @@ shape = SubResource("CapsuleShape3D_g75yn")
 
 [node name="CameraRig" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_qkcry")]
 player = NodePath("..")
+
+[node name="EffectsComponent" type="Node" parent="."]
+script = ExtResource("4_domh8")
 
 [node name="EquipmentComponent" type="Node" parent="."]
 script = ExtResource("5_qkcry")

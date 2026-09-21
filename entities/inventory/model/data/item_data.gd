@@ -45,6 +45,9 @@ enum Slot { NONE, WEAPON, HELMET, CHESTPLATE, LEGGINGS, CLOAK, TRINKET }
 @export var bonus_radius: float = 0.0
 @export var bonus_morale: int = 0
 
+@export_group("Passive Effect")
+@export var passive_effect: EffectData = null  # активируется пока предмет надет
+
 
 func is_equipment() -> bool:
 	return slot != Slot.NONE

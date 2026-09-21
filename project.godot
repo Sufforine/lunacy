@@ -19,7 +19,7 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 InputManager="*res://shared/input/input_manager.gd"
 PlayerProfile="*res://entities/player/model/player_profile.gd"
 SaveManager="*res://entities/player/model/save_manager.gd"
-ItemLibrary="*res://entities/inventory/model/item_library.gd"
+ItemLibrary="*res://entities/inventory/model/data/item_library.gd"
 HeroLibrary="*res://entities/hero/model/hero_library.gd"
 SteamLobby="*res://features/steam-lobby/api/steam_lobby.gd"
 

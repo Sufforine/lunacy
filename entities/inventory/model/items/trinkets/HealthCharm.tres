@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://dica1x1bt5brk"]
 
-[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/item_data.gd" id="1_6wie7"]
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/data/item_data.gd" id="1_6wie7"]
 [ext_resource type="Texture2D" uid="uid://b58t6yj2s5a26" path="res://Assets/Icons/WoW Icon Pack/Armour/89.png" id="1_wu7wl"]
 
 [resource]

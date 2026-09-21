@@ -15,6 +15,7 @@ signal revived
 @export var base_stats: HeroStat
 
 @onready var equipment: EquipmentComponent = $"../EquipmentComponent"
+@onready var effects: EffectsComponent     = $"../EffectsComponent"
 
 # ── текущий уровень (берётся из PlayerProfile) ───────────
 var level: int = 1
@@ -23,6 +24,7 @@ var level: int = 1
 var current_health: int = 0
 var current_mana: int   = 0
 var current_morale: int = 0
+var current_shield: float = 0.0  # поглощает урон до HP; наполняется эффектами
 
 # ── агония ───────────────────────────────────────────────
 var is_downed: bool  = false
@@ -83,6 +85,9 @@ func get_characteristic(name: String) -> float:
 			if bonus != null:
 				value += float(bonus)
 
+	if effects:
+		value += effects.get_characteristic_bonus(name)
+
 	return value
 
 
@@ -96,18 +101,18 @@ func get_stat(stat_name: String) -> float:
 
 	match stat_name:
 		"health":
-			return _base(stat_name) + get_characteristic("strength") * 10.0
+			return _base(stat_name) + get_characteristic("strength") * 10.0 + _effect_bonus(stat_name)
 		"mana":
-			return _base(stat_name) + get_characteristic("wisdom") * 10.0
+			return _base(stat_name) + get_characteristic("wisdom") * 10.0 + _effect_bonus(stat_name)
 		"attack_speed":
-			return _base(stat_name) + get_characteristic("agility") * 10.0 + _equip_bonus(stat_name)
+			return _base(stat_name) + get_characteristic("agility") * 10.0 + _equip_bonus(stat_name) + _effect_bonus(stat_name)
 		"magical_damage_bonus":
-			return _base(stat_name) + get_characteristic("intellect") + _equip_bonus(stat_name)
+			return _base(stat_name) + get_characteristic("intellect") + _equip_bonus(stat_name) + _effect_bonus(stat_name)
 		"morale":
-			# База всегда 0 — только бонусы снаряжения
-			return _equip_bonus(stat_name)
+			# База всегда 0 — только бонусы снаряжения и эффектов
+			return _equip_bonus(stat_name) + _effect_bonus(stat_name)
 		_:
-			return _base(stat_name) + _equip_bonus(stat_name)
+			return _base(stat_name) + _equip_bonus(stat_name) + _effect_bonus(stat_name)
 
 
 # Итоговый магический урон предмета/способности с учётом бонусов
@@ -129,6 +134,12 @@ func take_damage(amount: int, is_magical: bool = false) -> void:
 		"magic_resistance" if is_magical else "armor"
 	)
 	var actual: int = max(1, amount - int(resistance))
+
+	# Щит поглощает урон первым
+	if current_shield > 0.0:
+		var absorbed: float = min(current_shield, float(actual))
+		current_shield -= absorbed
+		actual -= int(absorbed)
 
 	current_health = max(0, current_health - actual)
 	stats_changed.emit()
@@ -241,3 +252,10 @@ func _equip_bonus(stat_name: String) -> float:
 		if bonus != null:
 			total += float(bonus)
 	return total
+
+
+# Сумма бонусов от активных эффектов (баффы/дебаффы) для показателя
+func _effect_bonus(stat_name: String) -> float:
+	if effects == null:
+		return 0.0
+	return effects.get_stat_bonus(stat_name)
