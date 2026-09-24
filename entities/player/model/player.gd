@@ -49,16 +49,14 @@ func _ready() -> void:
 
 
 func _init_inventory() -> void:
-	inventory_ui.bind(inventory, equipment)
+	inventory_ui.bind(inventory, equipment, stats)
 	inventory.set_quickslot_data(PlayerProfile.quickslots)
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
-	inventory.add_item(ItemLibrary.get_item("spd"))
-	inventory.add_item(ItemLibrary.get_item("coat"))
+	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 
 
 # ════════════════════════════════════════════════════════

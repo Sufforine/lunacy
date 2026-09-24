@@ -42,6 +42,7 @@ class_name InventoryUI
 # ── компоненты ───────────────────────────────────────────
 var _inventory:  InventoryComponent = null
 var _equipment:  EquipmentComponent = null
+var _stats:      StatsComponent     = null
 
 # ── слоты инвентаря ─────────────────────────────────────
 var _inv_buttons: Array[Button]      = []
@@ -71,12 +72,15 @@ func _ready() -> void:
 	_collect_inventory_slots()
 	_collect_equipment_slots()
 	_collect_quickslots()
+	_build_tab_buttons()
+	_build_stats_tab()
+	_show_inventory_tab()
 
 
 # ════════════════════════════════════════════════════════
 # BIND
 # ════════════════════════════════════════════════════════
-func bind(inventory: InventoryComponent, equipment: EquipmentComponent) -> void:
+func bind(inventory: InventoryComponent, equipment: EquipmentComponent, stats: StatsComponent = null) -> void:
 
 	if _inventory != null and _inventory.changed.is_connected(_refresh_inventory):
 		_inventory.changed.disconnect(_refresh_inventory)
@@ -90,10 +94,18 @@ func bind(inventory: InventoryComponent, equipment: EquipmentComponent) -> void:
 	_equipment = equipment
 	if _equipment != null:
 		_equipment.changed.connect(_refresh_equipment)
+		_equipment.changed.connect(_refresh_stats_tab)
+
+	if _stats != null and _stats.stats_changed.is_connected(_refresh_stats_tab):
+		_stats.stats_changed.disconnect(_refresh_stats_tab)
+	_stats = stats
+	if _stats != null:
+		_stats.stats_changed.connect(_refresh_stats_tab)
 
 	_refresh_inventory()
 	_refresh_equipment()
 	_refresh_quickslots()
+	_refresh_stats_tab()
 
 
 # ════════════════════════════════════════════════════════
@@ -627,3 +639,202 @@ func _quick_unequip(eq_idx: int) -> void:
 	_inventory.slots[free_slot] = item
 	_equipment.equip_to_slot(null, eq_idx)
 	_inventory.changed.emit()
+
+
+# ════════════════════════════════════════════════════════
+# ВКЛАДКИ: Инвентарь / Характеристики
+# Строятся программно поверх существующей раскладки MainPanel,
+# поэтому не требуют правок .tscn.
+# ════════════════════════════════════════════════════════
+
+var _tab_inventory_btn: Button = null
+var _tab_stats_btn:     Button = null
+var _stats_tab:         Control = null
+var _stats_value_labels: Dictionary = {}  # stat_name → Label
+
+# Отображаемые названия характеристик и показателей
+const CHARACTERISTIC_LABELS := {
+	"strength":  "Сила",
+	"agility":   "Ловкость",
+	"intellect": "Интеллект",
+	"wisdom":    "Мудрость",
+}
+
+const STAT_LABELS := {
+	"health":                 "Здоровье",
+	"mana":                   "Мана",
+	"armor":                  "Броня",
+	"magic_resistance":       "Магическое сопротивление",
+	"attack_speed":           "Скорость атаки",
+	"physical_damage_bonus":  "Увеличение физ. урона",
+	"magical_damage_bonus":   "Увеличение маг. урона",
+	"move_speed":             "Скорость передвижения",
+	"morale":                 "Боевой дух",
+	"crit_chance":            "Шанс крита",
+	"crit_multiplier":        "Множитель крита",
+	"duration":               "Длительность эффектов",
+	"radius":                 "Радиус способностей",
+}
+
+
+func _build_tab_buttons() -> void:
+
+	var bar := HBoxContainer.new()
+	bar.name = "TabBar"
+	bar.position = Vector2(8, 28)
+	bar.size = Vector2(624, 28)
+
+	_tab_inventory_btn = Button.new()
+	_tab_inventory_btn.text = "Инвентарь"
+	_tab_inventory_btn.toggle_mode = true
+	_tab_inventory_btn.button_pressed = true
+	_tab_inventory_btn.pressed.connect(_show_inventory_tab)
+	bar.add_child(_tab_inventory_btn)
+
+	_tab_stats_btn = Button.new()
+	_tab_stats_btn.text = "Характеристики"
+	_tab_stats_btn.toggle_mode = true
+	_tab_stats_btn.pressed.connect(_show_stats_tab)
+	bar.add_child(_tab_stats_btn)
+
+	main_panel.add_child(bar)
+
+	# Сдвинуть существующий контент (TopRow, InventorySection) вниз,
+	# чтобы освободить место под панель вкладок
+	var top_row := main_panel.get_node_or_null("TopRow")
+	if top_row:
+		top_row.position.y += 28
+	var inv_section := main_panel.get_node_or_null("InventorySection")
+	if inv_section:
+		inv_section.position.y += 28
+
+
+func _build_stats_tab() -> void:
+
+	_stats_tab = Control.new()
+	_stats_tab.name = "StatsTab"
+	_stats_tab.position = Vector2(8, 64)
+	_stats_tab.size = Vector2(624, 440)
+	_stats_tab.visible = false
+	main_panel.add_child(_stats_tab)
+
+	var scroll := ScrollContainer.new()
+	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_stats_tab.add_child(scroll)
+
+	var vbox := VBoxContainer.new()
+	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.add_child(vbox)
+
+	var char_title := Label.new()
+	char_title.text = "Характеристики"
+	char_title.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(char_title)
+
+	for key in CHARACTERISTIC_LABELS:
+		vbox.add_child(_make_stat_row(key, CHARACTERISTIC_LABELS[key]))
+
+	vbox.add_child(HSeparator.new())
+
+	var stat_title := Label.new()
+	stat_title.text = "Показатели"
+	stat_title.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(stat_title)
+
+	for key in STAT_LABELS:
+		vbox.add_child(_make_stat_row(key, STAT_LABELS[key]))
+
+	vbox.add_child(HSeparator.new())
+
+	var weapon_title := Label.new()
+	weapon_title.text = "Урон оружия"
+	weapon_title.add_theme_font_size_override("font_size", 16)
+	vbox.add_child(weapon_title)
+
+	vbox.add_child(_make_stat_row("weapon_physical", "Физический урон"))
+	vbox.add_child(_make_stat_row("weapon_magical",  "Магический урон"))
+
+
+func _make_stat_row(key: String, display_name: String) -> HBoxContainer:
+
+	var row := HBoxContainer.new()
+
+	var name_label := Label.new()
+	name_label.text = display_name
+	name_label.custom_minimum_size = Vector2(260, 0)
+	row.add_child(name_label)
+
+	var value_label := Label.new()
+	value_label.text = "—"
+	_stats_value_labels[key] = value_label
+	row.add_child(value_label)
+
+	return row
+
+
+func _show_inventory_tab() -> void:
+	_tab_inventory_btn.button_pressed = true
+	_tab_stats_btn.button_pressed = false
+	_stats_tab.visible = false
+	var top_row := main_panel.get_node_or_null("TopRow")
+	var inv_section := main_panel.get_node_or_null("InventorySection")
+	if top_row:
+		top_row.visible = true
+	if inv_section:
+		inv_section.visible = true
+
+
+func _show_stats_tab() -> void:
+	_tab_inventory_btn.button_pressed = false
+	_tab_stats_btn.button_pressed = true
+	_stats_tab.visible = true
+	var top_row := main_panel.get_node_or_null("TopRow")
+	var inv_section := main_panel.get_node_or_null("InventorySection")
+	if top_row:
+		top_row.visible = false
+	if inv_section:
+		inv_section.visible = false
+	_refresh_stats_tab()
+
+
+# ════════════════════════════════════════════════════════
+# ОБНОВЛЕНИЕ ЗНАЧЕНИЙ
+# ════════════════════════════════════════════════════════
+func _refresh_stats_tab() -> void:
+
+	if _stats == null:
+		return
+
+	for key in CHARACTERISTIC_LABELS:
+		if _stats_value_labels.has(key):
+			_stats_value_labels[key].text = "%.1f" % _stats.get_characteristic(key)
+
+	for key in STAT_LABELS:
+		if not _stats_value_labels.has(key):
+			continue
+		var value: float = _stats.get_stat(key)
+		_stats_value_labels[key].text = _format_stat(key, value)
+
+	# Урон оружия — берём из надетого WeaponData, если есть
+	var weapon: ItemData = _equipment.weapon if _equipment else null
+	if weapon != null and weapon is WeaponData:
+		var w := weapon as WeaponData
+		_stats_value_labels["weapon_physical"].text = "%.1f" % w.get_physical_damage(_stats)
+		_stats_value_labels["weapon_magical"].text  = "%.1f" % w.get_magical_damage(_stats)
+	else:
+		_stats_value_labels["weapon_physical"].text = "— (нет оружия)"
+		_stats_value_labels["weapon_magical"].text  = "— (нет оружия)"
+
+
+func _format_stat(key: String, value: float) -> String:
+	match key:
+		"physical_damage_bonus", "magical_damage_bonus", "duration":
+			return "%.1f%%" % value
+		"crit_chance":
+			return "%.1f%%" % (value * 100.0)
+		"crit_multiplier":
+			return "x%.2f" % value
+		"attack_speed":
+			return "%.2f" % value
+		_:
+			return "%d" % int(value)
