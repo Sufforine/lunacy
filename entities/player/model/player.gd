@@ -14,6 +14,8 @@ class_name Player
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
 @onready var stats_label: Label            = $CanvasLayer/StatsLabel
 
+var hud_bars: HUDBars = null
+
 
 # ── состояния анимации ───────────────────────────────────
 enum AnimationState { IDLE, WALK, DOWNED, DEAD }
@@ -36,6 +38,11 @@ func _ready() -> void:
 	stats.died.connect(_on_died)
 	stats.revived.connect(_on_revived)
 
+	if is_multiplayer_authority():
+		hud_bars = HUDBars.new()
+		$CanvasLayer.add_child(hud_bars)
+		hud_bars.bind(stats)
+
 	call_deferred("_init_inventory")
 
 	print("Player ready:", name, " auth:", is_multiplayer_authority())
@@ -49,8 +56,9 @@ func _init_inventory() -> void:
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
+	inventory.add_item(ItemLibrary.get_item("spd"))
+	inventory.add_item(ItemLibrary.get_item("coat"))
 
 
 # ════════════════════════════════════════════════════════

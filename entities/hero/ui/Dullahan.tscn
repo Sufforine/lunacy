@@ -11,7 +11,7 @@
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="12_xfaeu"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
-height = 3.4350586
+height = 1.9182129
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_thwtu"]
 properties/0/path = NodePath(".:position")
@@ -29,7 +29,7 @@ script = ExtResource("1_7b1e3")
 transform = Transform3D(-0.1, 0, -1.509958e-08, 0, 0.1, 0, 1.509958e-08, 0, -0.1, 0, 0, 0)
 
 [node name="Collision" type="CollisionShape3D" parent="."]
-transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 2.0564578, 0.014858723)
+transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 0.89607084, 0.014858723)
 shape = SubResource("CapsuleShape3D_g75yn")
 
 [node name="CameraRig" parent="." node_paths=PackedStringArray("player") instance=ExtResource("3_qkcry")]
