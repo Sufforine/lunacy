@@ -116,6 +116,9 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_I:
 			main_panel.visible = not main_panel.visible
+		elif event.keycode == KEY_ESCAPE and main_panel.visible:
+			main_panel.visible = false
+			get_viewport().set_input_as_handled()
 
 	if _drag_preview != null and event is InputEventMouseMotion:
 		_drag_preview.global_position = get_global_mouse_position() - _drag_preview.size * 0.5

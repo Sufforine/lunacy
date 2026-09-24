@@ -12,8 +12,6 @@ class_name Player
 @onready var effects: EffectsComponent     = $EffectsComponent
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
-@onready var stats_label: Label            = $CanvasLayer/StatsLabel
-
 var hud_bars: HUDBars = null
 
 
@@ -81,7 +79,6 @@ func _physics_process(delta: float) -> void:
 # PROCESS
 # ════════════════════════════════════════════════════════
 func _process(_delta: float) -> void:
-	_update_stats_ui()
 	_update_animation()
 
 
@@ -202,37 +199,6 @@ func _update_animation() -> void:
 		AnimationState.DEAD:
 			if not animation_player.current_animation == "dead":
 				animation_player.play("dead")
-
-
-# ════════════════════════════════════════════════════════
-# UI
-# ════════════════════════════════════════════════════════
-func _update_stats_ui() -> void:
-
-	if stats_label == null:
-		return
-
-	var agony_text := ""
-	if stats.is_downed:
-		agony_text = "\nАгония: %.1f сек (дух: %d)" % [
-			stats._agony_timer,
-			stats.current_morale
-		]
-	elif stats.is_dead:
-		agony_text = "\n[ПОГИБ]"
-
-	stats_label.text = (
-		"HP: %d / %d\nMana: %d / %d\nBronya: %d\nMag.res: %d\nMS: %.1f\nCrit: %.0f%%\nDukh: %d%s"
-	) % [
-		stats.current_health, int(stats.get_stat("health")),
-		stats.current_mana,   int(stats.get_stat("mana")),
-		int(stats.get_stat("armor")),
-		int(stats.get_stat("magic_resistance")),
-		stats.get_stat("move_speed"),
-		stats.get_stat("crit_chance") * 100.0,
-		stats.current_morale,
-		agony_text
-	]
 
 
 # ════════════════════════════════════════════════════════

@@ -52,11 +52,6 @@ script = ExtResource("11_xfaeu")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
-[node name="StatsLabel" type="Label" parent="CanvasLayer"]
-offset_right = 40.0
-offset_bottom = 23.0
-metadata/_edit_use_anchors_ = true
-
 [node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("12_xfaeu")]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
