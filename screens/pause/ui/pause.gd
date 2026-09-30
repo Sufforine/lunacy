@@ -4,10 +4,12 @@ func _ready():
 
 func resume():
 	get_tree().paused = false
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	$AnimationPlayer.play_backwards("blur_menu")
 
 func pause():
 	get_tree().paused = true
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	$AnimationPlayer.play("blur_menu")
 
 func testEsc():

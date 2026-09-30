@@ -4,15 +4,18 @@
 [ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_model"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dog"]
-height = 3.4350586
+radius = 0.45
+height = 2.2
 
 [node name="Dog" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 3
 floor_snap_length = 0.3
 script = ExtResource("1_dog")
 
 [node name="Model" parent="." instance=ExtResource("2_model")]
-transform = Transform3D(-0.3, 0, -2.6226834e-08, 0, 0.3, 0, 2.6226834e-08, 0, -0.3, 0, 0, 0)
+transform = Transform3D(-0.1, 0, -8.742278e-09, 0, 0.1, 0, 8.742278e-09, 0, -0.1, 0, 0, 0)
 
 [node name="Collision" type="CollisionShape3D" parent="."]
-transform = Transform3D(1.53, 0, 0, 0, 1.53, 0, 0, 0, 1.53, 0, 2.0564578, 0.014858723)
+position = Vector3(0, 1.1, 0)
 shape = SubResource("CapsuleShape3D_dog")

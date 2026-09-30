@@ -6,7 +6,7 @@
 		"weapon": ""
 	},
 	"experience": 0,
-	"hero_scene": "res://entities/hero/ui/Dullahan.tscn",
+	"hero_scene": "res://entities/characters/dullahan/Dullahan.tscn",
 	"inventory": [
 		"hpot",
 		"mpot",

@@ -8,6 +8,11 @@ extends Node
 
 const SAVE_DIR := "user://saves/"
 
+const MOVED_HERO_SCENES := {
+	"res://entities/hero/ui/Dullahan.tscn": "res://entities/characters/dullahan/Dullahan.tscn",
+	"res://entities/hero/ui/Slon.tscn": "res://entities/characters/Slon/Slon.tscn",
+}
+
 const EMPTY_EQUIPMENT := {
 	"weapon":     "",
 	"helmet":     "",
@@ -159,14 +164,17 @@ func load_profile() -> void:
 		push_error("SaveManager: повреждённый JSON в %s" % path)
 		return
 
-	PlayerProfile.hero_scene = data.get("hero_scene", "")
+	var saved_hero_scene: String = data.get("hero_scene", "")
+	PlayerProfile.hero_scene = MOVED_HERO_SCENES.get(saved_hero_scene, saved_hero_scene)
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
 	PlayerProfile.inventory  = data.get("inventory", [])
 	PlayerProfile.quickslots = data.get("quickslots", ["" ,"", ""])
 	PlayerProfile.equipment  = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
 
-
+	if PlayerProfile.hero_scene != saved_hero_scene:
+		save_profile()
+		print("SaveManager: обновлён путь героя → %s" % PlayerProfile.hero_scene)
 
 	print("SaveManager: загружено ← %s" % path)
 

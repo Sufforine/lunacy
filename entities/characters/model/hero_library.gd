@@ -12,8 +12,8 @@ var _heroes: Dictionary = {}  # id → HeroDefinition
 
 func _ready() -> void:
 	_register_all([
-		preload("res://entities/hero/model/definitions/Dullahan/Dullahan_def.tres"),
-		preload("res://entities/hero/model/definitions/Slon/Slon_def.tres"),
+		preload("res://entities/characters/dullahan/Dullahan_def.tres"),
+		preload("res://entities/characters/Slon/Slon_def.tres"),
 		# добавляй сюда новых героев
 	])
 

@@ -55,6 +55,8 @@ func _init_inventory() -> void:
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
 	inventory.add_item(ItemLibrary.get_item("mana_potion"))
+	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
+	inventory.add_item(ItemLibrary.get_item("spd"))
 
 
 # ════════════════════════════════════════════════════════
@@ -88,6 +90,8 @@ func _process(_delta: float) -> void:
 func _handle_movement() -> void:
 
 	var input_dir := InputManager.get_input_direction()
+	if camera_rig != null:
+		input_dir = camera_rig.get_camera_relative_direction(input_dir)
 	var speed: float = stats.get_stat("move_speed")
 
 	velocity.x = input_dir.x * speed
@@ -103,6 +107,15 @@ func _handle_movement() -> void:
 func _handle_rotation(delta: float) -> void:
 
 	if camera_rig == null:
+		return
+	if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		var aim_direction: Vector3 = camera_rig.get_aim_direction()
+		var camera_target_y := atan2(-aim_direction.x, -aim_direction.z)
+		rotation.y = lerp_angle(
+			rotation.y,
+			camera_target_y,
+			1.0 - pow(0.001, delta * ease_speed)
+		)
 		return
 
 	var camera: Camera3D = camera_rig.camera

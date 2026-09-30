@@ -19,5 +19,4 @@ func _draw():
 
 @warning_ignore("unused_parameter")
 func _process(delta):
-	# Request redraw every frame
 	queue_redraw()
