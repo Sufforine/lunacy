@@ -2,6 +2,9 @@ extends CharacterBody3D
 class_name Player
 
 @export var ease_speed: float = 5.0
+# Если выброшенные предметы летят НАЗАД от героя — поставь галочку:
+# значит перёд твоей модели смотрит вдоль +Z, а не -Z.
+@export var model_faces_positive_z: bool = false
 
 @onready var camera_rig          = $CameraRig
 @onready var model: Node3D           = $Model
@@ -24,6 +27,8 @@ var animation_state: AnimationState = AnimationState.IDLE
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+
+	add_to_group("player")
 
 	equipment.load_from_profile()
 	inventory.set_data(PlayerProfile.inventory)
@@ -233,3 +238,16 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
 		if is_multiplayer_authority():
 			SaveManager.save_player_state(inventory, equipment)
+
+
+# ════════════════════════════════════════════════════════
+# НАПРАВЛЕНИЕ ВЗГЛЯДА
+# Горизонтальный вектор куда смотрит герой. Герой поворачивается к
+# курсору (см. _handle_rotation), поэтому это направление на курсор.
+# ════════════════════════════════════════════════════════
+func get_facing_direction() -> Vector3:
+	var forward: Vector3 = global_transform.basis.z if model_faces_positive_z else -global_transform.basis.z
+	forward.y = 0.0
+	if forward.length() < 0.001:
+		return Vector3(0, 0, -1)
+	return forward.normalized()

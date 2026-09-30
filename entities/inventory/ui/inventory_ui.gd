@@ -125,6 +125,8 @@ func _input(event: InputEvent) -> void:
 			main_panel.visible = false
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_DELETE:
+			_drop_hovered_item()
 
 	if _drag_preview != null and event is InputEventMouseMotion:
 		_drag_preview.global_position = get_global_mouse_position() - _drag_preview.size * 0.5
@@ -141,6 +143,9 @@ func _input(event: InputEvent) -> void:
 				_drop_on_inventory(inv_idx)
 			elif eq_idx >= 0:
 				_drop_on_equipment(eq_idx)
+			elif main_panel.visible and not main_panel.get_global_rect().has_point(get_global_mouse_position()):
+				# Отпустили за пределами окна инвентаря — выбросить в мир
+				_drop_dragged_item_in_world()
 			else:
 				_cancel_drag()
 
@@ -847,3 +852,101 @@ func _format_stat(key: String, value: float) -> String:
 			return "%.2f" % value
 		_:
 			return "%d" % int(value)
+
+
+# ════════════════════════════════════════════════════════
+# ВЫБРАСЫВАНИЕ ПРЕДМЕТОВ В МИР
+# ════════════════════════════════════════════════════════
+
+# Delete над слотом: выбросить предмет из слота инвентаря или быстрого доступа.
+# Слоты экипировки намеренно не трогаем — чтобы не выбросить надетое случайно.
+func _drop_hovered_item() -> void:
+
+	if _inventory == null:
+		return
+
+	var inv_idx := _inv_slot_at_mouse()
+	if inv_idx >= 0 and not _inventory.is_empty(inv_idx):
+		var item: ItemData = _inventory.get_item(inv_idx)
+		_inventory.slots[inv_idx] = null
+		_inventory.changed.emit()
+		_spawn_world_drop(item)
+		return
+
+	var qs_idx := _qs_slot_at_mouse()
+	if qs_idx >= 0 and _inventory.quickslots[qs_idx] != null:
+		var q_item: ItemData = _inventory.quickslots[qs_idx]
+		_inventory.quickslots[qs_idx] = null
+		_inventory.changed.emit()
+		_spawn_world_drop(q_item)
+
+
+# Перетащили предмет за пределы окна — выбросить его
+func _drop_dragged_item_in_world() -> void:
+
+	var from := _drag_from_idx
+	var src  := _drag_source
+
+	# Надетое снаряжение за пределы окна не выбрасываем — возвращаем на место
+	if src == DragSource.EQUIPMENT or _inventory == null:
+		_cancel_drag()
+		return
+
+	_destroy_preview()
+	_restore_drag_icon()
+	_drag_source   = DragSource.NONE
+	_drag_from_idx = -1
+
+	var item: ItemData = null
+	match src:
+		DragSource.INVENTORY:
+			item = _inventory.get_item(from)
+			_inventory.slots[from] = null
+		DragSource.QUICKSLOT:
+			item = _inventory.quickslots[from]
+			_inventory.quickslots[from] = null
+
+	if item == null:
+		return
+
+	_inventory.changed.emit()
+	_spawn_world_drop(item)
+
+
+# Создать ItemPickup в мире перед героем
+func _spawn_world_drop(item: ItemData) -> void:
+
+	if item == null:
+		return
+
+	var player := _find_owner_player()
+	if player == null:
+		push_warning("InventoryUI: герой-владелец не найден, предмет не выброшен")
+		return
+
+	# Куда смотрит герой (метод есть у player.gd)
+	var direction := Vector3(0, 0, -1)
+	if player.has_method("get_facing_direction"):
+		direction = player.get_facing_direction()
+
+	var pickup := ItemPickup.new()
+	pickup.item = item
+	get_tree().current_scene.add_child(pickup)
+
+	# Стартуем на уровне груди чуть впереди героя и бросаем по дуге вперёд
+	pickup.global_position = player.global_position + direction * 0.6 + Vector3(0, 1.0, 0)
+	pickup.launch(direction, 5.0, 3.0, player)
+
+	print("InventoryUI: выброшен '%s'" % item.id)
+
+
+# Герой которому принадлежит этот интерфейс: идём вверх по дереву
+# (InventoryUI → CanvasLayer → Player). Так в мультиплеере предмет
+# выбрасывается у своего героя, а не у первого попавшегося.
+func _find_owner_player() -> Node3D:
+	var node: Node = get_parent()
+	while node != null:
+		if node is CharacterBody3D:
+			return node as Node3D
+		node = node.get_parent()
+	return null
