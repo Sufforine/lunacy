@@ -9,6 +9,9 @@
 #   get_tree().current_scene.add_child(pickup)
 #   pickup.global_position = ...
 #   pickup.launch(direction, speed, up_speed, thrower)   # опционально: бросок
+#
+# В игре создавать пикапы нужно через SteamLobby.request_drop(...): он сам
+# разошлёт предмет всем игрокам и выдаст drop_id.
 extends Area3D
 class_name ItemPickup
 
@@ -18,11 +21,13 @@ const MAX_FLIGHT_TIME  := 3.0    # страховка: если земля не 
 const LAND_OFFSET      := 0.05   # насколько выше точки касания встаёт предмет
 
 var item: ItemData = null
+var drop_id: int = 0        # одинаковый на всех пирах, назначает сервер
 
 var _velocity: Vector3 = Vector3.ZERO
 var _flying: bool = false
 var _flight_time: float = 0.0
 var _can_pickup: bool = false
+var _request_pending: bool = false
 var _exclude: Array[RID] = []
 
 
@@ -116,18 +121,24 @@ func _on_body_entered(body: Node) -> void:
 
 func _try_pickup(body: Node) -> void:
 
-	if not _can_pickup or item == null:
+	if not _can_pickup or item == null or _request_pending:
 		return
 	if not body.is_in_group("player"):
 		return
 
-	var inventory: InventoryComponent = body.get_node_or_null("InventoryComponent")
-	if inventory == null:
+	# Подбирает только владелец героя — иначе каждый пир слал бы свой запрос
+	if not body.is_multiplayer_authority():
 		return
 
-	if inventory.add_item(item):
-		queue_free()
-	# Если инвентарь полон — предмет остаётся лежать в мире
+	var inventory: InventoryComponent = body.get_node_or_null("InventoryComponent")
+	if inventory == null or not inventory.has_free_slot():
+		return
+
+	# Сами предмет не забираем: просим подтверждение у сервера.
+	# Нода удалится когда сервер разошлёт удаление всем пирам.
+	_request_pending = true
+	get_tree().create_timer(2.0).timeout.connect(func(): _request_pending = false)
+	SteamLobby.request_pickup(drop_id, inventory)
 
 
 # ════════════════════════════════════════════════════════

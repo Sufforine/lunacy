@@ -41,7 +41,9 @@ func _ready() -> void:
 		push_error("StatsComponent: base_stats не назначен в инспекторе")
 		return
 
-	level = PlayerProfile.level
+	# У героя из сети уровень приходит в network_state, а не из локального профиля
+	var net_state: Dictionary = get_parent().get_meta("network_state", {})
+	level = int(net_state.get("level", PlayerProfile.level))
 
 	if equipment:
 		equipment.changed.connect(_on_equipment_changed)

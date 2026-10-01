@@ -104,6 +104,13 @@ func is_empty(slot_index: int) -> bool:
 	return get_item(slot_index) == null
 
 
+func has_free_slot() -> bool:
+	for i in SLOT_COUNT:
+		if slots[i] == null:
+			return true
+	return false
+
+
 # =========================================================
 # SERIALISATION  (PlayerProfile хранит массив id строк)
 # =========================================================

@@ -30,8 +30,16 @@ func _ready() -> void:
 
 	add_to_group("player")
 
-	equipment.load_from_profile()
-	inventory.set_data(PlayerProfile.inventory)
+	# Герой владельца берёт данные из локального профиля, чужой герой — из
+	# network_state, который NetSpawner кладёт в meta при спавне.
+	# Иначе у чужих героев оказался бы инвентарь и снаряжение локального игрока.
+	if is_multiplayer_authority():
+		equipment.load_from_profile()
+		inventory.set_data(PlayerProfile.inventory)
+	else:
+		var net_state: Dictionary = get_meta("network_state", {})
+		equipment.load_from_dict(net_state.get("equipment", {}))
+		inventory.set_data(net_state.get("inventory", []))
 
 	stats.current_health = int(stats.get_stat("health"))
 	stats.current_mana   = int(stats.get_stat("mana"))
@@ -46,12 +54,21 @@ func _ready() -> void:
 		$CanvasLayer.add_child(hud_bars)
 		hud_bars.bind(stats)
 
+		# Любая смена снаряжения уходит остальным игрокам
+		equipment.changed.connect(_on_local_equipment_changed)
+	else:
+		# Интерфейс чужого героя на моём экране не нужен
+		$CanvasLayer.visible = false
+
 	call_deferred("_init_inventory")
 
 	print("Player ready:", name, " auth:", is_multiplayer_authority())
 
 
 func _init_inventory() -> void:
+	if not is_multiplayer_authority():
+		return
+
 	inventory_ui.bind(inventory, equipment, stats)
 	inventory.set_quickslot_data(PlayerProfile.quickslots)
 	inventory.add_item(ItemLibrary.get_item("health_potion"))
@@ -251,3 +268,10 @@ func get_facing_direction() -> Vector3:
 	if forward.length() < 0.001:
 		return Vector3(0, 0, -1)
 	return forward.normalized()
+
+
+# ════════════════════════════════════════════════════════
+# СЕТЬ
+# ════════════════════════════════════════════════════════
+func _on_local_equipment_changed() -> void:
+	SteamLobby.sync_equipment(equipment.to_dict())

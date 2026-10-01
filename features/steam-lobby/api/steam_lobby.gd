@@ -9,6 +9,7 @@ signal players_updated(players: Array)
 const NetSteamTransport := preload("res://features/net/transport/steam_transport.gd")
 const NetSession := preload("res://features/net/session/net_session.gd")
 const NetSpawner := preload("res://features/net/spawn/net_spawner.gd")
+const NetDrops := preload("res://features/net/sync/net_drops.gd")
 
 const LOBBY_TYPE_PUBLIC := 2
 const RESULT_OK := 1
@@ -21,6 +22,7 @@ var is_joining: bool = false
 var _transport := NetSteamTransport.new()
 var _session := NetSession.new()
 var _spawner := NetSpawner.new()
+var _drops := NetDrops.new()
 
 var _pending_hub: Node3D
 var _pending_spawns: Array = []
@@ -80,6 +82,7 @@ func join_lobby(id: int) -> void:
 
 func disconnect_lobby() -> void:
 	_clear_autoload_spawns()
+	_drops.clear()
 	_transport.close_connection(multiplayer)
 	_session.player_states.clear()
 	lobby_id = 0
@@ -103,6 +106,7 @@ func start_game() -> void:
 			return
 
 	_clear_autoload_spawns()
+	_drops.clear()
 	_rpc_load_hub.rpc()
 
 
@@ -305,6 +309,178 @@ func _rpc_update_hero(hero_scene: String) -> void:
 	var sender_id := multiplayer.get_remote_sender_id()
 	_session.update_hero(sender_id, hero_scene)
 	_broadcast_player_list()
+
+
+# ════════════════════════════════════════════════════════
+# ПРЕДМЕТЫ В МИРЕ
+# Выбросить может любой игрок, но id предмету назначает и подбор
+# подтверждает сервер — так один предмет не достанется двоим сразу.
+# Работает и без сессии (соло): тогда всё происходит локально.
+# ════════════════════════════════════════════════════════
+
+# Выбросить предмет. position — точка старта, direction — куда бросать.
+func request_drop(item_id: String, position: Vector3, direction: Vector3, thrower: Node3D = null) -> void:
+	if item_id.is_empty():
+		return
+
+	if not is_session_active():
+		var item: ItemData = ItemLibrary.get_item(item_id)
+		if item == null:
+			return
+		var scene := get_tree().current_scene
+		if scene != null:
+			_drops.spawn(scene, _drops.allocate_id(), item, position, direction, thrower)
+		return
+
+	if multiplayer.is_server():
+		_server_spawn_drop(item_id, position, direction, multiplayer.get_unique_id())
+	else:
+		_rpc_request_drop.rpc_id(1, item_id, position, direction)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_request_drop(item_id: String, position: Vector3, direction: Vector3) -> void:
+	if not multiplayer.is_server():
+		return
+	_server_spawn_drop(item_id, position, direction, multiplayer.get_remote_sender_id())
+
+
+func _server_spawn_drop(item_id: String, position: Vector3, direction: Vector3, thrower_peer: int) -> void:
+	if not ItemLibrary.has_item(item_id):
+		push_warning("SteamLobby: неизвестный предмет '%s' в запросе на выброс" % item_id)
+		return
+	_rpc_spawn_drop.rpc(_drops.allocate_id(), item_id, position, direction, thrower_peer)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_spawn_drop(drop_id: int, item_id: String, position: Vector3, direction: Vector3, thrower_peer: int) -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var item: ItemData = ItemLibrary.get_item(item_id)
+	if item == null:
+		return
+	# Бросивший герой исключается из поиска земли, чтобы предмет не «встал» на него
+	var thrower := scene.get_node_or_null(str(thrower_peer)) as Node3D
+	_drops.spawn(scene, drop_id, item, position, direction, thrower)
+
+
+# Игрок дошёл до предмета и просит его забрать.
+# picker — инвентарь того, кто просит (нужен в соло-режиме).
+func request_pickup(drop_id: int, picker: InventoryComponent) -> void:
+	if not is_session_active():
+		if _drops.has_drop(drop_id):
+			var item_id := _drops.get_item_id(drop_id)
+			_drops.remove(drop_id)
+			_apply_pickup_grant(picker, item_id)
+		return
+
+	if multiplayer.is_server():
+		_server_handle_pickup(multiplayer.get_unique_id(), drop_id)
+	else:
+		_rpc_request_pickup.rpc_id(1, drop_id)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_request_pickup(drop_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	_server_handle_pickup(multiplayer.get_remote_sender_id(), drop_id)
+
+
+func _server_handle_pickup(picker_peer: int, drop_id: int) -> void:
+	# Предмет уже забрал кто-то другой (или он давно исчез)
+	if not _drops.has_drop(drop_id):
+		return
+
+	var item_id := _drops.get_item_id(drop_id)
+	_rpc_remove_drop.rpc(drop_id)
+
+	if picker_peer == multiplayer.get_unique_id():
+		_apply_pickup_grant(_local_inventory(), item_id)
+	else:
+		_rpc_grant_pickup.rpc_id(picker_peer, item_id)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_remove_drop(drop_id: int) -> void:
+	_drops.remove(drop_id)
+
+
+@rpc("authority", "reliable")
+func _rpc_grant_pickup(item_id: String) -> void:
+	_apply_pickup_grant(_local_inventory(), item_id)
+
+
+func _apply_pickup_grant(inventory: InventoryComponent, item_id: String) -> void:
+	var item: ItemData = ItemLibrary.get_item(item_id)
+	if item == null or inventory == null:
+		return
+
+	if inventory.add_item(item):
+		return
+
+	# Редкая гонка: инвентарь заполнился между запросом и ответом сервера —
+	# возвращаем предмет в мир, чтобы он не пропал.
+	var hero := inventory.get_parent() as Node3D
+	if hero == null:
+		return
+	var direction := Vector3(0, 0, -1)
+	if hero.has_method("get_facing_direction"):
+		direction = hero.call("get_facing_direction")
+	request_drop(item_id, hero.global_position + Vector3(0, 1.0, 0), direction, hero)
+
+
+func _local_inventory() -> InventoryComponent:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return null
+	var hero := scene.get_node_or_null(str(multiplayer.get_unique_id()))
+	if hero == null:
+		return null
+	return hero.get_node_or_null("InventoryComponent") as InventoryComponent
+
+
+# ════════════════════════════════════════════════════════
+# СНАРЯЖЕНИЕ — чтобы остальные видели что надето (и пассивки вроде щита)
+# Вызывается героем-владельцем при каждой смене снаряжения.
+# ════════════════════════════════════════════════════════
+func sync_equipment(equipment_data: Dictionary) -> void:
+	if not is_session_active():
+		return
+
+	if multiplayer.is_server():
+		_rpc_equipment_changed.rpc(multiplayer.get_unique_id(), equipment_data)
+	else:
+		_rpc_equipment_to_server.rpc_id(1, equipment_data)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_equipment_to_server(equipment_data: Dictionary) -> void:
+	if not multiplayer.is_server():
+		return
+	var sender_id := multiplayer.get_remote_sender_id()
+	_apply_remote_equipment(sender_id, equipment_data)  # копия героя на хосте
+	_rpc_equipment_changed.rpc(sender_id, equipment_data)
+
+
+# call_remote: на самом сервере не выполняется (он применил снаряжение выше)
+@rpc("authority", "call_remote", "reliable")
+func _rpc_equipment_changed(peer_id: int, equipment_data: Dictionary) -> void:
+	_apply_remote_equipment(peer_id, equipment_data)
+
+
+func _apply_remote_equipment(peer_id: int, equipment_data: Dictionary) -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	var hero := scene.get_node_or_null(str(peer_id))
+	# Своего героя не трогаем — его снаряжение уже актуально
+	if hero == null or hero.is_multiplayer_authority():
+		return
+	var eq := hero.get_node_or_null("EquipmentComponent") as EquipmentComponent
+	if eq != null:
+		eq.load_from_dict(equipment_data)
 
 
 func _clear_autoload_spawns() -> void:

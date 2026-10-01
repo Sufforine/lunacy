@@ -116,14 +116,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_I:
 			main_panel.visible = not main_panel.visible
-			Input.mouse_mode = (
-				Input.MOUSE_MODE_VISIBLE
-				if main_panel.visible
-				else Input.MOUSE_MODE_CAPTURED
-			)
 		elif event.keycode == KEY_ESCAPE and main_panel.visible:
 			main_panel.visible = false
-			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_DELETE:
 			_drop_hovered_item()
@@ -913,7 +907,9 @@ func _drop_dragged_item_in_world() -> void:
 	_spawn_world_drop(item)
 
 
-# Создать ItemPickup в мире перед героем
+# Попросить SteamLobby создать предмет в мире перед героем.
+# В соло это происходит немедленно локально, в сети — сервер сам
+# разошлёт появление всем игрокам (см. steam_lobby.gd).
 func _spawn_world_drop(item: ItemData) -> void:
 
 	if item == null:
@@ -924,18 +920,13 @@ func _spawn_world_drop(item: ItemData) -> void:
 		push_warning("InventoryUI: герой-владелец не найден, предмет не выброшен")
 		return
 
-	# Куда смотрит герой (метод есть у player.gd)
 	var direction := Vector3(0, 0, -1)
 	if player.has_method("get_facing_direction"):
 		direction = player.get_facing_direction()
 
-	var pickup := ItemPickup.new()
-	pickup.item = item
-	get_tree().current_scene.add_child(pickup)
+	var spawn_position: Vector3 = player.global_position + direction * 0.6 + Vector3(0, 1.0, 0)
 
-	# Стартуем на уровне груди чуть впереди героя и бросаем по дуге вперёд
-	pickup.global_position = player.global_position + direction * 0.6 + Vector3(0, 1.0, 0)
-	pickup.launch(direction, 5.0, 3.0, player)
+	SteamLobby.request_drop(item.id, spawn_position, direction, player)
 
 	print("InventoryUI: выброшен '%s'" % item.id)
 
