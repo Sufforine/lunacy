@@ -39,9 +39,12 @@ func from_profile(profile) -> void:
 	experience = profile.experience
 	inventory = profile.inventory.duplicate(true)
 	equipment = profile.equipment.duplicate(true)
-	var steam = Engine.get_singleton("Steam")
-	nickname = steam.getPersonaName() if steam else "Игрок"
-	steam_id = steam.getSteamID() if steam else 0
+	if SteamLobby.is_steam_ready():
+		nickname = Steam.getPersonaName()
+		steam_id = Steam.getSteamID()
+	else:
+		nickname = "Player"
+		steam_id = 0
 
 # APPLY BACK TO PROFILE (после миссии)
 func apply_to_profile(profile) -> void:

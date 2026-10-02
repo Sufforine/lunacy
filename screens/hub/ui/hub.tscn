@@ -8,6 +8,23 @@
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qssp3"]
 albedo_color = Color(0.28985527, 0.41622728, 0.27746338, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_boundary_wall"]
+albedo_color = Color(0.235, 0.255, 0.29, 1)
+roughness = 0.88
+
+[sub_resource type="BoxMesh" id="BoxMesh_boundary_wall"]
+material = SubResource("StandardMaterial3D_boundary_wall")
+size = Vector3(62.5, 6, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_boundary_wall"]
+size = Vector3(62.5, 6, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_camera_boundary_z"]
+size = Vector3(64, 30, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_camera_boundary_x"]
+size = Vector3(1, 30, 53)
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_qssp3"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hcxm3"]
@@ -37,23 +54,6 @@ albedo_color = Color(1.1012864, 0, 0, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_bfqb0"]
 size = Vector3(1.9815979, 0.55422974, 1.2089844)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_boundary_wall"]
-albedo_color = Color(0.235, 0.255, 0.29, 1)
-roughness = 0.88
-
-[sub_resource type="BoxMesh" id="BoxMesh_boundary_wall"]
-material = SubResource("StandardMaterial3D_boundary_wall")
-size = Vector3(62.5, 6, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_boundary_wall"]
-size = Vector3(62.5, 6, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_camera_boundary_z"]
-size = Vector3(64, 30, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_camera_boundary_x"]
-size = Vector3(1, 30, 53)
-
 [node name="Hub" type="Node3D"]
 script = ExtResource("1_ami6s")
 
@@ -71,7 +71,7 @@ light_color = Color(0.76558864, 0.72944033, 0.548492, 1)
 shadow_enabled = true
 
 [node name="NorthBoundaryWall" type="StaticBody3D" parent="."]
-position = Vector3(0.61094, 3, 25.83)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61094, 3, 25.83)
 
 [node name="Mesh" type="MeshInstance3D" parent="NorthBoundaryWall"]
 mesh = SubResource("BoxMesh_boundary_wall")
@@ -84,19 +84,19 @@ collision_layer = 512
 collision_mask = 0
 
 [node name="North" type="CollisionShape3D" parent="CameraBounds"]
-position = Vector3(0.61094, 10, 25.83)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61094, 10, 25.83)
 shape = SubResource("BoxShape3D_camera_boundary_z")
 
 [node name="South" type="CollisionShape3D" parent="CameraBounds"]
-position = Vector3(0.61094, 10, -25.83)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61094, 10, -25.83)
 shape = SubResource("BoxShape3D_camera_boundary_z")
 
 [node name="West" type="CollisionShape3D" parent="CameraBounds"]
-position = Vector3(-30.63, 10, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.63, 10, 0)
 shape = SubResource("BoxShape3D_camera_boundary_x")
 
 [node name="East" type="CollisionShape3D" parent="CameraBounds"]
-position = Vector3(31.85, 10, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.85, 10, 0)
 shape = SubResource("BoxShape3D_camera_boundary_x")
 
 [node name="Merchant" type="StaticBody3D" parent="."]

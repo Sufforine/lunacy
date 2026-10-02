@@ -8,11 +8,6 @@ extends Node
 
 const SAVE_DIR := "user://saves/"
 
-const MOVED_HERO_SCENES := {
-	"res://entities/hero/ui/Dullahan.tscn": "res://entities/characters/dullahan/Dullahan.tscn",
-	"res://entities/hero/ui/Slon.tscn": "res://entities/characters/Slon/Slon.tscn",
-}
-
 const EMPTY_EQUIPMENT := {
 	"weapon":     "",
 	"helmet":     "",
@@ -32,13 +27,24 @@ var _active_save_name: String = ""
 # =========================================================
 func get_save_path() -> String:
 
-	var steam_id: int = Steam.getSteamID()
-	var prefix: String = str(steam_id) if steam_id != 0 else "offline"
+	var prefix: String = _save_prefix()
 
 	if _active_save_name.is_empty():
 		return SAVE_DIR + prefix + ".json"
 
 	return SAVE_DIR + prefix + "__" + _active_save_name + ".json"
+
+
+# Префикс файла сохранения. Если Steam не запущен/не инициализирован —
+# используем "offline", не трогая Steam.getSteamID() вообще, иначе
+# godotsteam падает с C++ ошибкой (SteamUser() == null).
+func _save_prefix() -> String:
+
+	if not SteamLobby.is_steam_ready():
+		return "offline"
+
+	var steam_id: int = Steam.getSteamID()
+	return str(steam_id) if steam_id != 0 else "offline"
 
 
 func get_active_save_name() -> String:
@@ -53,8 +59,7 @@ func list_saves() -> Array:
 
 	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
 
-	var steam_id: int = Steam.getSteamID()
-	var prefix: String = str(steam_id) if steam_id != 0 else "offline"
+	var prefix: String = _save_prefix()
 
 	var result: Array = []
 	var dir := DirAccess.open(SAVE_DIR)
@@ -164,17 +169,14 @@ func load_profile() -> void:
 		push_error("SaveManager: повреждённый JSON в %s" % path)
 		return
 
-	var saved_hero_scene: String = data.get("hero_scene", "")
-	PlayerProfile.hero_scene = MOVED_HERO_SCENES.get(saved_hero_scene, saved_hero_scene)
+	PlayerProfile.hero_scene = data.get("hero_scene", "")
 	PlayerProfile.level      = data.get("level",      1)
 	PlayerProfile.experience = data.get("experience", 0)
 	PlayerProfile.inventory  = data.get("inventory", [])
 	PlayerProfile.quickslots = data.get("quickslots", ["" ,"", ""])
 	PlayerProfile.equipment  = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
 
-	if PlayerProfile.hero_scene != saved_hero_scene:
-		save_profile()
-		print("SaveManager: обновлён путь героя → %s" % PlayerProfile.hero_scene)
+
 
 	print("SaveManager: загружено ← %s" % path)
 

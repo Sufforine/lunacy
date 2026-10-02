@@ -14,6 +14,8 @@ const NetDrops := preload("res://features/net/sync/net_drops.gd")
 const LOBBY_TYPE_PUBLIC := 2
 const RESULT_OK := 1
 
+var _steam_ready: bool = false
+
 var lobby_id: int = 0
 var peer: MultiplayerPeer
 var is_host: bool = false
@@ -34,8 +36,17 @@ func _ready() -> void:
 		push_warning("SteamLobby: Steam singleton is not available")
 		return
 
-	var init_result := Steam.steamInit(480, true)
+	var init_result: bool = Steam.steamInit(480, true)
 	print("Steam initialized: ", init_result)
+
+	# false — инициализация не удалась (Steam не запущен, нет
+	# steam_appid.txt рядом с проектом/билдом, или не тот appid).
+	# Любой дальнейший вызов Steam.* в этом случае падает с C++ ошибкой,
+	# поэтому дальше идти нельзя.
+	if not init_result:
+		push_error("SteamLobby: Steam не инициализирован. Проверь что Steam запущен, ты залогинен, и рядом с проектом/билдом лежит steam_appid.txt с содержимым '480'.")
+		lobby_failed.emit("Steam init failed")
+		return
 
 	await get_tree().process_frame
 
@@ -45,6 +56,8 @@ func _ready() -> void:
 	Steam.lobby_created.connect(_on_lobby_created)
 	Steam.lobby_joined.connect(_on_lobby_joined)
 	print("Loaded hero: ", PlayerProfile.hero_scene)
+
+	_steam_ready = true
 
 
 func _process(_delta: float) -> void:
@@ -57,8 +70,8 @@ func is_session_active() -> bool:
 
 
 func host_lobby() -> void:
-	if not _steam_available():
-		lobby_failed.emit("Steam singleton is not available")
+	if not is_steam_ready():
+		lobby_failed.emit("Steam не инициализирован")
 		return
 
 	if lobby_id != 0:
@@ -69,8 +82,8 @@ func host_lobby() -> void:
 
 
 func join_lobby(id: int) -> void:
-	if not _steam_available():
-		lobby_failed.emit("Steam singleton is not available")
+	if not is_steam_ready():
+		lobby_failed.emit("Steam не инициализирован")
 		return
 
 	if lobby_id != 0:
@@ -487,6 +500,12 @@ func _clear_autoload_spawns() -> void:
 	for child in get_children():
 		if child.name.is_valid_int():
 			child.queue_free()
+
+
+# true только если steamInit прошёл успешно и initRelayNetworkAccess вызван.
+# Используй для отключения кнопки Host Game в главном меню.
+func is_steam_ready() -> bool:
+	return _steam_ready
 
 
 func _steam_available() -> bool:
