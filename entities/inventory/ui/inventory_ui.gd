@@ -17,6 +17,10 @@ class_name InventoryUI
 
 # ── ноды ────────────────────────────────────────────────
 @onready var main_panel: Panel          = $MainPanel
+
+# Режим мыши до открытия инвентаря — чтобы вернуть при закрытии именно его
+# (например MOUSE_MODE_CAPTURED для камеры за плечом во время боя)
+var _mouse_mode_before_open: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 @onready var inv_grid: GridContainer    = $MainPanel/InventorySection/InvGrid
 
 # Экипировка
@@ -68,6 +72,17 @@ var _drag_preview:  Control    = null
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+	# Control по умолчанию — mouse_filter STOP, то есть этот полноэкранный
+	# узел перехватывал бы мышь ВСЕГДА (даже когда MainPanel скрыт, из-за
+	# постоянно видимого QuickBarHUD), и camera_rig._unhandled_input()
+	# никогда не получал бы движение мыши. IGNORE пропускает её дальше;
+	# кнопки внутри сами по себе интерактивны и не страдают от этого.
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var quick_bar_hud := get_node_or_null("QuickBarHUD")
+	if quick_bar_hud is Control:
+		(quick_bar_hud as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+
 	main_panel.visible = false
 	_collect_inventory_slots()
 	_collect_equipment_slots()
@@ -115,9 +130,12 @@ func _input(event: InputEvent) -> void:
 
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_I:
-			main_panel.visible = not main_panel.visible
+			if main_panel.visible:
+				_close_main_panel()
+			else:
+				_open_main_panel()
 		elif event.keycode == KEY_ESCAPE and main_panel.visible:
-			main_panel.visible = false
+			_close_main_panel()
 			get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_DELETE:
 			_drop_hovered_item()
@@ -941,3 +959,20 @@ func _find_owner_player() -> Node3D:
 			return node as Node3D
 		node = node.get_parent()
 	return null
+
+
+# ════════════════════════════════════════════════════════
+# ОТКРЫТИЕ / ЗАКРЫТИЕ ПАНЕЛИ
+# Мышь нужно освобождать: пока камера захватывает курсор для обзора
+# (MOUSE_MODE_CAPTURED), в UI нельзя ни увидеть курсор, ни кликнуть
+# по слотам. При закрытии возвращаем тот режим, что был до открытия.
+# ════════════════════════════════════════════════════════
+func _open_main_panel() -> void:
+	_mouse_mode_before_open = Input.mouse_mode
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	main_panel.visible = true
+
+
+func _close_main_panel() -> void:
+	main_panel.visible = false
+	Input.mouse_mode = _mouse_mode_before_open

@@ -103,9 +103,9 @@ func get_stat(stat_name: String) -> float:
 
 	match stat_name:
 		"health":
-			return _base(stat_name) + get_characteristic("strength") * 10.0 + _effect_bonus(stat_name)
+			return _base(stat_name) + get_characteristic("strength") * 10.0 + _equip_bonus(stat_name) + _effect_bonus(stat_name)
 		"mana":
-			return _base(stat_name) + get_characteristic("wisdom") * 10.0 + _effect_bonus(stat_name)
+			return _base(stat_name) + get_characteristic("wisdom") * 10.0 + _equip_bonus(stat_name) + _effect_bonus(stat_name)
 		"attack_speed":
 			return _base(stat_name) + get_characteristic("agility") * 10.0 + _equip_bonus(stat_name) + _effect_bonus(stat_name)
 		"magical_damage_bonus":

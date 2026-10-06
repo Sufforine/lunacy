@@ -10,5 +10,6 @@ id = "ShieldArmor"
 item_name = "Shield Armor"
 icon = ExtResource("1_v8np7")
 slot = 3
+bonus_health = 100
 passive_effect = ExtResource("2_tsmim")
 metadata/_custom_type_script = "uid://c77evqxqq52db"
