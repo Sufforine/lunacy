@@ -31,11 +31,16 @@ extends Control
 @onready var save_name_input: LineEdit     = $SavePickerPopup/VBox/NewSaveRow/NameInput
 @onready var save_create_button: Button    = $SavePickerPopup/VBox/NewSaveRow/CreateButton
 
-var _hero_buttons: Dictionary = {}  # id → Button
-var _lobby_ui_active: bool = false
+@onready var steam_lobby = $SteamLobby  # поправь путь под свою сцену
 
 
+
+
+# ════════════════════════════════════════════════════════
+# READY
+# ════════════════════════════════════════════════════════
 func _ready() -> void:
+
 	lobby_panel.visible = false
 	save_picker.visible = false
 
@@ -46,35 +51,21 @@ func _ready() -> void:
 	save_new_button.pressed.connect(_open_save_picker)
 	save_create_button.pressed.connect(_on_create_save_pressed)
 
-	_populate_hero_grid()
+	_refresh_character_label()
 	_update_save_label()
 	_update_nickname_label()
 	_clear_players_list()
 
-	if not SteamLobby.lobby_ready.is_connected(_on_lobby_ready):
-		SteamLobby.lobby_ready.connect(_on_lobby_ready)
-	if not SteamLobby.lobby_failed.is_connected(_on_lobby_failed):
-		SteamLobby.lobby_failed.connect(_on_lobby_failed)
-	if not SteamLobby.players_updated.is_connected(_on_players_updated):
-		SteamLobby.players_updated.connect(_on_players_updated)
+	if steam_lobby:
+		steam_lobby.lobby_ready.connect(_on_lobby_ready)
+		steam_lobby.players_updated.connect(_on_players_updated)
 
 
-func _show_lobby_pending(status_text: String) -> void:
-	main_menu_panel.visible = false
-	lobby_panel.visible = true
-	code_label.text = status_text
-
-
-func _reset_host_join_buttons() -> void:
-	host_button.disabled = false
-	join_button.disabled = false
-
-
+# ════════════════════════════════════════════════════════
+# HOST / JOIN
+# ════════════════════════════════════════════════════════
 func _on_host_pressed() -> void:
-	host_button.disabled = true
-	join_button.disabled = true
-	_show_lobby_pending("Создание лобби...")
-	SteamLobby.host_lobby()
+	steam_lobby.host_lobby()
 
 
 func _on_join_pressed() -> void:
@@ -82,43 +73,31 @@ func _on_join_pressed() -> void:
 	if code == 0:
 		push_warning("lobby_menu: введите корректный код лобби")
 		return
-
-	host_button.disabled = true
-	join_button.disabled = true
-	_show_lobby_pending("Подключение...")
-	SteamLobby.join_lobby(code)
-
-
-func _on_lobby_failed(reason: String) -> void:
-	push_warning("lobby_menu: %s" % reason)
-	_lobby_ui_active = false
-	main_menu_panel.visible = true
-	lobby_panel.visible = false
-	_reset_host_join_buttons()
+	steam_lobby.join_lobby(code)
 
 
 func _on_lobby_ready(lobby_id: int) -> void:
-	if _lobby_ui_active:
-		return
-	_lobby_ui_active = true
-
 	main_menu_panel.visible = false
 	lobby_panel.visible = true
 	code_label.text = "Код лобби: %d" % lobby_id
 
 	var is_host: bool = multiplayer.is_server()
 
+	# Кнопки выбора сохранения — только для хоста
 	save_select_button.visible = is_host
 	save_new_button.visible = is_host
 	save_label.visible = is_host
 
+	# Кнопка старта — только для хоста
 	ready_button.visible = is_host
 	if is_host:
 		ready_button.text = "Старт"
-		if not ready_button.pressed.is_connected(_on_start_pressed):
-			ready_button.pressed.connect(_on_start_pressed)
+		ready_button.pressed.connect(_on_start_pressed)
 
 
+# ════════════════════════════════════════════════════════
+# КОПИРОВАНИЕ КОДА
+# ════════════════════════════════════════════════════════
 func _on_copy_pressed() -> void:
 	var code_text := code_label.text.replace("Код лобби: ", "")
 	DisplayServer.clipboard_set(code_text)
@@ -127,86 +106,42 @@ func _on_copy_pressed() -> void:
 	copy_button.text = "Копировать"
 
 
-func _populate_hero_grid() -> void:
-	for child in hero_grid.get_children():
-		child.queue_free()
-	_hero_buttons.clear()
+# ════════════════════════════════════════════════════════
+# ПЕРСОНАЖ
+# Заранее готовых героев больше нет — персонаж создаётся и выбирается
+# заранее в главном меню (SaveManager.create_character / select_save).
+# Здесь просто показываем кто уже выбран, без возможности сменить.
+# ════════════════════════════════════════════════════════
+func _refresh_character_label() -> void:
 
-	for hero in HeroLibrary.all_heroes():
-		var btn := Button.new()
-		btn.custom_minimum_size = Vector2(48, 48)
-		btn.tooltip_text = hero.hero_name
+	if hero_grid:
+		hero_grid.visible = false
 
-		var icon := TextureRect.new()
-		icon.texture = hero.icon
-		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		btn.add_child(icon)
-
-		btn.pressed.connect(func(): _on_hero_selected(hero))
-		hero_grid.add_child(btn)
-		_hero_buttons[hero.id] = btn
-
-	_refresh_hero_selection_highlight()
+	if PlayerProfile.character_name.is_empty():
+		hero_name_label.text = "Персонаж не выбран — вернись в меню"
+	else:
+		hero_name_label.text = PlayerProfile.character_name
 
 
-func _on_hero_selected(hero: HeroDefinition) -> void:
-	PlayerProfile.hero_scene = hero.scene.resource_path
-	hero_name_label.text = hero.hero_name
-	_refresh_hero_selection_highlight()
-
-	if SteamLobby.peer != null:
-		SteamLobby.notify_hero_changed()
-
-	print("lobby_menu: выбран герой '%s'" % hero.id)
-
-
-func _refresh_hero_selection_highlight() -> void:
-	for id in _hero_buttons:
-		var btn: Button = _hero_buttons[id]
-		var hero: HeroDefinition = HeroLibrary.get_hero(id)
-		var selected := hero != null and hero.scene.resource_path == PlayerProfile.hero_scene
-		btn.modulate = Color.WHITE if selected else Color(0.6, 0.6, 0.6, 1.0)
-
-		if selected:
-			hero_name_label.text = hero.hero_name
-
-
+# ════════════════════════════════════════════════════════
+# СПИСОК ИГРОКОВ В ЛОББИ
+# Вызывается сигналом players_updated(players: Array)
+# где players = [{ peer_id, nickname, hero_scene }, ...]
+#
+# TODO: сейчас показывается только Steam-ник. Чтобы показать реальное
+# имя персонажа (character_name) других игроков, нужно чтобы оно тоже
+# передавалось по сети — добавь его в payload рядом с nickname там,
+# где сервер формирует список игроков.
+# ════════════════════════════════════════════════════════
 func _on_players_updated(players: Array) -> void:
+
 	_clear_players_list()
 
 	for info in players:
-		var row := HBoxContainer.new()
-		row.custom_minimum_size = Vector2(0, 32)
-
-		var icon := TextureRect.new()
-		icon.custom_minimum_size = Vector2(28, 28)
-		icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-
-		var hero_scene_path: String = info.get("hero_scene", "")
-		var hero_def := _find_hero_by_scene_path(hero_scene_path)
-		icon.texture = hero_def.icon if hero_def else null
-		row.add_child(icon)
-
 		var label := Label.new()
 		var nick: String = info.get("nickname", "Игрок")
-		var hero_label := hero_def.hero_name if hero_def else "не выбран"
-		label.text = "%s — %s" % [nick, hero_label]
-		row.add_child(label)
-
-		players_list.add_child(row)
-
-
-func _find_hero_by_scene_path(path: String) -> HeroDefinition:
-	if path.is_empty():
-		return null
-	for hero in HeroLibrary.all_heroes():
-		if hero.scene and hero.scene.resource_path == path:
-			return hero
-	return null
+		label.text = nick
+		players_list.add_child(label)
 
 
 func _clear_players_list() -> void:
@@ -214,15 +149,22 @@ func _clear_players_list() -> void:
 		child.queue_free()
 
 
+# ════════════════════════════════════════════════════════
+# НИК
+# ════════════════════════════════════════════════════════
 func _update_nickname_label() -> void:
-	nickname_label.text = Steam.getPersonaName() if Engine.has_singleton("Steam") else "Игрок"
+	nickname_label.text = Steam.getPersonaName()
 
 
+# ════════════════════════════════════════════════════════
+# СОХРАНЕНИЯ — выбор существующего / создание нового
+# ════════════════════════════════════════════════════════
 func _update_save_label() -> void:
 	save_label.text = "Сохранение: %s" % SaveManager.get_active_save_name()
 
 
 func _open_save_picker() -> void:
+
 	for child in save_picker_list.get_children():
 		child.queue_free()
 
@@ -238,33 +180,46 @@ func _open_save_picker() -> void:
 
 
 func _on_save_selected(info: Dictionary) -> void:
+
 	SaveManager.select_save(info)
 	_update_save_label()
-	_populate_hero_grid()
+	_refresh_character_label()  # перерисовать выбор героя из загруженного профиля
 	save_picker.hide()
 
 
 func _on_create_save_pressed() -> void:
+
 	var save_name := save_name_input.text.strip_edges()
 	if save_name.is_empty():
 		push_warning("lobby_menu: введите имя для нового сохранения")
 		return
 
-	if not SaveManager.create_named_save(save_name):
+	if not SaveManager.create_character(save_name):
 		return
 
 	_update_save_label()
-	_populate_hero_grid()
+	_refresh_character_label()
 	save_picker.hide()
 
 
+# ════════════════════════════════════════════════════════
+# СТАРТ — только хост
+# ════════════════════════════════════════════════════════
 func _on_start_pressed() -> void:
+
 	if not multiplayer.is_server():
 		return
 
+	# Проверить что хост выбрал героя
 	if PlayerProfile.hero_scene.is_empty():
 		push_warning("lobby_menu: хост не выбрал героя")
+		# TODO: показать сообщение об ошибке в UI
 		return
 
 	ready_button.disabled = true
-	SteamLobby.start_game()
+	_rpc_load_hub.rpc()
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_load_hub() -> void:
+	get_tree().change_scene_to_file("res://Scenes/Hub/hub.tscn")

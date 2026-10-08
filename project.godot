@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Lunacy"
-run/main_scene="uid://bowkf26i4v23c"
+run/main_scene="uid://xb4fl42bb6ci"
 config/features=PackedStringArray("4.5", "Forward Plus")
 
 [autoload]
@@ -20,7 +20,6 @@ InputManager="*res://shared/input/input_manager.gd"
 PlayerProfile="*res://entities/player/model/player_profile.gd"
 SaveManager="*res://entities/player/model/save_manager.gd"
 ItemLibrary="*res://entities/inventory/model/data/item_library.gd"
-HeroLibrary="*res://entities/characters/model/hero_library.gd"
 SteamLobby="*res://features/steam-lobby/api/steam_lobby.gd"
 
 [display]

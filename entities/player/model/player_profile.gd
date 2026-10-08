@@ -3,6 +3,17 @@ extends Node
 var save_version: int = 1
 var hero_scene: String = ""
 
+# Имя, которое игрок дал персонажу при создании. Пусто = персонаж ещё
+# не создан — Start/Host должны требовать создать или выбрать персонажа.
+var character_name: String = ""
+
+# Внешность персонажа: {"color": "rrggbb", "hair": индекс причёски}.
+# Выбирается при создании в главном меню.
+var appearance: Dictionary = {"color": "3498db", "hair": 0}
+
+# Unix-время создания — по нему находим «последнего созданного» персонажа
+var created_at: float = 0.0
+
 var level: int = 1
 var experience: int = 0
 
