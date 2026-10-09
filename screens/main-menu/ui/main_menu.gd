@@ -27,9 +27,9 @@ const HAIR_STYLES := [
 
 const BODY_TOP_Y := 1.1  # верх основного куба: центр 0.6 + половина высоты 0.5
 
-enum State { TITLE, MOVING, STAGE, EDITING, MODE_SELECT }
+enum State { TITLE, MOVING, STAGE, EDITING, MODE_SELECT, CONFIRM_DELETE }
 
-@export var game_title: String = "LUNACY"
+@export var game_title: String = "НАЗВАНИЕ ИГРЫ"
 @export var title_camera_position: Vector3 = Vector3(0.0, 1.8, 7.0)
 @export var stage_camera_position: Vector3 = Vector3(-10.0, 1.5, 3.4)
 @export var stage_center: Vector3 = Vector3(-10.0, 0.0, 0.0)
@@ -50,10 +50,13 @@ var _title_ui: Control
 var _stage_ui: Control
 var _edit_ui: Control
 var _mode_ui: Control
+var _confirm_ui: Control
 
 var _character_label: Label
 var _back_button: Button
 var _select_button: Button
+var _delete_button: Button
+var _confirm_label: Label
 var _create_button: Button
 
 var _name_input: LineEdit
@@ -227,6 +230,9 @@ func _build_ui() -> void:
 	_mode_ui = _build_mode_ui()
 	root.add_child(_mode_ui)
 
+	_confirm_ui = _build_confirm_ui()
+	root.add_child(_confirm_ui)
+
 
 func _build_title_ui() -> Control:
 
@@ -286,6 +292,10 @@ func _build_stage_ui() -> Control:
 
 	_select_button = _make_button("Выбрать", _on_select_pressed)
 	bar.add_child(_select_button)
+
+	_delete_button = _make_button("Удалить", _on_delete_pressed, 140.0)
+	_delete_button.modulate = Color(1.0, 0.6, 0.6)
+	bar.add_child(_delete_button)
 
 	_create_button = _make_button("Создать персонажа", _on_create_pressed, 260.0)
 	bar.add_child(_create_button)
@@ -405,6 +415,53 @@ func _build_edit_ui() -> Control:
 	return margin
 
 
+func _build_confirm_ui() -> Control:
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_ignore_mouse(center)
+
+	var panel := PanelContainer.new()
+	center.add_child(panel)
+
+	var inner := MarginContainer.new()
+	inner.add_theme_constant_override("margin_left", 28)
+	inner.add_theme_constant_override("margin_right", 28)
+	inner.add_theme_constant_override("margin_top", 24)
+	inner.add_theme_constant_override("margin_bottom", 24)
+	panel.add_child(inner)
+
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 14)
+	inner.add_child(column)
+
+	var title := _make_label("Удалить персонажа?", 26)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+
+	_confirm_label = _make_label("", 20)
+	_confirm_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(_confirm_label)
+
+	var warning := _make_label("Инвентарь, снаряжение и прогресс будут потеряны.\nЭто нельзя отменить.", 16)
+	warning.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	warning.modulate = Color(1.0, 0.7, 0.7)
+	column.add_child(warning)
+
+	var buttons := HBoxContainer.new()
+	buttons.add_theme_constant_override("separation", 12)
+	buttons.alignment = BoxContainer.ALIGNMENT_CENTER
+	column.add_child(buttons)
+
+	buttons.add_child(_make_button("Отмена", _on_delete_cancelled, 150.0))
+
+	var confirm_button := _make_button("Удалить", _on_delete_confirmed, 150.0)
+	confirm_button.modulate = Color(1.0, 0.5, 0.5)
+	buttons.add_child(confirm_button)
+
+	return center
+
+
 func _build_mode_ui() -> Control:
 
 	var center := CenterContainer.new()
@@ -470,6 +527,7 @@ func _set_state(new_state: State) -> void:
 	_stage_ui.visible = new_state == State.STAGE
 	_edit_ui.visible  = new_state == State.EDITING
 	_mode_ui.visible  = new_state == State.MODE_SELECT
+	_confirm_ui.visible = new_state == State.CONFIRM_DELETE
 
 
 func _move_camera(target: Vector3) -> void:
@@ -495,6 +553,7 @@ func _show_stage() -> void:
 
 	_figure.visible = has_character
 	_select_button.visible = has_character
+	_delete_button.visible = has_character
 	_back_button.visible = true
 	_create_button.text = "Создать нового" if has_character else "Создать персонажа"
 
@@ -586,6 +645,33 @@ func _on_select_pressed() -> void:
 	_multiplayer_button.tooltip_text = "" if steam_ready else "Steam недоступен. Запусти Steam, залогинься и перезапусти игру."
 
 	_set_state(State.MODE_SELECT)
+
+
+func _on_delete_pressed() -> void:
+
+	if _state != State.STAGE or _last_character.is_empty():
+		return
+
+	_confirm_label.text = "«%s»" % str(_last_character.get("character_name", ""))
+	_set_state(State.CONFIRM_DELETE)
+
+
+func _on_delete_confirmed() -> void:
+
+	if _state != State.CONFIRM_DELETE:
+		return
+
+	if not SaveManager.delete_character(_last_character):
+		push_warning("main_menu: не удалось удалить персонажа")
+
+	# Постамент покажет следующего по дате персонажа или опустеет
+	_show_stage()
+
+
+func _on_delete_cancelled() -> void:
+	if _state != State.CONFIRM_DELETE:
+		return
+	_set_state(State.STAGE)
 
 
 func _on_solo_pressed() -> void:

@@ -12,7 +12,7 @@ const SAVE_DIR := "user://saves/"
 # Заранее готовых героев больше нет — в игре пока используется общая сцена
 # игрока. ВАЖНО: укажи сюда реальный путь к твоей базовой сцене игрока
 # (той, что раньше была у Dullahan/Slon), иначе персонаж не заспавнится.
-const DEFAULT_HERO_SCENE := ""
+const DEFAULT_HERO_SCENE := "res://entities/characters/model/Player.tscn"
 
 const DEFAULT_APPEARANCE := {"color": "3498db", "hair": 0}
 
@@ -236,6 +236,48 @@ func select_save(save_info: Dictionary) -> void:
 	_active_save_name = "" if save_info.get("is_default", true) else str(save_info.get("slug", ""))
 	load_profile()
 	print("SaveManager: выбран персонаж '%s'" % get_active_save_name())
+
+
+# =========================================================
+# УДАЛИТЬ ПЕРСОНАЖА
+# Удаляет файл сохранения. Если удаляется активный персонаж —
+# профиль в памяти сбрасывается, чтобы его нельзя было случайно
+# перезаписать обратно в файл.
+# =========================================================
+func delete_character(save_info: Dictionary) -> bool:
+
+	var path: String = str(save_info.get("path", ""))
+
+	# Страховка: трогаем только .json внутри папки сохранений
+	if not path.begins_with(SAVE_DIR) or not path.ends_with(".json"):
+		push_error("SaveManager: отказ удалять файл вне папки сохранений: '%s'" % path)
+		return false
+
+	if not FileAccess.file_exists(path):
+		push_warning("SaveManager: файл персонажа уже удалён: '%s'" % path)
+		return false
+
+	var was_active: bool = path == get_save_path()
+
+	var result: Error = DirAccess.remove_absolute(path)
+	if result != OK:
+		push_error("SaveManager: не удалось удалить '%s' (ошибка %d)" % [path, result])
+		return false
+
+	if was_active:
+		_active_save_name = ""
+		PlayerProfile.character_name = ""
+		PlayerProfile.hero_scene     = ""
+		PlayerProfile.created_at     = 0.0
+		PlayerProfile.appearance     = DEFAULT_APPEARANCE.duplicate()
+		PlayerProfile.level          = 1
+		PlayerProfile.experience     = 0
+		PlayerProfile.inventory      = []
+		PlayerProfile.quickslots     = ["", "", ""]
+		PlayerProfile.equipment      = EMPTY_EQUIPMENT.duplicate()
+
+	print("SaveManager: удалён персонаж '%s'" % str(save_info.get("character_name", path)))
+	return true
 
 
 # =========================================================
