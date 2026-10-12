@@ -8,13 +8,15 @@ extends Node
 
 const SAVE_DIR := "user://saves/"
 
-# Сцена, которая используется для ЛЮБОГО созданного персонажа.
-# Заранее готовых героев больше нет — в игре пока используется общая сцена
-# игрока. ВАЖНО: укажи сюда реальный путь к твоей базовой сцене игрока
-# (той, что раньше была у Dullahan/Slon), иначе персонаж не заспавнится.
-const DEFAULT_HERO_SCENE := "res://entities/characters/model/Player.tscn"
+# Сцена, которую хаб/миссия инстанцируют для ЛЮБОГО созданного персонажа.
+# В ней уже должны быть player.gd и все компоненты (Stats, Equipment,
+# Inventory, Effects, CameraRig, CanvasLayer/InventoryUI и т.д.) —
+# собирается один раз в редакторе, а не кодом при создании персонажа.
+# ВАЖНО: укажи путь к ней, иначе в хабе никто не появится.
+# Пример: const DEFAULT_HERO_SCENE := "res://entities/player/player.tscn"
+const DEFAULT_HERO_SCENE := ""
 
-const DEFAULT_APPEARANCE := {"color": "3498db", "hair": 0}
+const DEFAULT_APPEARANCE := {"body": "male", "skin": "e0ac69", "hair": 0}
 
 const EMPTY_EQUIPMENT := {
 	"weapon":     "",
@@ -64,6 +66,11 @@ func has_active_character() -> bool:
 	return not PlayerProfile.character_name.is_empty()
 
 
+# Можно ли реально заспавнить текущего персонажа: сцена задана и существует
+func has_valid_hero_scene() -> bool:
+	return not PlayerProfile.hero_scene.is_empty() and ResourceLoader.exists(PlayerProfile.hero_scene)
+
+
 # =========================================================
 # СПИСОК ВСЕХ СОХРАНЕНИЙ ТЕКУЩЕГО ИГРОКА
 # Каждый элемент:
@@ -73,7 +80,7 @@ func has_active_character() -> bool:
 #   path           — путь к файлу
 #   is_default     — это файл <steam_id>.json без слага
 #   created_at     — время создания (для старых файлов — время изменения файла)
-#   appearance     — {"color": "rrggbb", "hair": int}
+#   appearance     — {"body": id, "skin": "rrggbb", "hair": int}
 # =========================================================
 func list_saves() -> Array:
 
@@ -177,7 +184,7 @@ func _peek_save(path: String) -> Dictionary:
 # СОЗДАТЬ НОВОГО ПЕРСОНАЖА
 # Имя, введённое игроком, становится и отображаемым именем персонажа,
 # и (в очищенном виде) именем файла сохранения.
-# appearance — {"color": "rrggbb", "hair": int}
+# appearance — {"body": id, "skin": "rrggbb", "hair": int}
 # =========================================================
 func create_character(character_name: String, appearance: Dictionary = {}) -> bool:
 
@@ -339,7 +346,12 @@ func load_profile() -> void:
 
 	PlayerProfile.character_name = data.get("character_name", "")
 	PlayerProfile.created_at     = float(data.get("created_at", 0.0))
-	PlayerProfile.hero_scene     = data.get("hero_scene", "")
+	# Все персонажи пока используют общую сцену. Сохранения, созданные до того
+	# как DEFAULT_HERO_SCENE был задан (или с устаревшим путём), чиним на лету.
+	var saved_hero_scene: String = str(data.get("hero_scene", ""))
+	if saved_hero_scene.is_empty() or not ResourceLoader.exists(saved_hero_scene):
+		saved_hero_scene = DEFAULT_HERO_SCENE
+	PlayerProfile.hero_scene     = saved_hero_scene
 	PlayerProfile.level          = data.get("level",      1)
 	PlayerProfile.experience     = data.get("experience", 0)
 	PlayerProfile.inventory      = data.get("inventory", [])

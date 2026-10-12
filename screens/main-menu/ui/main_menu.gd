@@ -3,12 +3,16 @@
 # камера, свет, декорации и CanvasLayer с кнопками строятся кодом.
 #
 # Поток:
-#   TITLE       → кнопки «Играть» / «Выход»
-#   MOVING      → камера плавно уезжает влево к постаменту
-#   STAGE       → снизу по центру «Создать персонажа»; если персонаж уже есть,
-#                 на постаменте стоит последний созданный + кнопка «Выбрать»
-#   EDITING     → имя, цвет куба, причёска (второй куб сверху), «Сохранить»
-#   MODE_SELECT → одиночная игра или мультиплеер
+#   TITLE          → «Играть» / «Выход»
+#   MOVING         → камера плавно переезжает (кнопок нет)
+#   STAGE          → на сцене последний созданный персонаж (если есть);
+#                    «Выбрать», «Удалить», «Создать персонажа»
+#   CHOOSE_BODY    → на сцене два тела рядом, выбираешь мужское или женское
+#   EDITING        → камера приближена к выбранному телу: имя, цвет кожи, причёска
+#   MODE_SELECT    → одиночная игра или мультиплеер
+#   CONFIRM_DELETE → подтверждение удаления
+#
+# Модели и применение внешности — в character_models.gd.
 extends Node3D
 
 const SOLO_SCENE  := "res://screens/hub/ui/hub.tscn"
@@ -16,23 +20,18 @@ const LOBBY_SCENE := "res://features/steam-lobby/ui/lobby_menu.tscn"
 
 const NAME_MAX_LENGTH := 24
 
-# Причёски — дополнительный куб на верхней части. size == ZERO → без причёски.
-const HAIR_STYLES := [
-	{"label": "Без причёски", "size": Vector3.ZERO},
-	{"label": "Ёжик",         "size": Vector3(1.0, 0.18, 1.0)},
-	{"label": "Башня",        "size": Vector3(0.6, 0.7, 0.6)},
-	{"label": "Шляпа",        "size": Vector3(1.45, 0.2, 1.45)},
-	{"label": "Гребень",      "size": Vector3(0.2, 0.45, 1.0)},
-]
+const STAGE_FLOOR_Y := 0.1  # верх постамента: на этой высоте стоят ноги фигур
 
-const BODY_TOP_Y := 1.1  # верх основного куба: центр 0.6 + половина высоты 0.5
-
-enum State { TITLE, MOVING, STAGE, EDITING, MODE_SELECT, CONFIRM_DELETE }
+enum State { TITLE, MOVING, STAGE, CHOOSE_BODY, EDITING, MODE_SELECT, CONFIRM_DELETE }
 
 @export var game_title: String = "НАЗВАНИЕ ИГРЫ"
 @export var title_camera_position: Vector3 = Vector3(0.0, 1.8, 7.0)
-@export var stage_camera_position: Vector3 = Vector3(-10.0, 1.5, 3.4)
+@export var stage_camera_position: Vector3 = Vector3(-10.0, 1.6, 4.0)
 @export var stage_center: Vector3 = Vector3(-10.0, 0.0, 0.0)
+# Положение камеры при редактировании относительно выбранной фигуры.
+# Смещение по X сдвигает фигуру влево от центра, чтобы её не закрывала панель.
+@export var edit_camera_offset: Vector3 = Vector3(0.9, 1.25, 2.4)
+@export var figure_spacing: float = 3.4
 @export var camera_pitch_degrees: float = -6.0
 @export var camera_move_time: float = 1.4
 @export var figure_spin_speed: float = 0.6
@@ -40,11 +39,8 @@ enum State { TITLE, MOVING, STAGE, EDITING, MODE_SELECT, CONFIRM_DELETE }
 var _state: State = State.TITLE
 
 var _camera: Camera3D
-var _figure: Node3D
-var _body: CSGBox3D
-var _hair: CSGBox3D
-var _body_material: StandardMaterial3D
-var _hair_material: StandardMaterial3D
+var _figures: Dictionary = {}   # id тела → Node3D (позиция и вращение)
+var _models: Dictionary = {}    # id тела → Node3D (сама модель внутри фигуры)
 
 var _title_ui: Control
 var _stage_ui: Control
@@ -56,29 +52,35 @@ var _character_label: Label
 var _back_button: Button
 var _select_button: Button
 var _delete_button: Button
-var _confirm_label: Label
 var _create_button: Button
+var _cancel_choice_button: Button
+var _body_buttons: Array[Button] = []
+var _confirm_label: Label
 
 var _name_input: LineEdit
 var _error_label: Label
 var _color_picker: ColorPickerButton
+var _hair_container: GridContainer
 var _hair_buttons: Array[Button] = []
 
+var _solo_button: Button
 var _multiplayer_button: Button
 
 var _last_character: Dictionary = {}
-var _edit_color: Color = Color8(52, 152, 219)
+
+var _edit_body: String = CharacterModels.DEFAULT_BODY
+var _edit_skin: Color = Color.html(CharacterModels.DEFAULT_SKIN)
 var _edit_hair: int = 0
 
-var _swatch_colors: Array[Color] = [
-	Color8(231, 76, 60),
-	Color8(230, 126, 34),
-	Color8(241, 196, 15),
-	Color8(46, 204, 113),
-	Color8(26, 188, 156),
-	Color8(52, 152, 219),
-	Color8(155, 89, 182),
-	Color8(236, 240, 241),
+var _skin_swatches: Array[Color] = [
+	Color8(255, 224, 196),
+	Color8(241, 194, 125),
+	Color8(224, 172, 105),
+	Color8(198, 134, 66),
+	Color8(141, 85, 36),
+	Color8(104, 66, 38),
+	Color8(84, 52, 30),
+	Color8(60, 38, 24),
 ]
 
 
@@ -95,8 +97,14 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if _figure.visible:
-		_figure.rotate_y(figure_spin_speed * delta)
+	# Крутим фигуры только в показе и редактировании; при выборе тела
+	# они стоят лицом к камере
+	if _state != State.STAGE and _state != State.EDITING:
+		return
+	for body_id in _figures:
+		var figure: Node3D = _figures[body_id]
+		if figure.visible:
+			figure.rotate_y(figure_spin_speed * delta)
 
 
 # ════════════════════════════════════════════════════════
@@ -126,11 +134,9 @@ func _build_world() -> void:
 	floor_box.material = _make_material(Color(0.14, 0.15, 0.2))
 	add_child(floor_box)
 
-	# Постамент для персонажа
-	var platform := CSGCylinder3D.new()
-	platform.radius = 1.6
-	platform.height = 0.2
-	platform.sides = 32
+	# Широкий постамент: на нём помещаются и два тела для выбора
+	var platform := CSGBox3D.new()
+	platform.size = Vector3(8.0, 0.2, 3.4)
 	platform.position = stage_center
 	platform.material = _make_material(Color(0.3, 0.32, 0.4))
 	add_child(platform)
@@ -156,24 +162,21 @@ func _build_world() -> void:
 	add_child(_camera)
 	_camera.make_current()
 
-	# Фигура персонажа: куб + куб-причёска сверху
-	_figure = Node3D.new()
-	_figure.position = stage_center
-	_figure.visible = false
-	add_child(_figure)
+	# По одной фигуре на каждое тело; показываем нужные по ситуации
+	for entry in CharacterModels.BODY_TYPES:
+		var body_def: Dictionary = entry
+		var body_id: String = str(body_def["id"])
 
-	_body_material = _make_material(Color.WHITE)
-	_hair_material = _make_material(Color.WHITE)
+		var figure := Node3D.new()
+		figure.visible = false
+		add_child(figure)
 
-	_body = CSGBox3D.new()
-	_body.size = Vector3.ONE
-	_body.position = Vector3(0.0, 0.6, 0.0)
-	_body.material = _body_material
-	_figure.add_child(_body)
+		var model: Node3D = CharacterModels.create_model(body_id)
+		figure.add_child(model)
+		CharacterModels.play_idle(model)
 
-	_hair = CSGBox3D.new()
-	_hair.material = _hair_material
-	_figure.add_child(_hair)
+		_figures[body_id] = figure
+		_models[body_id] = model
 
 
 func _make_material(color: Color) -> StandardMaterial3D:
@@ -182,27 +185,24 @@ func _make_material(color: Color) -> StandardMaterial3D:
 	return material
 
 
-# Показать на фигуре внешность: цвет куба и индекс причёски
-func _apply_appearance(color: Color, hair_index: int) -> void:
-
-	_body_material.albedo_color = color
-	_hair_material.albedo_color = color.darkened(0.45)
-
-	var index: int = clampi(hair_index, 0, HAIR_STYLES.size() - 1)
-	var hair_style: Dictionary = HAIR_STYLES[index]
-	var hair_size: Vector3 = hair_style["size"]
-
-	if hair_size == Vector3.ZERO:
-		_hair.visible = false
-		return
-
-	_hair.visible = true
-	_hair.size = hair_size
-	_hair.position = Vector3(0.0, BODY_TOP_Y + hair_size.y * 0.5 - 0.02, 0.0)
+# Поставить фигуру на постамент со смещением по X и повернуть лицом к камере
+func _place_figure(body_id: String, x_offset: float) -> void:
+	var figure: Node3D = _figures[body_id]
+	figure.position = stage_center + Vector3(x_offset, STAGE_FLOOR_Y, 0.0)
+	figure.rotation = Vector3.ZERO
 
 
-func _appearance_color(appearance: Dictionary) -> Color:
-	return Color.html(str(appearance.get("color", "3498db")))
+func _hide_all_figures() -> void:
+	for body_id in _figures:
+		var figure: Node3D = _figures[body_id]
+		figure.visible = false
+
+
+func _body_id_of(appearance: Dictionary) -> String:
+	var body_id: String = str(appearance.get("body", CharacterModels.DEFAULT_BODY))
+	if _figures.has(body_id):
+		return body_id
+	return CharacterModels.DEFAULT_BODY
 
 
 # ════════════════════════════════════════════════════════
@@ -278,7 +278,9 @@ func _build_stage_ui() -> Control:
 	_ignore_mouse(spacer)
 	column.add_child(spacer)
 
-	# Нижняя панель кнопок — CenterContainer сам держит её по центру
+	# Нижняя панель кнопок — CenterContainer сам держит её по центру.
+	# Кнопки показа и кнопки выбора тела лежат в одной панели
+	# и переключаются через _set_bar_mode().
 	var bar_center := CenterContainer.new()
 	_ignore_mouse(bar_center)
 	column.add_child(bar_center)
@@ -299,6 +301,17 @@ func _build_stage_ui() -> Control:
 
 	_create_button = _make_button("Создать персонажа", _on_create_pressed, 260.0)
 	bar.add_child(_create_button)
+
+	_cancel_choice_button = _make_button("Отмена", _on_cancel_choice_pressed, 140.0)
+	bar.add_child(_cancel_choice_button)
+
+	# По кнопке на каждое тело — порядок совпадает с порядком фигур слева направо
+	for entry in CharacterModels.BODY_TYPES:
+		var body_def: Dictionary = entry
+		var body_id: String = str(body_def["id"])
+		var body_button := _make_button(str(body_def["label"]), func(): _on_body_chosen(body_id), 200.0)
+		bar.add_child(body_button)
+		_body_buttons.append(body_button)
 
 	var bottom_gap := Control.new()
 	bottom_gap.custom_minimum_size = Vector2(0.0, 36.0)
@@ -351,14 +364,14 @@ func _build_edit_ui() -> Control:
 	_name_input.custom_minimum_size = Vector2(0.0, 36.0)
 	column.add_child(_name_input)
 
-	# ── Цвет ──────────────────────────────────────────────
-	column.add_child(_make_label("Цвет", 18))
+	# ── Цвет кожи ─────────────────────────────────────────
+	column.add_child(_make_label("Цвет кожи", 18))
 
 	var swatches := GridContainer.new()
 	swatches.columns = 4
 	column.add_child(swatches)
 
-	for swatch_color in _swatch_colors:
+	for swatch_color in _skin_swatches:
 		var swatch := Button.new()
 		swatch.custom_minimum_size = Vector2(44.0, 32.0)
 		for state_name in ["normal", "hover", "pressed"]:
@@ -366,7 +379,7 @@ func _build_edit_ui() -> Control:
 			box_style.bg_color = swatch_color
 			box_style.set_corner_radius_all(4)
 			swatch.add_theme_stylebox_override(state_name, box_style)
-		swatch.pressed.connect(func(): _set_edit_color(swatch_color, true))
+		swatch.pressed.connect(func(): _set_edit_skin(swatch_color, true))
 		swatches.add_child(swatch)
 
 	var custom_row := HBoxContainer.new()
@@ -377,25 +390,20 @@ func _build_edit_ui() -> Control:
 	_color_picker = ColorPickerButton.new()
 	_color_picker.custom_minimum_size = Vector2(80.0, 32.0)
 	_color_picker.edit_alpha = false
-	_color_picker.color = _edit_color
-	_color_picker.color_changed.connect(_on_custom_color_changed)
+	_color_picker.color = _edit_skin
+	_color_picker.color_changed.connect(_on_custom_skin_changed)
 	custom_row.add_child(_color_picker)
 
 	# ── Причёска ──────────────────────────────────────────
+	# Кнопки создаются заново под каждое тело (_rebuild_hair_buttons):
+	# у мужской и женской модели число причёсок может отличаться.
 	column.add_child(_make_label("Причёска", 18))
 
-	var hair_group := ButtonGroup.new()
-	_hair_buttons.clear()
-	for i in range(HAIR_STYLES.size()):
-		var hair_style: Dictionary = HAIR_STYLES[i]
-		var hair_button := Button.new()
-		hair_button.text = str(hair_style["label"])
-		hair_button.toggle_mode = true
-		hair_button.button_group = hair_group
-		hair_button.custom_minimum_size = Vector2(0.0, 34.0)
-		hair_button.pressed.connect(func(): _set_edit_hair(i))
-		column.add_child(hair_button)
-		_hair_buttons.append(hair_button)
+	_hair_container = GridContainer.new()
+	_hair_container.columns = 2
+	_hair_container.add_theme_constant_override("h_separation", 6)
+	_hair_container.add_theme_constant_override("v_separation", 6)
+	column.add_child(_hair_container)
 
 	_error_label = _make_label("", 16)
 	_error_label.modulate = Color(1.0, 0.45, 0.45)
@@ -413,6 +421,41 @@ func _build_edit_ui() -> Control:
 	buttons.add_child(save_button)
 
 	return margin
+
+
+func _build_mode_ui() -> Control:
+
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_ignore_mouse(center)
+
+	var panel := PanelContainer.new()
+	center.add_child(panel)
+
+	var inner := MarginContainer.new()
+	inner.add_theme_constant_override("margin_left", 28)
+	inner.add_theme_constant_override("margin_right", 28)
+	inner.add_theme_constant_override("margin_top", 24)
+	inner.add_theme_constant_override("margin_bottom", 24)
+	panel.add_child(inner)
+
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 12)
+	inner.add_child(column)
+
+	var title := _make_label("Режим игры", 26)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+
+	_solo_button = _make_button("Одиночная игра", _on_solo_pressed, 280.0)
+	column.add_child(_solo_button)
+
+	_multiplayer_button = _make_button("Мультиплеер", _on_multiplayer_pressed, 280.0)
+	column.add_child(_multiplayer_button)
+
+	column.add_child(_make_button("Назад", _on_mode_back_pressed, 280.0))
+
+	return center
 
 
 func _build_confirm_ui() -> Control:
@@ -462,40 +505,6 @@ func _build_confirm_ui() -> Control:
 	return center
 
 
-func _build_mode_ui() -> Control:
-
-	var center := CenterContainer.new()
-	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_ignore_mouse(center)
-
-	var panel := PanelContainer.new()
-	center.add_child(panel)
-
-	var inner := MarginContainer.new()
-	inner.add_theme_constant_override("margin_left", 28)
-	inner.add_theme_constant_override("margin_right", 28)
-	inner.add_theme_constant_override("margin_top", 24)
-	inner.add_theme_constant_override("margin_bottom", 24)
-	panel.add_child(inner)
-
-	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 12)
-	inner.add_child(column)
-
-	var title := _make_label("Режим игры", 26)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	column.add_child(title)
-
-	column.add_child(_make_button("Одиночная игра", _on_solo_pressed, 280.0))
-
-	_multiplayer_button = _make_button("Мультиплеер", _on_multiplayer_pressed, 280.0)
-	column.add_child(_multiplayer_button)
-
-	column.add_child(_make_button("Назад", _on_mode_back_pressed, 280.0))
-
-	return center
-
-
 # ── Мелкие помощники для UI ──────────────────────────────
 func _ignore_mouse(control: Control) -> void:
 	control.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -523,11 +532,22 @@ func _make_button(text: String, callback: Callable, min_width: float = 220.0) ->
 # ════════════════════════════════════════════════════════
 func _set_state(new_state: State) -> void:
 	_state = new_state
-	_title_ui.visible = new_state == State.TITLE
-	_stage_ui.visible = new_state == State.STAGE
-	_edit_ui.visible  = new_state == State.EDITING
-	_mode_ui.visible  = new_state == State.MODE_SELECT
+	_title_ui.visible   = new_state == State.TITLE
+	_stage_ui.visible   = new_state == State.STAGE or new_state == State.CHOOSE_BODY
+	_edit_ui.visible    = new_state == State.EDITING
+	_mode_ui.visible    = new_state == State.MODE_SELECT
 	_confirm_ui.visible = new_state == State.CONFIRM_DELETE
+
+
+# Какие кнопки нижней панели показывать: обычные или выбор тела
+func _set_bar_mode(has_character: bool, choosing: bool) -> void:
+	_back_button.visible          = not choosing
+	_select_button.visible        = has_character and not choosing
+	_delete_button.visible        = has_character and not choosing
+	_create_button.visible        = not choosing
+	_cancel_choice_button.visible = choosing
+	for body_button in _body_buttons:
+		body_button.visible = choosing
 
 
 func _move_camera(target: Vector3) -> void:
@@ -538,26 +558,74 @@ func _move_camera(target: Vector3) -> void:
 	await tween.finished
 
 
-# Экран с постаментом: последний созданный персонаж или пустой постамент
+# Экран с постаментом: последний созданный персонаж по центру или пустой постамент
 func _show_stage() -> void:
 
 	_last_character = SaveManager.get_last_character()
 	var has_character: bool = not _last_character.is_empty()
 
+	_hide_all_figures()
+
 	if has_character:
 		var appearance: Dictionary = _last_character.get("appearance", {})
-		_apply_appearance(_appearance_color(appearance), int(appearance.get("hair", 0)))
+		var body_id: String = _body_id_of(appearance)
+		var model: Node3D = _models[body_id]
+		CharacterModels.apply_appearance(model, appearance)
+		_place_figure(body_id, 0.0)
+		var figure: Node3D = _figures[body_id]
+		figure.visible = true
 		_character_label.text = str(_last_character.get("character_name", ""))
 	else:
 		_character_label.text = ""
 
-	_figure.visible = has_character
-	_select_button.visible = has_character
-	_delete_button.visible = has_character
-	_back_button.visible = true
 	_create_button.text = "Создать нового" if has_character else "Создать персонажа"
-
+	_set_bar_mode(has_character, false)
 	_set_state(State.STAGE)
+
+
+# Оба тела рядом, слева направо в порядке BODY_TYPES
+func _show_choose_body() -> void:
+
+	_hide_all_figures()
+
+	var count: int = CharacterModels.BODY_TYPES.size()
+	for index in range(count):
+		var body_def: Dictionary = CharacterModels.BODY_TYPES[index]
+		var body_id: String = str(body_def["id"])
+
+		var preview: Dictionary = {
+			"body": body_id,
+			"skin": CharacterModels.DEFAULT_SKIN,
+			"hair": 1,
+		}
+		var model: Node3D = _models[body_id]
+		CharacterModels.apply_appearance(model, preview)
+
+		_place_figure(body_id, (index - (count - 1) * 0.5) * figure_spacing)
+		var figure: Node3D = _figures[body_id]
+		figure.visible = true
+
+	_character_label.text = "Выбери модель"
+	_set_bar_mode(false, true)
+	_set_state(State.CHOOSE_BODY)
+
+
+# Камера уже рядом с выбранной фигурой — готовим редактор
+func _begin_editing() -> void:
+
+	_edit_skin = Color.html(CharacterModels.DEFAULT_SKIN)
+	_color_picker.color = _edit_skin
+	_name_input.text = ""
+	_error_label.visible = false
+
+	_rebuild_hair_buttons()
+	# Первая причёска, если она есть: фигура сразу выглядит живее
+	_edit_hair = 1 if _hair_buttons.size() > 1 else 0
+	_refresh_hair_buttons()
+	_apply_edit_preview()
+
+	_set_state(State.EDITING)
+	_name_input.grab_focus()
 
 
 # ════════════════════════════════════════════════════════
@@ -578,35 +646,52 @@ func _on_quit_pressed() -> void:
 func _on_back_pressed() -> void:
 	if _state != State.STAGE:
 		return
-	_figure.visible = false
+	_hide_all_figures()
 	_set_state(State.MOVING)
 	await _move_camera(title_camera_position)
 	_set_state(State.TITLE)
 
 
 func _on_create_pressed() -> void:
-
 	if _state != State.STAGE:
 		return
-
-	_edit_color = Color8(52, 152, 219)
-	_edit_hair = 0
-	_name_input.text = ""
-	_error_label.visible = false
-	_color_picker.color = _edit_color
-	_refresh_hair_buttons()
-
-	_apply_appearance(_edit_color, _edit_hair)
-	_figure.visible = true
-
-	_set_state(State.EDITING)
-	_name_input.grab_focus()
+	_show_choose_body()
 
 
+func _on_cancel_choice_pressed() -> void:
+	if _state != State.CHOOSE_BODY:
+		return
+	_show_stage()
+
+
+# Выбрали тело: камера приближается к нему, затем открывается редактор
+func _on_body_chosen(body_id: String) -> void:
+
+	if _state != State.CHOOSE_BODY:
+		return
+
+	_edit_body = body_id
+	_set_state(State.MOVING)
+
+	var chosen: Node3D = _figures[body_id]
+	await _move_camera(chosen.position + edit_camera_offset)
+
+	# Второе тело больше не нужно
+	for other_id in _figures:
+		if str(other_id) != body_id:
+			var other: Node3D = _figures[other_id]
+			other.visible = false
+
+	_begin_editing()
+
+
+# Отмена в редакторе: камера отъезжает, снова выбор тела
 func _on_cancel_edit_pressed() -> void:
 	if _state != State.EDITING:
 		return
-	_show_stage()
+	_set_state(State.MOVING)
+	await _move_camera(stage_camera_position)
+	_show_choose_body()
 
 
 func _on_save_pressed() -> void:
@@ -620,16 +705,18 @@ func _on_save_pressed() -> void:
 		return
 
 	var appearance: Dictionary = {
-		"color": _edit_color.to_html(false),
-		"hair":  _edit_hair,
+		"body": _edit_body,
+		"skin": _edit_skin.to_html(false),
+		"hair": _edit_hair,
 	}
 
 	if not SaveManager.create_character(character_name, appearance):
 		_show_error("Не удалось сохранить персонажа")
 		return
 
-	# Возвращаемся на постамент: теперь там только что созданный персонаж
-	# и доступна кнопка «Выбрать»
+	# Камера возвращается, на постаменте стоит новый персонаж и есть «Выбрать»
+	_set_state(State.MOVING)
+	await _move_camera(stage_camera_position)
 	_show_stage()
 
 
@@ -640,9 +727,21 @@ func _on_select_pressed() -> void:
 
 	SaveManager.select_save(_last_character)
 
+	# Без сцены героя хаб останется пустым — лучше сказать об этом сразу
+	var hero_ready: bool = SaveManager.has_valid_hero_scene()
+	var hero_hint: String = "Не задана сцена героя: впиши путь в DEFAULT_HERO_SCENE (SaveManager.gd)."
+
+	_solo_button.disabled = not hero_ready
+	_solo_button.tooltip_text = "" if hero_ready else hero_hint
+
 	var steam_ready: bool = SteamLobby.is_steam_ready()
-	_multiplayer_button.disabled = not steam_ready
-	_multiplayer_button.tooltip_text = "" if steam_ready else "Steam недоступен. Запусти Steam, залогинься и перезапусти игру."
+	_multiplayer_button.disabled = not (steam_ready and hero_ready)
+	if not hero_ready:
+		_multiplayer_button.tooltip_text = hero_hint
+	elif not steam_ready:
+		_multiplayer_button.tooltip_text = "Steam недоступен. Запусти Steam, залогинься и перезапусти игру."
+	else:
+		_multiplayer_button.tooltip_text = ""
 
 	_set_state(State.MODE_SELECT)
 
@@ -689,22 +788,56 @@ func _on_mode_back_pressed() -> void:
 
 
 # ── Редактор внешности ───────────────────────────────────
+func _apply_edit_preview() -> void:
+	var model: Node3D = _models[_edit_body]
+	CharacterModels.apply_appearance(model, {
+		"body": _edit_body,
+		"skin": _edit_skin.to_html(false),
+		"hair": _edit_hair,
+	})
+
+
 # update_picker == false, когда цвет пришёл из самого пикера —
 # иначе мы бы заново выставляли ему тот же цвет.
-func _set_edit_color(color: Color, update_picker: bool) -> void:
-	_edit_color = color
+func _set_edit_skin(color: Color, update_picker: bool) -> void:
+	_edit_skin = color
 	if update_picker:
 		_color_picker.color = color
-	_apply_appearance(_edit_color, _edit_hair)
+	_apply_edit_preview()
 
 
-func _on_custom_color_changed(color: Color) -> void:
-	_set_edit_color(color, false)
+func _on_custom_skin_changed(color: Color) -> void:
+	_set_edit_skin(color, false)
 
 
 func _set_edit_hair(index: int) -> void:
 	_edit_hair = index
-	_apply_appearance(_edit_color, _edit_hair)
+	_apply_edit_preview()
+
+
+# Кнопки причёсок под выбранное тело: «Без причёски» + по кнопке на каждую
+# причёску модели (имя берётся из имени узла в Hair)
+func _rebuild_hair_buttons() -> void:
+
+	for child in _hair_container.get_children():
+		_hair_container.remove_child(child)
+		child.queue_free()
+	_hair_buttons.clear()
+
+	var model: Node3D = _models[_edit_body]
+	var labels: Array[String] = ["Без причёски"]
+	labels.append_array(CharacterModels.hair_names(model))
+
+	var group := ButtonGroup.new()
+	for i in range(labels.size()):
+		var hair_button := Button.new()
+		hair_button.text = labels[i]
+		hair_button.toggle_mode = true
+		hair_button.button_group = group
+		hair_button.custom_minimum_size = Vector2(140.0, 34.0)
+		hair_button.pressed.connect(func(): _set_edit_hair(i))
+		_hair_container.add_child(hair_button)
+		_hair_buttons.append(hair_button)
 
 
 func _refresh_hair_buttons() -> void:

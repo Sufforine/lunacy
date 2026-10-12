@@ -7,9 +7,9 @@ var hero_scene: String = ""
 # не создан — Start/Host должны требовать создать или выбрать персонажа.
 var character_name: String = ""
 
-# Внешность персонажа: {"color": "rrggbb", "hair": индекс причёски}.
-# Выбирается при создании в главном меню.
-var appearance: Dictionary = {"color": "3498db", "hair": 0}
+# Внешность персонажа: {"body": "male"/"female", "skin": "rrggbb", "hair": индекс}.
+# Выбирается при создании в главном меню (см. character_models.gd).
+var appearance: Dictionary = {"body": "male", "skin": "e0ac69", "hair": 0}
 
 # Unix-время создания — по нему находим «последнего созданного» персонажа
 var created_at: float = 0.0
