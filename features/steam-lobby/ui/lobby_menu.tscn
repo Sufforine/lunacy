@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://kw1joc0vf6x7"]
+[gd_scene load_steps=3 format=3 uid="uid://kw1joc0vf6x7"]
 
 [ext_resource type="Script" uid="uid://d03pje0if4i16" path="res://features/steam-lobby/ui/lobby_menu.gd" id="1"]
+[ext_resource type="Script" uid="uid://bhtb3nbrj5jjd" path="res://features/steam-lobby/api/steam_lobby.gd" id="2_808i5"]
 
 [node name="LobbyMenu" type="Control"]
 layout_mode = 3
@@ -173,10 +174,19 @@ size = Vector2i(280, 320)
 visible = true
 
 [node name="VBox" type="VBoxContainer" parent="SavePickerPopup"]
-offset_left = 4.0
-offset_top = 4.0
-offset_right = 276.0
-offset_bottom = 316.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -136.0
+offset_top = -156.0
+offset_right = 136.0
+offset_bottom = 156.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
 
 [node name="Title" type="Label" parent="SavePickerPopup/VBox"]
 layout_mode = 2
@@ -210,3 +220,6 @@ placeholder_text = "Название сохранения"
 [node name="CreateButton" type="Button" parent="SavePickerPopup/VBox/NewSaveRow"]
 layout_mode = 2
 text = "Создать"
+
+[node name="Steam" type="Node" parent="."]
+script = ExtResource("2_808i5")
