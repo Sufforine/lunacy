@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3 uid="uid://xb4fl42bb6ci"]
+[gd_scene load_steps=3 format=3 uid="uid://xb4fl42bb6ci"]
 
 [ext_resource type="Script" uid="uid://jxc6s6k7pyna" path="res://screens/main-menu/ui/main_menu.gd" id="1_tself"]
+[ext_resource type="PackedScene" uid="uid://186xvhxfq3q2" path="res://entities/characters/model/Player.tscn" id="2_krlpd"]
 
 [node name="Node3D" type="Node3D"]
 script = ExtResource("1_tself")
+hero_scene = ExtResource("2_krlpd")

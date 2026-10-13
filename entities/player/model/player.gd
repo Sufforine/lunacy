@@ -5,10 +5,14 @@ class_name Player
 # Если выброшенные предметы летят НАЗАД от героя — поставь галочку:
 # значит перёд твоей модели смотрит вдоль +Z, а не -Z.
 @export var model_faces_positive_z: bool = false
+# Поворот модели персонажа вокруг Y. glTF-модели смотрят в +Z, а герой
+# целится вдоль -Z, поэтому по умолчанию модель разворачивается на 180°.
+# Если персонаж стоит спиной к курсору — поменяй значение.
+@export var character_model_yaw_degrees: float = 180.0
 
 @onready var camera_rig          = $CameraRig
 @onready var model: Node3D           = $Model
-@onready var animation_player: AnimationPlayer = $Model/AnimationPlayer
+@onready var animation_player: AnimationPlayer = get_node_or_null("Model/AnimationPlayer") as AnimationPlayer
 
 @onready var stats: StatsComponent         = $StatsComponent
 @onready var equipment: EquipmentComponent = $EquipmentComponent
@@ -29,6 +33,10 @@ var animation_state: AnimationState = AnimationState.IDLE
 func _ready() -> void:
 
 	add_to_group("player")
+
+	# Первым делом: заменить модель из сцены на модель, созданную в редакторе
+	# персонажа (до того как что-то начнёт использовать model/animation_player)
+	_apply_character_model()
 
 	# Герой владельца берёт данные из локального профиля, чужой герой — из
 	# network_state, который NetSpawner кладёт в meta при спавне.
@@ -275,3 +283,53 @@ func get_facing_direction() -> Vector3:
 # ════════════════════════════════════════════════════════
 func _on_local_equipment_changed() -> void:
 	SteamLobby.sync_equipment(equipment.to_dict())
+
+
+# ════════════════════════════════════════════════════════
+# МОДЕЛЬ ПЕРСОНАЖА
+# Модель из сцены игрока заменяется на ту, что собрана в редакторе
+# персонажа (тело, цвет кожи, причёска — см. character_models.gd).
+# ════════════════════════════════════════════════════════
+func _apply_character_model() -> void:
+
+	var appearance: Dictionary = _resolve_appearance()
+	if appearance.is_empty():
+		return  # внешности нет — остаётся модель из сцены
+
+	var body_id: String = str(appearance.get("body", CharacterModels.DEFAULT_BODY))
+	var new_model: Node3D = CharacterModels.create_model(body_id)
+
+	# Старую модель убираем, а новую ставим на то же место в дереве
+	var slot_index: int = 0
+	if model != null:
+		slot_index = model.get_index()
+		model.name = "ModelReplaced"  # освободить имя "Model"
+		remove_child(model)
+		model.queue_free()
+
+	new_model.name = "Model"
+	new_model.rotation_degrees.y = character_model_yaw_degrees
+	add_child(new_model)
+	move_child(new_model, slot_index)
+
+	model = new_model
+	animation_player = new_model.find_child("AnimationPlayer", true, false) as AnimationPlayer
+
+	CharacterModels.apply_appearance(new_model, appearance)
+
+
+# Чью внешность показывать: свою — из профиля, чужую — из сетевого состояния
+func _resolve_appearance() -> Dictionary:
+
+	if is_multiplayer_authority():
+		# Нет созданного персонажа (например отладочный запуск миссии) —
+		# оставляем модель сцены
+		if PlayerProfile.character_name.is_empty():
+			return {}
+		return PlayerProfile.appearance
+
+	var net_state: Dictionary = get_meta("network_state", {})
+	var remote_appearance: Variant = net_state.get("appearance", null)
+	if remote_appearance is Dictionary and not (remote_appearance as Dictionary).is_empty():
+		return remote_appearance as Dictionary
+	return {}

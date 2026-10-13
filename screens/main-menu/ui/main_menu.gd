@@ -24,6 +24,11 @@ const STAGE_FLOOR_Y := 0.1  # верх постамента: на этой вы�
 
 enum State { TITLE, MOVING, STAGE, CHOOSE_BODY, EDITING, MODE_SELECT, CONFIRM_DELETE }
 
+# Сцена игрока (корень с player.gd и всеми компонентами). Перетащи её сюда
+# в инспекторе: так она используется для любого созданного персонажа.
+# Модель внутри неё подменяется моделью персонажа при спавне (см. player.gd).
+@export var hero_scene: PackedScene
+
 @export var game_title: String = "НАЗВАНИЕ ИГРЫ"
 @export var title_camera_position: Vector3 = Vector3(0.0, 1.8, 7.0)
 @export var stage_camera_position: Vector3 = Vector3(-10.0, 1.6, 4.0)
@@ -90,6 +95,11 @@ var _skin_swatches: Array[Color] = [
 func _ready() -> void:
 	# Предыдущая сцена (миссия) могла оставить мышь захваченной камерой
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+	if hero_scene != null:
+		SaveManager.default_hero_scene = hero_scene.resource_path
+	elif SaveManager.default_hero_scene.is_empty():
+		push_warning("main_menu: не задан Hero Scene — «Одиночная игра» будет недоступна. Перетащи сцену игрока в инспекторе корневого узла меню.")
 
 	_build_world()
 	_build_ui()
@@ -729,7 +739,7 @@ func _on_select_pressed() -> void:
 
 	# Без сцены героя хаб останется пустым — лучше сказать об этом сразу
 	var hero_ready: bool = SaveManager.has_valid_hero_scene()
-	var hero_hint: String = "Не задана сцена героя: впиши путь в DEFAULT_HERO_SCENE (SaveManager.gd)."
+	var hero_hint: String = "Не задана сцена героя: перетащи сцену игрока в поле Hero Scene у корневого узла меню."
 
 	_solo_button.disabled = not hero_ready
 	_solo_button.tooltip_text = "" if hero_ready else hero_hint

@@ -4,6 +4,10 @@ var peer_id: int = 0
 var steam_id: int = 0
 var nickname: String = ""
 
+# Персонаж, созданный игроком: имя и внешность (см. character_models.gd)
+var character_name: String = ""
+var appearance: Dictionary = {}
+
 var hero_scene: String = ""
 
 # прогресс (постоянный, но копируется из PlayerProfile)
@@ -15,9 +19,12 @@ var inventory: Array = []
 
 var equipment: Dictionary = {
 	"weapon": "",
-	"armor": "",
+	"helmet": "",
+	"chestplate": "",
+	"leggings": "",
+	"cloak": "",
 	"trinket_1": "",
-	"scroll": ""
+	"trinket_2": ""
 }
 
 # --- временные данные миссии ---
@@ -35,6 +42,8 @@ var is_ready: bool = false
 # COPY FROM LOCAL PROFILE
 func from_profile(profile) -> void:
 	hero_scene = profile.hero_scene
+	character_name = profile.character_name
+	appearance = profile.appearance.duplicate(true)
 	level = profile.level
 	experience = profile.experience
 	inventory = profile.inventory.duplicate(true)
@@ -58,6 +67,7 @@ func debug_print():
 	print("--- PlayerState ---")
 	print("peer:", peer_id)
 	print("nick:", nickname)
+	print("character:", character_name, appearance)
 	print("hero:", hero_scene)
 	print("lvl:", level)
 	print("xp:", experience)

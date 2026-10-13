@@ -13,7 +13,8 @@
 #    • Причёски — дети узла с именем "Hair" (любого уровня вложенности).
 #      Каждый ребёнок — одна причёска, ИМЯ УЗЛА показывается на кнопке.
 #      Лысый вариант добавлять не нужно: он есть всегда (индекс 0).
-#    • Если есть AnimationPlayer с анимацией "idle", она запустится в меню.
+#    • AnimationPlayer с анимациями "idle", "walk", "downed", "dead":
+#      "idle" играет в меню, остальные использует player.gd в игре.
 # ═════════════════════════════════════════════════════════════════
 class_name CharacterModels
 extends RefCounted
@@ -84,6 +85,9 @@ static func play_idle(model: Node3D) -> void:
 static func apply_appearance(model: Node3D, appearance: Dictionary) -> void:
 
 	var skin_html: String = str(appearance.get("skin", appearance.get("color", DEFAULT_SKIN)))
+	# Внешность может прийти по сети от другого игрока — не доверяем строке слепо
+	if not Color.html_is_valid(skin_html):
+		skin_html = DEFAULT_SKIN
 	var skin: Color = Color.html(skin_html)
 	var hair_index: int = int(appearance.get("hair", 0))
 

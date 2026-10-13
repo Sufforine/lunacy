@@ -14,6 +14,8 @@ static func to_dict(state: PlayerState) -> Dictionary:
 		"peer_id": state.peer_id,
 		"steam_id": state.steam_id,
 		"nickname": state.nickname,
+		"character_name": state.character_name,
+		"appearance": state.appearance.duplicate(true),
 		"hero_scene": state.hero_scene,
 		"level": state.level,
 		"experience": state.experience,
@@ -26,6 +28,8 @@ static func apply_dict(data: Dictionary, state: PlayerState) -> void:
 	state.peer_id = data.get("peer_id", 0)
 	state.steam_id = data.get("steam_id", 0)
 	state.nickname = data.get("nickname", "Игрок")
+	state.character_name = data.get("character_name", "")
+	state.appearance = data.get("appearance", {})
 	state.hero_scene = data.get("hero_scene", "")
 	state.level = data.get("level", 1)
 	state.experience = data.get("experience", 0)

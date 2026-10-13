@@ -12,9 +12,9 @@ const SAVE_DIR := "user://saves/"
 # В ней уже должны быть player.gd и все компоненты (Stats, Equipment,
 # Inventory, Effects, CameraRig, CanvasLayer/InventoryUI и т.д.) —
 # собирается один раз в редакторе, а не кодом при создании персонажа.
-# ВАЖНО: укажи путь к ней, иначе в хабе никто не появится.
-# Пример: const DEFAULT_HERO_SCENE := "res://entities/player/player.tscn"
-const DEFAULT_HERO_SCENE := ""
+# Путь задаётся в инспекторе корневого узла главного меню (поле Hero Scene) —
+# main_menu.gd передаёт его сюда при запуске. Править код не нужно.
+var default_hero_scene: String = ""
 
 const DEFAULT_APPEARANCE := {"body": "male", "skin": "e0ac69", "hair": 0}
 
@@ -205,15 +205,15 @@ func create_character(character_name: String, appearance: Dictionary = {}) -> bo
 	PlayerProfile.character_name = clean_name
 	PlayerProfile.appearance     = final_appearance.duplicate(true)
 	PlayerProfile.created_at     = Time.get_unix_time_from_system()
-	PlayerProfile.hero_scene     = DEFAULT_HERO_SCENE
+	PlayerProfile.hero_scene     = default_hero_scene
 	PlayerProfile.level          = 1
 	PlayerProfile.experience     = 0
 	PlayerProfile.inventory      = []
 	PlayerProfile.quickslots     = ["", "", ""]
 	PlayerProfile.equipment      = EMPTY_EQUIPMENT.duplicate()
 
-	if DEFAULT_HERO_SCENE.is_empty():
-		push_warning("SaveManager: DEFAULT_HERO_SCENE не задан — персонаж не сможет заспавниться. Укажи путь к базовой сцене игрока в SaveManager.gd.")
+	if default_hero_scene.is_empty():
+		push_warning("SaveManager: сцена героя не задана — персонаж не сможет заспавниться. Перетащи сцену игрока в поле Hero Scene у корневого узла главного меню.")
 
 	save_profile()
 	print("SaveManager: создан персонаж '%s' (%s)" % [clean_name, slug])
@@ -347,10 +347,10 @@ func load_profile() -> void:
 	PlayerProfile.character_name = data.get("character_name", "")
 	PlayerProfile.created_at     = float(data.get("created_at", 0.0))
 	# Все персонажи пока используют общую сцену. Сохранения, созданные до того
-	# как DEFAULT_HERO_SCENE был задан (или с устаревшим путём), чиним на лету.
+	# как сцена героя была задана (или с устаревшим путём), чиним на лету.
 	var saved_hero_scene: String = str(data.get("hero_scene", ""))
 	if saved_hero_scene.is_empty() or not ResourceLoader.exists(saved_hero_scene):
-		saved_hero_scene = DEFAULT_HERO_SCENE
+		saved_hero_scene = default_hero_scene
 	PlayerProfile.hero_scene     = saved_hero_scene
 	PlayerProfile.level          = data.get("level",      1)
 	PlayerProfile.experience     = data.get("experience", 0)
