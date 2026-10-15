@@ -96,7 +96,13 @@ func join_lobby(id: int) -> void:
 func disconnect_lobby() -> void:
 	_clear_autoload_spawns()
 	_drops.clear()
+	if _steam_ready and lobby_id != 0:
+		Steam.leaveLobby(lobby_id)
 	_transport.close_connection(multiplayer)
+	if multiplayer.peer_connected.is_connected(_on_peer_connected):
+		multiplayer.peer_connected.disconnect(_on_peer_connected)
+	if multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
+		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected)
 	_session.player_states.clear()
 	lobby_id = 0
 	peer = null
@@ -118,6 +124,8 @@ func start_game() -> void:
 			push_warning("SteamLobby: игрок %d не выбрал героя" % peer_id)
 			return
 
+	# Мир принадлежит хосту; профили персонажей в этот файл не пишутся.
+	SaveManager.save_world_progress(SaveManager.load_world_progress())
 	_clear_autoload_spawns()
 	_drops.clear()
 	_rpc_load_hub.rpc()
@@ -173,6 +181,11 @@ func _on_spawn_profile_sync_done() -> void:
 	if _pending_hub == null or _pending_spawns.is_empty():
 		return
 
+	# Файл мира принадлежит хосту. Клиенты получают тот же снимок только по
+	# сети и поэтому не могут случайно перезаписать локальный мир хоста.
+	_pending_hub.sync_world_progress_to_peers(SaveManager.load_world_progress())
+	_pending_hub.spawn_test_dog_for_session()
+
 	for peer_id in _session.player_states:
 		var state_data := _session.player_state_data(peer_id)
 		var spawn_index := int(peer_id) % _pending_spawns.size()
@@ -227,14 +240,17 @@ func _on_lobby_created(result: int, id: int) -> void:
 		return
 
 	if result != RESULT_OK:
+		is_host = false
 		lobby_failed.emit("Failed to create lobby: %d" % result)
 		push_error("SteamLobby: не удалось создать лобби: %d" % result)
 		return
 
 	lobby_id = id
 	peer = _transport.create_steam_host(multiplayer)
-	multiplayer.peer_connected.connect(_on_peer_connected)
-	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	if not multiplayer.peer_connected.is_connected(_on_peer_connected):
+		multiplayer.peer_connected.connect(_on_peer_connected)
+	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 
 	_session.register_local_player(1)
 	lobby_ready.emit(lobby_id)
@@ -242,11 +258,15 @@ func _on_lobby_created(result: int, id: int) -> void:
 	print("SteamLobby: лобби создано ", lobby_id)
 
 
-func _on_lobby_joined(id: int, _permissions: int, _locked: bool, _response: int) -> void:
+func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) -> void:
 	if not is_joining:
 		return
 
 	if not _steam_available():
+		return
+	if response != RESULT_OK:
+		is_joining = false
+		lobby_failed.emit("Не удалось войти в Steam-лобби: %d" % response)
 		return
 
 	lobby_id = id
@@ -255,6 +275,8 @@ func _on_lobby_joined(id: int, _permissions: int, _locked: bool, _response: int)
 
 	multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
 	multiplayer.connection_failed.connect(_on_connection_failed, CONNECT_ONE_SHOT)
+	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
+		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	print("SteamLobby: в лобби, ожидание P2P-подключения к хосту...")
 
 
@@ -322,6 +344,114 @@ func _rpc_update_hero(hero_scene: String) -> void:
 	var sender_id := multiplayer.get_remote_sender_id()
 	_session.update_hero(sender_id, hero_scene)
 	_broadcast_player_list()
+
+
+# ════════════════════════════════════════════════
+# РАЗВИТИЕ ПЕРСОНАЖА
+# Хост проверяет наличие реликвии и свободного очка, затем рассылает
+# одинаковое состояние всем копиям героя.
+# ════════════════════════════════════════════════
+func request_spend_attribute(attribute_name: String) -> void:
+	if not is_session_active():
+		return
+	if multiplayer.is_server():
+		_server_spend_attribute(multiplayer.get_unique_id(), attribute_name)
+	else:
+		_rpc_request_spend_attribute.rpc_id(1, attribute_name)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_request_spend_attribute(attribute_name: String) -> void:
+	if multiplayer.is_server():
+		_server_spend_attribute(multiplayer.get_remote_sender_id(), attribute_name)
+
+
+func _server_spend_attribute(peer_id: int, attribute_name: String) -> void:
+	var stats := _stats_for_peer(peer_id)
+	if stats == null or not stats._apply_spent_attribute(attribute_name):
+		return
+	var progress := stats.get_progress_data()
+	_session.update_progress(peer_id, progress)
+	_rpc_apply_progress.rpc(peer_id, progress)
+
+
+func request_use_experience_relic(source: String, slot_index: int, item_id: String) -> void:
+	if not is_session_active():
+		return
+	if multiplayer.is_server():
+		_server_use_experience_relic(multiplayer.get_unique_id(), source, slot_index, item_id)
+	else:
+		_rpc_request_experience_relic.rpc_id(1, source, slot_index, item_id)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_request_experience_relic(source: String, slot_index: int, item_id: String) -> void:
+	if multiplayer.is_server():
+		_server_use_experience_relic(multiplayer.get_remote_sender_id(), source, slot_index, item_id)
+
+
+func _server_use_experience_relic(peer_id: int, source: String, slot_index: int, item_id: String) -> void:
+	var inventory := _inventory_for_peer(peer_id)
+	var stats := _stats_for_peer(peer_id)
+	if inventory == null or stats == null:
+		return
+	var item := inventory.get_source_item(source, slot_index)
+	var authoritative_source := source
+	var authoritative_slot := slot_index
+	if item == null or item.id != item_id:
+		var location := inventory.find_item_location(item_id)
+		if not location.is_empty():
+			authoritative_source = str(location["source"])
+			authoritative_slot = int(location["slot_index"])
+			item = inventory.get_source_item(authoritative_source, authoritative_slot)
+	if item == null or item.id != item_id or item.experience_amount <= 0:
+		push_warning("SteamLobby: peer %d попытался использовать отсутствующую реликвию" % peer_id)
+		return
+	# Сразу убираем авторитетную копию: повторный RPC не сможет выдать ещё один уровень.
+	inventory.consume_network_item(authoritative_source, authoritative_slot, item_id)
+	stats.add_experience(item.experience_amount)
+	var progress := stats.get_progress_data()
+	_session.update_progress(peer_id, progress)
+	_rpc_commit_experience_relic.rpc(peer_id, source, slot_index, item_id, progress)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_commit_experience_relic(peer_id: int, source: String, slot_index: int, item_id: String, progress: Dictionary) -> void:
+	var inventory := _inventory_for_peer(peer_id)
+	if inventory != null:
+		inventory.consume_network_item(source, slot_index, item_id)
+	var stats := _stats_for_peer(peer_id)
+	if stats != null:
+		stats.apply_progress_data(progress)
+	var hero := _hero_for_peer(peer_id)
+	if hero != null and hero.is_multiplayer_authority() and inventory != null:
+		PlayerProfile.inventory = inventory.get_data()
+		PlayerProfile.quickslots = inventory.get_quickslot_data()
+		SaveManager.save_profile()
+	_session.update_progress(peer_id, progress)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_apply_progress(peer_id: int, progress: Dictionary) -> void:
+	var stats := _stats_for_peer(peer_id)
+	if stats != null:
+		stats.apply_progress_data(progress)
+	_session.update_progress(peer_id, progress)
+
+
+func _hero_for_peer(peer_id: int) -> Node:
+	var scene := get_tree().current_scene
+	return scene.get_node_or_null(str(peer_id)) if scene != null else null
+
+
+func _inventory_for_peer(peer_id: int) -> InventoryComponent:
+	var hero := _hero_for_peer(peer_id)
+	return hero.get_node_or_null("InventoryComponent") as InventoryComponent if hero != null else null
+
+
+func _stats_for_peer(peer_id: int) -> StatsComponent:
+	var hero := _hero_for_peer(peer_id)
+	return hero.get_node_or_null("StatsComponent") as StatsComponent if hero != null else null
 
 
 # ════════════════════════════════════════════════════════
@@ -407,11 +537,14 @@ func _server_handle_pickup(picker_peer: int, drop_id: int) -> void:
 		return
 
 	var item_id := _drops.get_item_id(drop_id)
-	_rpc_remove_drop.rpc(drop_id)
+	var server_inventory := _inventory_for_peer(picker_peer)
+	var item := ItemLibrary.get_item(item_id)
+	if server_inventory == null or item == null or not server_inventory.has_free_slot():
+		return
 
-	if picker_peer == multiplayer.get_unique_id():
-		_apply_pickup_grant(_local_inventory(), item_id)
-	else:
+	_rpc_remove_drop.rpc(drop_id)
+	server_inventory.add_item(item)
+	if picker_peer != multiplayer.get_unique_id():
 		_rpc_grant_pickup.rpc_id(picker_peer, item_id)
 
 

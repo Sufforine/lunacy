@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://c811dhvlm1ea0"]
+
+[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/data/item_data.gd" id="1_item"]
+[ext_resource type="Texture2D" uid="uid://bh2offnanl7f4" path="res://Assets/Icons/WoW Icon Pack/Trade/11.png" id="1_r5iv4"]
+
+[resource]
+script = ExtResource("1_item")
+id = "experience_relic"
+item_name = "Реликвия опыта"
+icon = ExtResource("1_r5iv4")
+description = "Даёт один уровень и одно очко характеристик."
+is_consumable = true
+experience_amount = 100

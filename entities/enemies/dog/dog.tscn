@@ -1,11 +1,38 @@
-[gd_scene load_steps=4 format=3 uid="uid://cj4hun1om8y7a"]
+[gd_scene load_steps=8 format=3 uid="uid://cj4hun1om8y7a"]
 
 [ext_resource type="Script" path="res://entities/enemies/dog/dog.gd" id="1_dog"]
-[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_model"]
+[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Player.glb" id="2_model"]
+[ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/characters/model/stats_component.gd" id="3_stats_component"]
+[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/characters/model/character_stats.gd" id="4_character_stats"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_dog"]
 radius = 0.45
 height = 2.2
+
+[sub_resource type="Resource" id="Resource_dog_stats"]
+script = ExtResource("4_character_stats")
+strength = 0
+agility = 0
+intellect = 0
+wisdom = 0
+health = 50
+mana = 0
+move_speed = 2.5
+crit_chance = 0.0
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_dog"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath(".:_state")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath("StatsComponent:current_health")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [node name="Dog" type="CharacterBody3D"]
 collision_layer = 4
@@ -19,3 +46,11 @@ transform = Transform3D(-0.1, 0, -8.742278e-09, 0, 0.1, 0, 8.742278e-09, 0, -0.1
 [node name="Collision" type="CollisionShape3D" parent="."]
 position = Vector3(0, 1.1, 0)
 shape = SubResource("CapsuleShape3D_dog")
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("3_stats_component")
+base_stats = SubResource("Resource_dog_stats")
+uses_player_progress = false
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_dog")

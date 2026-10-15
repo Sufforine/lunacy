@@ -155,6 +155,21 @@ func _build_collision() -> void:
 func _build_visual() -> void:
 	if item == null:
 		return
+	if item.id == "experience_relic":
+		var cube := MeshInstance3D.new()
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(0.45, 0.45, 0.45)
+		var material := StandardMaterial3D.new()
+		material.albedo_color = Color(0.55, 0.25, 0.95)
+		material.emission_enabled = true
+		material.emission = Color(0.2, 0.05, 0.5)
+		material.emission_energy_multiplier = 1.5
+		mesh.material = material
+		cube.mesh = mesh
+		cube.position = Vector3(0, 0.3, 0)
+		cube.rotation_degrees = Vector3(25, 35, 15)
+		add_child(cube)
+		return
 	var sprite := Sprite3D.new()
 	sprite.texture = item.icon
 	sprite.billboard = BaseMaterial3D.BILLBOARD_ENABLED

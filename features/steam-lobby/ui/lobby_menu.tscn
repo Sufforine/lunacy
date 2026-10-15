@@ -138,7 +138,7 @@ layout_mode = 2
 
 [node name="SaveLabel" type="Label" parent="LobbyPanel/SaveInfoBox/VBox"]
 layout_mode = 2
-text = "Сохранение: По умолчанию"
+text = "Мир: default"
 
 [node name="SaveButtons" type="HBoxContainer" parent="LobbyPanel/SaveInfoBox/VBox"]
 layout_mode = 2
@@ -146,7 +146,7 @@ layout_mode = 2
 [node name="SelectSaveButton" type="Button" parent="LobbyPanel/SaveInfoBox/VBox/SaveButtons"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Выбрать сохранение"
+text = "Выбрать мир"
 
 [node name="NewSaveButton" type="Button" parent="LobbyPanel/SaveInfoBox/VBox/SaveButtons"]
 layout_mode = 2
@@ -180,7 +180,7 @@ offset_bottom = 316.0
 
 [node name="Title" type="Label" parent="SavePickerPopup/VBox"]
 layout_mode = 2
-text = "Сохранения"
+text = "Миры"
 horizontal_alignment = 1
 
 [node name="ScrollContainer" type="ScrollContainer" parent="SavePickerPopup/VBox"]
@@ -197,7 +197,7 @@ layout_mode = 2
 
 [node name="NewSaveLabel" type="Label" parent="SavePickerPopup/VBox"]
 layout_mode = 2
-text = "Создать новое:"
+text = "Создать новый мир:"
 
 [node name="NewSaveRow" type="HBoxContainer" parent="SavePickerPopup/VBox"]
 layout_mode = 2
@@ -205,7 +205,7 @@ layout_mode = 2
 [node name="NameInput" type="LineEdit" parent="SavePickerPopup/VBox/NewSaveRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-placeholder_text = "Название сохранения"
+placeholder_text = "Название мира"
 
 [node name="CreateButton" type="Button" parent="SavePickerPopup/VBox/NewSaveRow"]
 layout_mode = 2

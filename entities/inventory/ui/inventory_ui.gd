@@ -227,7 +227,7 @@ func _collect_quickslots() -> void:
 		_qs_icons.append(tex)
 		if tex:
 			_setup_icon(tex)
-		btn.tooltip_text = "Alt+%d" % (i + 1)
+		btn.tooltip_text = "Клавиша %d" % (i + 1)
 		btn.gui_input.connect(func(e): _on_qs_gui_input(e, i))
 
 		# HUD кнопки — только отображение, клик = использовать
@@ -236,7 +236,7 @@ func _collect_quickslots() -> void:
 		_qs_hud_icons.append(hud_tex)
 		if hud_tex:
 			_setup_icon(hud_tex)
-		hud_btn.tooltip_text = "Alt+%d" % (i + 1)
+		hud_btn.tooltip_text = "Клавиша %d" % (i + 1)
 		hud_btn.pressed.connect(func(): _use_quickslot_item(i))
 
 
@@ -282,6 +282,11 @@ func _on_inv_gui_input(event: InputEvent, idx: int) -> void:
 	if not event is InputEventMouseButton:
 		return
 	var mb := event as InputEventMouseButton
+	if mb.button_index == MOUSE_BUTTON_RIGHT:
+		if mb.pressed:
+			_use_inventory_item(idx)
+			accept_event()
+		return
 	if mb.button_index != MOUSE_BUTTON_LEFT:
 		return
 	if mb.pressed:
@@ -469,9 +474,9 @@ func _restore_drag_icon() -> void:
 func _use_inventory_item(slot_index: int) -> void:
 	if _inventory == null or _inventory.is_empty(slot_index):
 		return
-	var player := get_tree().get_first_node_in_group("player")
+	var player := _find_owner_player()
 	if player == null:
-		player = get_parent().get_parent()
+		return
 	_inventory.use_item(slot_index, player)
 
 
@@ -586,9 +591,9 @@ func _set_icon(tex: TextureRect, icon: Texture2D) -> void:
 func _use_quickslot_item(slot_index: int) -> void:
 	if _inventory == null:
 		return
-	var player := get_tree().get_first_node_in_group("player")
+	var player := _find_owner_player()
 	if player == null:
-		player = get_parent().get_parent()
+		return
 	_inventory.use_quickslot(slot_index, player)
 	_refresh_quickslots()
 
@@ -677,6 +682,9 @@ var _tab_inventory_btn: Button = null
 var _tab_stats_btn:     Button = null
 var _stats_tab:         Control = null
 var _stats_value_labels: Dictionary = {}  # stat_name → Label
+var _attribute_buttons: Dictionary = {}
+var _level_label: Label = null
+var _attribute_points_label: Label = null
 
 # Отображаемые названия характеристик и показателей
 const CHARACTERISTIC_LABELS := {
@@ -752,13 +760,19 @@ func _build_stats_tab() -> void:
 	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(vbox)
 
+	_level_label = Label.new()
+	vbox.add_child(_level_label)
+	_attribute_points_label = Label.new()
+	vbox.add_child(_attribute_points_label)
+	vbox.add_child(HSeparator.new())
+
 	var char_title := Label.new()
 	char_title.text = "Характеристики"
 	char_title.add_theme_font_size_override("font_size", 16)
 	vbox.add_child(char_title)
 
 	for key in CHARACTERISTIC_LABELS:
-		vbox.add_child(_make_stat_row(key, CHARACTERISTIC_LABELS[key]))
+		vbox.add_child(_make_stat_row(key, CHARACTERISTIC_LABELS[key], true))
 
 	vbox.add_child(HSeparator.new())
 
@@ -781,7 +795,7 @@ func _build_stats_tab() -> void:
 	vbox.add_child(_make_stat_row("weapon_magical",  "Магический урон"))
 
 
-func _make_stat_row(key: String, display_name: String) -> HBoxContainer:
+func _make_stat_row(key: String, display_name: String, can_increase: bool = false) -> HBoxContainer:
 
 	var row := HBoxContainer.new()
 
@@ -794,6 +808,17 @@ func _make_stat_row(key: String, display_name: String) -> HBoxContainer:
 	value_label.text = "—"
 	_stats_value_labels[key] = value_label
 	row.add_child(value_label)
+
+	if can_increase:
+		var spacer := Control.new()
+		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(spacer)
+		var increase_button := Button.new()
+		increase_button.text = "+"
+		increase_button.tooltip_text = "Вложить одно очко"
+		increase_button.pressed.connect(func(): _on_attribute_increased(key))
+		_attribute_buttons[key] = increase_button
+		row.add_child(increase_button)
 
 	return row
 
@@ -830,11 +855,15 @@ func _refresh_stats_tab() -> void:
 
 	if _stats == null:
 		return
+	_level_label.text = "Уровень: %d   Опыт: %d/%d" % [
+		_stats.level, _stats.experience, StatsComponent.EXPERIENCE_PER_LEVEL]
+	_attribute_points_label.text = "Свободные очки: %d" % _stats.attribute_points
+	for button in _attribute_buttons.values():
+		(button as Button).disabled = _stats.attribute_points <= 0
 
 	for key in CHARACTERISTIC_LABELS:
 		if _stats_value_labels.has(key):
 			_stats_value_labels[key].text = "%.1f" % _stats.get_characteristic(key)
-
 	for key in STAT_LABELS:
 		if not _stats_value_labels.has(key):
 			continue
@@ -850,6 +879,11 @@ func _refresh_stats_tab() -> void:
 	else:
 		_stats_value_labels["weapon_physical"].text = "— (нет оружия)"
 		_stats_value_labels["weapon_magical"].text  = "— (нет оружия)"
+
+
+func _on_attribute_increased(attribute_name: String) -> void:
+	if _stats != null:
+		_stats.request_spend_attribute(attribute_name)
 
 
 func _format_stat(key: String, value: float) -> String:
@@ -971,6 +1005,10 @@ func _open_main_panel() -> void:
 	_mouse_mode_before_open = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	main_panel.visible = true
+
+
+func is_main_panel_open() -> bool:
+	return main_panel != null and main_panel.visible
 
 
 func _close_main_panel() -> void:

@@ -20,12 +20,11 @@ func _init() -> void:
 		preload("res://entities/inventory/model/items/consumables/health_potion.tres"),
 		preload("res://entities/inventory/model/items/consumables/mana_potion.tres"),
 		preload("res://entities/inventory/model/items/consumables/big_potion.tres"),
+		preload("res://entities/inventory/model/items/consumables/experience_relic.tres"),
 		preload("res://entities/inventory/model/items/trinkets/DamageCharm.tres"),
 		preload("res://entities/inventory/model/items/trinkets/SpeedCharm.tres"),
 		preload("res://entities/inventory/model/items/weapon/Axe.tres"),
 		preload("res://entities/inventory/model/items/armor/DullahanCoat.tres"),
-		preload("res://entities/inventory/model/items/consumables/mana_potion.tres"),
-		preload("res://entities/inventory/model/items/consumables/big_potion.tres"),
 		preload("res://entities/inventory/model/items/armor/ShieldArmor.tres"),
 	])
 

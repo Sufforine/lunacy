@@ -76,10 +76,7 @@ func activate_for_local_player() -> void:
 func deactivate() -> void:
 	enabled = false
 	if camera != null:
-		var was_current := camera.current
 		camera.current = false
-		if was_current and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 
 func _unhandled_input(event: InputEvent) -> void:

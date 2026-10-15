@@ -1,27 +1,23 @@
-# HeroStat.gd
-# Resource для каждого героя. Создавай .tres файлы: New Resource → HeroStat
-# Базовые значения + прирост за уровень редактируются прямо в инспекторе.
+# CharacterStats.gd
+# Универсальные базовые значения игрока или NPC. Развитие конкретного
+# игрока хранится отдельно в PlayerProfile.attributes.
 extends Resource
-class_name HeroStat
+class_name CharacterStats
 
 # ════════════════════════════════════════════════════════
 # ХАРАКТЕРИСТИКИ — первичные, влияют на показатели
 # ════════════════════════════════════════════════════════
 @export_group("Strength")
 @export var strength: int = 10
-@export var strength_per_level: float = 2.0   # +X за уровень
 
 @export_group("Agility")
 @export var agility: int = 10
-@export var agility_per_level: float = 1.5
 
 @export_group("Intellect")
 @export var intellect: int = 10
-@export var intellect_per_level: float = 1.5
 
 @export_group("Wisdom")
 @export var wisdom: int = 10
-@export var wisdom_per_level: float = 1.5
 
 # ════════════════════════════════════════════════════════
 # ПОКАЗАТЕЛИ — вторичные, базовые значения
@@ -52,12 +48,9 @@ class_name HeroStat
 @export var morale: int = 0           # база всегда 0, только бонусы от снаряжения
 
 
-# Получить значение характеристики с учётом уровня
-func get_characteristic(stat_name: String, level: int) -> float:
+# Получить базовое значение характеристики.
+func get_characteristic(stat_name: String) -> float:
 	var base: Variant = get(stat_name)
-	var growth: Variant = get(stat_name + "_per_level")
 	if base == null:
 		return 0.0
-	if growth == null:
-		return float(base)
-	return float(base) + float(growth) * max(0, level - 1)
+	return float(base)

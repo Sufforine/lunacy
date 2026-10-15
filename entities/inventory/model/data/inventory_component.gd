@@ -83,6 +83,9 @@ func use_item(slot_index: int, player: Node) -> void:
 	var item: ItemData = slots[slot_index]
 	if item == null:
 		return
+	if item.experience_amount > 0:
+		_request_experience_relic(item, "inventory", slot_index, player)
+		return
 
 	var used := item.use(player)
 
@@ -146,10 +149,54 @@ func use_quickslot(slot_index: int, player: Node) -> void:
 	var item: ItemData = quickslots[slot_index]
 	if item == null:
 		return
+	if item.experience_amount > 0:
+		_request_experience_relic(item, "quickslot", slot_index, player)
+		return
 	var used := item.use(player)
 	if used and item.is_consumable:
 		quickslots[slot_index] = null
 		changed.emit()
+
+
+func get_source_item(source: String, slot_index: int) -> ItemData:
+	if source == "inventory":
+		return get_item(slot_index)
+	if source == "quickslot" and slot_index >= 0 and slot_index < QUICKSLOT_COUNT:
+		return quickslots[slot_index]
+	return null
+
+
+func find_item_location(item_id: String) -> Dictionary:
+	for i in slots.size():
+		if slots[i] != null and slots[i].id == item_id:
+			return {"source": "inventory", "slot_index": i}
+	for i in quickslots.size():
+		if quickslots[i] != null and quickslots[i].id == item_id:
+			return {"source": "quickslot", "slot_index": i}
+	return {}
+
+
+func consume_network_item(source: String, slot_index: int, expected_item_id: String) -> bool:
+	var item := get_source_item(source, slot_index)
+	if item == null or item.id != expected_item_id:
+		return false
+	if source == "inventory":
+		slots[slot_index] = null
+	else:
+		quickslots[slot_index] = null
+	changed.emit()
+	return true
+
+
+func _request_experience_relic(item: ItemData, source: String, slot_index: int, player: Node) -> void:
+	if SteamLobby.is_session_active():
+		SteamLobby.request_use_experience_relic(source, slot_index, item.id)
+		return
+	var stats := player.get_node_or_null("StatsComponent") as StatsComponent
+	if stats == null:
+		return
+	stats.add_experience(item.experience_amount)
+	consume_network_item(source, slot_index, item.id)
 
 
 func move_to_quickslot(inv_idx: int, qs_idx: int) -> void:

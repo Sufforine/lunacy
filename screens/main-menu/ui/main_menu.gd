@@ -10,6 +10,7 @@
 #   CHOOSE_BODY    → на сцене два тела рядом, выбираешь мужское или женское
 #   EDITING        → камера приближена к выбранному телу: имя, цвет кожи, причёска
 #   MODE_SELECT    → одиночная игра или мультиплеер
+#   WORLD_SELECT   → выбор/создание мира перед одиночным хабом
 #   CONFIRM_DELETE → подтверждение удаления
 #
 # Модели и применение внешности — в character_models.gd.
@@ -22,7 +23,7 @@ const NAME_MAX_LENGTH := 24
 
 const STAGE_FLOOR_Y := 0.1  # верх постамента: на этой высоте стоят ноги фигур
 
-enum State { TITLE, MOVING, STAGE, CHOOSE_BODY, EDITING, MODE_SELECT, CONFIRM_DELETE }
+enum State { TITLE, MOVING, STAGE, CHOOSE_BODY, EDITING, MODE_SELECT, WORLD_SELECT, CONFIRM_DELETE }
 
 # Сцена игрока (корень с player.gd и всеми компонентами). Перетащи её сюда
 # в инспекторе: так она используется для любого созданного персонажа.
@@ -51,6 +52,7 @@ var _title_ui: Control
 var _stage_ui: Control
 var _edit_ui: Control
 var _mode_ui: Control
+var _world_ui: Control
 var _confirm_ui: Control
 
 var _character_label: Label
@@ -70,6 +72,12 @@ var _hair_buttons: Array[Button] = []
 
 var _solo_button: Button
 var _multiplayer_button: Button
+
+var _world_list: VBoxContainer
+var _world_name_input: LineEdit
+var _world_error_label: Label
+var _world_start_button: Button
+var _selected_world_name: String = ""
 
 var _last_character: Dictionary = {}
 
@@ -239,6 +247,9 @@ func _build_ui() -> void:
 
 	_mode_ui = _build_mode_ui()
 	root.add_child(_mode_ui)
+
+	_world_ui = _build_world_select_ui()
+	root.add_child(_world_ui)
 
 	_confirm_ui = _build_confirm_ui()
 	root.add_child(_confirm_ui)
@@ -468,6 +479,82 @@ func _build_mode_ui() -> Control:
 	return center
 
 
+func _build_world_select_ui() -> Control:
+	var center := CenterContainer.new()
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_ignore_mouse(center)
+
+	var panel := PanelContainer.new()
+	panel.custom_minimum_size = Vector2(480.0, 520.0)
+	center.add_child(panel)
+
+	var inner := MarginContainer.new()
+	inner.add_theme_constant_override("margin_left", 24)
+	inner.add_theme_constant_override("margin_right", 24)
+	inner.add_theme_constant_override("margin_top", 20)
+	inner.add_theme_constant_override("margin_bottom", 20)
+	panel.add_child(inner)
+
+	var column := VBoxContainer.new()
+	column.add_theme_constant_override("separation", 10)
+	inner.add_child(column)
+
+	var title := _make_label("Выбор мира", 26)
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(title)
+
+	var hint := _make_label("Персонаж сохраняется отдельно и может заходить в разные миры.", 15)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	column.add_child(hint)
+
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(0.0, 260.0)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_child(scroll)
+
+	_world_list = VBoxContainer.new()
+	_world_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_world_list.add_theme_constant_override("separation", 6)
+	scroll.add_child(_world_list)
+
+	column.add_child(HSeparator.new())
+	column.add_child(_make_label("Создать новый мир", 18))
+
+	var create_row := HBoxContainer.new()
+	create_row.add_theme_constant_override("separation", 8)
+	column.add_child(create_row)
+
+	_world_name_input = LineEdit.new()
+	_world_name_input.placeholder_text = "Название мира"
+	_world_name_input.max_length = NAME_MAX_LENGTH
+	_world_name_input.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_world_name_input.text_submitted.connect(func(_text: String): _on_world_create_pressed())
+	create_row.add_child(_world_name_input)
+
+	var create_button := Button.new()
+	create_button.text = "Создать"
+	create_button.custom_minimum_size = Vector2(120.0, 36.0)
+	create_button.pressed.connect(_on_world_create_pressed)
+	create_row.add_child(create_button)
+
+	_world_error_label = _make_label("", 15)
+	_world_error_label.modulate = Color(1.0, 0.45, 0.45)
+	_world_error_label.visible = false
+	column.add_child(_world_error_label)
+
+	var actions := HBoxContainer.new()
+	actions.alignment = BoxContainer.ALIGNMENT_CENTER
+	actions.add_theme_constant_override("separation", 12)
+	column.add_child(actions)
+	actions.add_child(_make_button("Назад", _on_world_back_pressed, 150.0))
+	_world_start_button = _make_button("Играть", _on_world_start_pressed, 180.0)
+	_world_start_button.disabled = true
+	actions.add_child(_world_start_button)
+
+	return center
+
+
 func _build_confirm_ui() -> Control:
 
 	var center := CenterContainer.new()
@@ -546,6 +633,7 @@ func _set_state(new_state: State) -> void:
 	_stage_ui.visible   = new_state == State.STAGE or new_state == State.CHOOSE_BODY
 	_edit_ui.visible    = new_state == State.EDITING
 	_mode_ui.visible    = new_state == State.MODE_SELECT
+	_world_ui.visible   = new_state == State.WORLD_SELECT
 	_confirm_ui.visible = new_state == State.CONFIRM_DELETE
 
 
@@ -784,7 +872,11 @@ func _on_delete_cancelled() -> void:
 
 
 func _on_solo_pressed() -> void:
-	get_tree().change_scene_to_file(SOLO_SCENE)
+	_selected_world_name = ""
+	_world_name_input.text = ""
+	_world_error_label.visible = false
+	_refresh_world_list()
+	_set_state(State.WORLD_SELECT)
 
 
 func _on_multiplayer_pressed() -> void:
@@ -795,6 +887,69 @@ func _on_mode_back_pressed() -> void:
 	if _state != State.MODE_SELECT:
 		return
 	_set_state(State.STAGE)
+
+
+func _refresh_world_list() -> void:
+	for child in _world_list.get_children():
+		child.queue_free()
+
+	var worlds := SaveManager.list_worlds()
+	if worlds.is_empty():
+		var empty_label := _make_label("Нет сохранённых миров", 17)
+		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_world_list.add_child(empty_label)
+
+	for raw_info in worlds:
+		var info: Dictionary = raw_info
+		var world_name := str(info.get("name", "Мир"))
+		var button := Button.new()
+		button.text = world_name
+		button.toggle_mode = true
+		button.button_pressed = world_name == _selected_world_name
+		button.custom_minimum_size = Vector2(0.0, 42.0)
+		button.pressed.connect(func(): _on_world_selected(info))
+		_world_list.add_child(button)
+
+	_world_start_button.disabled = _selected_world_name.is_empty()
+
+
+func _on_world_selected(info: Dictionary) -> void:
+	_selected_world_name = str(info.get("name", ""))
+	SaveManager.select_world(info)
+	_world_error_label.visible = false
+	_refresh_world_list()
+
+
+func _on_world_create_pressed() -> void:
+	var world_name := _world_name_input.text.strip_edges()
+	if world_name.is_empty():
+		_show_world_error("Введи название мира")
+		return
+	if not SaveManager.create_world(world_name):
+		_show_world_error("Мир с таким именем уже существует")
+		return
+	_selected_world_name = SaveManager.get_active_world_name()
+	_world_name_input.text = ""
+	_world_error_label.visible = false
+	_refresh_world_list()
+
+
+func _show_world_error(message: String) -> void:
+	_world_error_label.text = message
+	_world_error_label.visible = true
+
+
+func _on_world_start_pressed() -> void:
+	if _selected_world_name.is_empty():
+		return
+	SaveManager.select_world(_selected_world_name)
+	# Гарантируем, что файл мира существует, и не затрагиваем файл персонажа.
+	SaveManager.save_world_progress(SaveManager.load_world_progress())
+	get_tree().change_scene_to_file(SOLO_SCENE)
+
+
+func _on_world_back_pressed() -> void:
+	_set_state(State.MODE_SELECT)
 
 
 # ── Редактор внешности ───────────────────────────────────

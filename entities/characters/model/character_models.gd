@@ -72,8 +72,12 @@ static func create_model(body_id: String) -> Node3D:
 
 static func play_idle(model: Node3D) -> void:
 	var player := model.find_child("AnimationPlayer", true, false) as AnimationPlayer
-	if player != null and player.has_animation("idle"):
-		player.play("idle")
+	if player == null:
+		return
+	for animation_name in [&"idle", &"T"]:
+		if player.has_animation(animation_name):
+			player.play(animation_name)
+			return
 
 
 # ════════════════════════════════════════════════════════

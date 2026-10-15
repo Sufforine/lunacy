@@ -31,7 +31,7 @@ extends Control
 @onready var save_name_input: LineEdit     = $SavePickerPopup/VBox/NewSaveRow/NameInput
 @onready var save_create_button: Button    = $SavePickerPopup/VBox/NewSaveRow/CreateButton
 
-@onready var steam_lobby = $SteamLobby  # поправь путь под свою сцену
+@onready var steam_lobby = SteamLobby
 
 
 
@@ -58,6 +58,7 @@ func _ready() -> void:
 
 	if steam_lobby:
 		steam_lobby.lobby_ready.connect(_on_lobby_ready)
+		steam_lobby.lobby_failed.connect(_on_lobby_failed)
 		steam_lobby.players_updated.connect(_on_players_updated)
 
 
@@ -93,6 +94,12 @@ func _on_lobby_ready(lobby_id: int) -> void:
 	if is_host:
 		ready_button.text = "Старт"
 		ready_button.pressed.connect(_on_start_pressed)
+
+
+func _on_lobby_failed(reason: String) -> void:
+	push_warning("lobby_menu: %s" % reason)
+	host_button.disabled = false
+	join_button.disabled = false
 
 
 # ════════════════════════════════════════════════════════
@@ -140,7 +147,8 @@ func _on_players_updated(players: Array) -> void:
 	for info in players:
 		var label := Label.new()
 		var nick: String = info.get("nickname", "Игрок")
-		label.text = nick
+		var character_name: String = info.get("character_name", "")
+		label.text = "%s — %s" % [nick, character_name] if not character_name.is_empty() else nick
 		players_list.add_child(label)
 
 
@@ -160,7 +168,7 @@ func _update_nickname_label() -> void:
 # СОХРАНЕНИЯ — выбор существующего / создание нового
 # ════════════════════════════════════════════════════════
 func _update_save_label() -> void:
-	save_label.text = "Сохранение: %s" % SaveManager.get_active_save_name()
+	save_label.text = "Мир: %s" % SaveManager.get_active_world_name()
 
 
 func _open_save_picker() -> void:
@@ -168,7 +176,7 @@ func _open_save_picker() -> void:
 	for child in save_picker_list.get_children():
 		child.queue_free()
 
-	for info in SaveManager.list_saves():
+	for info in SaveManager.list_worlds():
 		var btn := Button.new()
 		btn.text = info["name"]
 		btn.custom_minimum_size = Vector2(0, 32)
@@ -181,9 +189,8 @@ func _open_save_picker() -> void:
 
 func _on_save_selected(info: Dictionary) -> void:
 
-	SaveManager.select_save(info)
+	SaveManager.select_world(info)
 	_update_save_label()
-	_refresh_character_label()  # перерисовать выбор героя из загруженного профиля
 	save_picker.hide()
 
 
@@ -194,11 +201,10 @@ func _on_create_save_pressed() -> void:
 		push_warning("lobby_menu: введите имя для нового сохранения")
 		return
 
-	if not SaveManager.create_character(save_name):
+	if not SaveManager.create_world(save_name):
 		return
 
 	_update_save_label()
-	_refresh_character_label()
 	save_picker.hide()
 
 
@@ -217,9 +223,4 @@ func _on_start_pressed() -> void:
 		return
 
 	ready_button.disabled = true
-	_rpc_load_hub.rpc()
-
-
-@rpc("authority", "call_local", "reliable")
-func _rpc_load_hub() -> void:
-	get_tree().change_scene_to_file("res://Scenes/Hub/hub.tscn")
+	SteamLobby.start_game()

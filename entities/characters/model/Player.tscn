@@ -1,18 +1,22 @@
-[gd_scene load_steps=12 format=3 uid="uid://186xvhxfq3q2"]
+[gd_scene load_steps=13 format=3 uid="uid://186xvhxfq3q2"]
 
-[ext_resource type="Script" uid="uid://c6n4pitamm0fi" path="res://entities/characters/model/dullahan.gd" id="1_m0quj"]
-[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Dull.glb" id="2_u0fdg"]
+[ext_resource type="Script" path="res://entities/player/model/player.gd" id="1_m0quj"]
+[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Player.glb" id="2_u0fdg"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="3_el8t1"]
 [ext_resource type="Script" uid="uid://d01j10rnkd40j" path="res://entities/inventory/model/data/EffectComponent.gd" id="4_8fjr3"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/data/equipment_component.gd" id="5_sn5os"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/characters/model/stats_component.gd" id="6_x0035"]
-[ext_resource type="Resource" uid="uid://cctlboe5gxkyn" path="res://entities/characters/model/Dullahan_Stat.tres" id="7_gey0r"]
+[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/characters/model/character_stats.gd" id="7_gey0r"]
 [ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/data/inventory_component.gd" id="8_kvg34"]
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="9_35bxx"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 radius = 0.45
 height = 2.2
+
+[sub_resource type="Resource" id="Resource_player_stats"]
+script = ExtResource("7_gey0r")
+crit_chance = 0.0
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_thwtu"]
 properties/0/path = NodePath(".:position")
@@ -21,6 +25,9 @@ properties/0/replication_mode = 1
 properties/1/path = NodePath(".:rotation")
 properties/1/spawn = true
 properties/1/replication_mode = 1
+properties/2/path = NodePath(".:animation_state")
+properties/2/spawn = true
+properties/2/replication_mode = 1
 
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
@@ -47,7 +54,7 @@ metadata/_custom_type_script = "uid://djbdlfj35305n"
 
 [node name="StatsComponent" type="Node" parent="."]
 script = ExtResource("6_x0035")
-base_stats = ExtResource("7_gey0r")
+base_stats = SubResource("Resource_player_stats")
 metadata/_custom_type_script = "uid://6u724dpa4ia2"
 
 [node name="InventoryComponent" type="Node" parent="."]

@@ -1,6 +1,14 @@
 extends CharacterBody3D
 class_name Player
 
+const ANIM_IDLE := [&"idle", &"T"]
+const ANIM_RUN := [&"walk", &"Run"]
+const ANIM_CRAWL := [&"downed", &"Crawl"]
+const ANIM_DEAD := [&"dead", &"T"]
+const ANIM_SLASH := [&"attack", &"Slash"]
+const ANIM_ABILITY := [&"ability", &"Fireballs"]
+const ANIM_JUMP := [&"jump", &"Jump"]
+
 @export var ease_speed: float = 5.0
 # Если выброшенные предметы летят НАЗАД от героя — поставь галочку:
 # значит перёд твоей модели смотрит вдоль +Z, а не -Z.
@@ -25,6 +33,7 @@ var hud_bars: HUDBars = null
 # ── состояния анимации ───────────────────────────────────
 enum AnimationState { IDLE, WALK, DOWNED, DEAD }
 var animation_state: AnimationState = AnimationState.IDLE
+var _action_locked: bool = false
 
 
 # ════════════════════════════════════════════════════════
@@ -37,6 +46,9 @@ func _ready() -> void:
 	# Первым делом: заменить модель из сцены на модель, созданную в редакторе
 	# персонажа (до того как что-то начнёт использовать model/animation_player)
 	_apply_character_model()
+	_resolve_animation_player()
+	if animation_player != null and not animation_player.animation_finished.is_connected(_on_action_animation_finished):
+		animation_player.animation_finished.connect(_on_action_animation_finished)
 
 	# Герой владельца берёт данные из локального профиля, чужой герой — из
 	# network_state, который NetSpawner кладёт в meta при спавне.
@@ -48,6 +60,7 @@ func _ready() -> void:
 		var net_state: Dictionary = get_meta("network_state", {})
 		equipment.load_from_dict(net_state.get("equipment", {}))
 		inventory.set_data(net_state.get("inventory", []))
+		inventory.set_quickslot_data(net_state.get("quickslots", []))
 
 	stats.current_health = int(stats.get_stat("health"))
 	stats.current_mana   = int(stats.get_stat("mana"))
@@ -61,6 +74,10 @@ func _ready() -> void:
 		hud_bars = HUDBars.new()
 		$CanvasLayer.add_child(hud_bars)
 		hud_bars.bind(stats)
+		# CameraRig готовится раньше корневого Player. Повторная отложенная
+		# активация гарантирует, что после спавна всех сетевых игроков текущей
+		# останется камера владельца, а мышь снова будет захвачена после меню.
+		call_deferred("_activate_local_camera")
 
 		# Любая смена снаряжения уходит остальным игрокам
 		equipment.changed.connect(_on_local_equipment_changed)
@@ -73,20 +90,18 @@ func _ready() -> void:
 	print("Player ready:", name, " auth:", is_multiplayer_authority())
 
 
+func _activate_local_camera() -> void:
+	if is_multiplayer_authority() and camera_rig != null:
+		camera_rig.activate_for_local_player()
+
+
 func _init_inventory() -> void:
 	if not is_multiplayer_authority():
 		return
 
 	inventory_ui.bind(inventory, equipment, stats)
 	inventory.set_quickslot_data(PlayerProfile.quickslots)
-	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("mana_potion"))
-	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("mana_potion"))
-	inventory.add_item(ItemLibrary.get_item("health_potion"))
-	inventory.add_item(ItemLibrary.get_item("mana_potion"))
-	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
-	inventory.add_item(ItemLibrary.get_item("spd"))
+	inventory.add_item(ItemLibrary.get_item("experience_relic"))
 
 
 # ════════════════════════════════════════════════════════
@@ -182,22 +197,25 @@ func _input(event: InputEvent) -> void:
 	# В агонии/смерти — только кнопки которые не требуют управления
 	if stats.is_dead:
 		return
+	# Пока открыт инвентарь, мышь и цифровые клавиши принадлежат интерфейсу.
+	if inventory_ui != null and inventory_ui.is_main_panel_open():
+		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
-		# Быстрый доступ Alt+1/2/3
-		if event.alt_pressed:
-			match event.keycode:
-				KEY_1: inventory.use_quickslot(0, self)
-				KEY_2: inventory.use_quickslot(1, self)
-				KEY_3: inventory.use_quickslot(2, self)
-			return
+		# 1/2/3 всегда относятся только к панели быстрого доступа.
 		match event.keycode:
-			KEY_1: inventory.use_item(0, self)
-			KEY_2: inventory.use_item(1, self)
-			KEY_3: inventory.use_item(2, self)
-			KEY_4: inventory.use_item(3, self)
-			KEY_5: inventory.use_item(4, self)
-			KEY_6: inventory.use_item(5, self)
+			KEY_1: inventory.use_quickslot(0, self)
+			KEY_2: inventory.use_quickslot(1, self)
+			KEY_3: inventory.use_quickslot(2, self)
+
+	if stats.is_downed or not event.is_pressed() or event.is_echo():
+		return
+	if event.is_action_pressed("attack"):
+		_play_action(ANIM_SLASH)
+	elif event.is_action_pressed("ability"):
+		_play_action(ANIM_ABILITY)
+	elif event.is_action_pressed("jump"):
+		_play_action(ANIM_JUMP)
 
 
 # ════════════════════════════════════════════════════════
@@ -226,22 +244,68 @@ func _on_revived() -> void:
 # ════════════════════════════════════════════════════════
 func _update_animation() -> void:
 
-	if animation_player == null:
+	if animation_player == null or _action_locked:
 		return
 
 	match animation_state:
 		AnimationState.IDLE:
-			if not animation_player.current_animation == "idle":
-				animation_player.play("idle")
+			_play_loop(ANIM_IDLE)
 		AnimationState.WALK:
-			if not animation_player.current_animation == "walk":
-				animation_player.play("walk")
+			_play_loop(ANIM_RUN)
 		AnimationState.DOWNED:
-			if not animation_player.current_animation == "downed":
-				animation_player.play("downed")
+			_play_loop(ANIM_CRAWL)
 		AnimationState.DEAD:
-			if not animation_player.current_animation == "dead":
-				animation_player.play("dead")
+			_play_loop(ANIM_DEAD)
+
+
+func _resolve_animation_player() -> void:
+	if animation_player == null and model != null:
+		animation_player = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
+
+
+func _find_animation(candidates: Array) -> StringName:
+	if animation_player == null:
+		return &""
+	for animation_name in candidates:
+		if animation_player.has_animation(animation_name):
+			return animation_name
+	return &""
+
+
+func _play_loop(candidates: Array) -> void:
+	var animation_name := _find_animation(candidates)
+	if animation_name != &"" and animation_player.current_animation != animation_name:
+		animation_player.play(animation_name)
+
+
+func _play_action(candidates: Array) -> void:
+	if _action_locked:
+		return
+	var animation_name := _find_animation(candidates)
+	if animation_name == &"":
+		return
+	_start_action_animation(animation_name)
+	if SteamLobby.is_session_active():
+		_rpc_play_action_animation.rpc(animation_name)
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_play_action_animation(animation_name: StringName) -> void:
+	if animation_player == null or not animation_player.has_animation(animation_name):
+		return
+	_start_action_animation(animation_name)
+
+
+func _start_action_animation(animation_name: StringName) -> void:
+	_action_locked = true
+	animation_player.play(animation_name)
+
+
+func _on_action_animation_finished(_animation_name: StringName) -> void:
+	if not _action_locked:
+		return
+	_action_locked = false
+	_update_animation()
 
 
 # ════════════════════════════════════════════════════════
@@ -260,7 +324,7 @@ func on_mission_complete() -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_PREDELETE:
+	if what == NOTIFICATION_PREDELETE and is_inside_tree():
 		if is_multiplayer_authority():
 			SaveManager.save_player_state(inventory, equipment)
 

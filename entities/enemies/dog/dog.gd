@@ -2,8 +2,8 @@ extends CharacterBody3D
 
 enum State { IDLE, WALK }
 
-const ANIM_IDLE := "T"
-const ANIM_RUN := "Run"
+const ANIM_IDLE := [&"idle", &"T"]
+const ANIM_RUN := [&"walk", &"Run"]
 
 @export var move_speed: float = 2.5
 @export var turn_speed: float = 5.0
@@ -14,6 +14,7 @@ const ANIM_RUN := "Run"
 @export var wander_radius: float = 14.0
 
 @onready var model: Node3D = $Model
+@onready var stats: StatsComponent = $StatsComponent
 
 var animation_player: AnimationPlayer
 var _state: State = State.IDLE
@@ -29,6 +30,10 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if SteamLobby.is_session_active() and not is_multiplayer_authority():
+		_update_animation()
+		return
+
 	_state_timer -= delta
 
 	match _state:
@@ -76,8 +81,9 @@ func _pick_walk_direction() -> Vector3:
 
 
 func _apply_walk(delta: float) -> void:
-	velocity.x = _move_direction.x * move_speed
-	velocity.z = _move_direction.z * move_speed
+	var actual_speed := stats.get_stat("move_speed") if stats != null else move_speed
+	velocity.x = _move_direction.x * actual_speed
+	velocity.z = _move_direction.z * actual_speed
 
 	if _move_direction.length_squared() < 0.001:
 		return
@@ -96,11 +102,12 @@ func _update_animation() -> void:
 	if animation_player == null:
 		return
 
-	var anim_name := ANIM_RUN if _state == State.WALK else ANIM_IDLE
-	if not animation_player.has_animation(anim_name):
-		return
-	if animation_player.current_animation != anim_name:
-		animation_player.play(anim_name)
+	var candidates: Array = ANIM_RUN if _state == State.WALK else ANIM_IDLE
+	for animation_name in candidates:
+		if animation_player.has_animation(animation_name):
+			if animation_player.current_animation != animation_name:
+				animation_player.play(animation_name)
+			return
 
 
 func _get_gravity() -> float:

@@ -28,6 +28,16 @@ func update_hero(peer_id: int, hero_scene: String) -> void:
 		player_states[peer_id].hero_scene = hero_scene
 
 
+func update_progress(peer_id: int, progress: Dictionary) -> void:
+	if not player_states.has(peer_id):
+		return
+	var state: PlayerState = player_states[peer_id]
+	state.level = int(progress.get("level", state.level))
+	state.experience = int(progress.get("experience", state.experience))
+	state.attributes = progress.get("attributes", state.attributes).duplicate(true)
+	state.attribute_points = int(progress.get("attribute_points", state.attribute_points))
+
+
 func player_state_data(peer_id: int) -> Dictionary:
 	if not player_states.has(peer_id):
 		return {}
@@ -41,6 +51,7 @@ func player_list() -> Array:
 		list.append({
 			"peer_id": state.peer_id,
 			"nickname": state.nickname,
+			"character_name": state.character_name,
 			"hero_scene": state.hero_scene,
 		})
 	return list

@@ -19,7 +19,10 @@ static func to_dict(state: PlayerState) -> Dictionary:
 		"hero_scene": state.hero_scene,
 		"level": state.level,
 		"experience": state.experience,
+		"attributes": state.attributes.duplicate(true),
+		"attribute_points": state.attribute_points,
 		"inventory": state.inventory.duplicate(),
+		"quickslots": state.quickslots.duplicate(),
 		"equipment": state.equipment.duplicate(),
 	}
 
@@ -33,7 +36,10 @@ static func apply_dict(data: Dictionary, state: PlayerState) -> void:
 	state.hero_scene = data.get("hero_scene", "")
 	state.level = data.get("level", 1)
 	state.experience = data.get("experience", 0)
+	state.attributes = data.get("attributes", {}).duplicate(true)
+	state.attribute_points = data.get("attribute_points", 0)
 	state.inventory = data.get("inventory", [])
+	state.quickslots = data.get("quickslots", [])
 	state.equipment = data.get("equipment", {})
 
 

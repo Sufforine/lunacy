@@ -13,9 +13,12 @@ var hero_scene: String = ""
 # прогресс (постоянный, но копируется из PlayerProfile)
 var level: int = 1
 var experience: int = 0
+var attributes: Dictionary = {}
+var attribute_points: int = 0
 
 # инвентарь (после миссии возвращается в PlayerProfile)
 var inventory: Array = []
+var quickslots: Array = []
 
 var equipment: Dictionary = {
 	"weapon": "",
@@ -46,7 +49,10 @@ func from_profile(profile) -> void:
 	appearance = profile.appearance.duplicate(true)
 	level = profile.level
 	experience = profile.experience
+	attributes = profile.attributes.duplicate(true)
+	attribute_points = profile.attribute_points
 	inventory = profile.inventory.duplicate(true)
+	quickslots = profile.quickslots.duplicate(true)
 	equipment = profile.equipment.duplicate(true)
 	if SteamLobby.is_steam_ready():
 		nickname = Steam.getPersonaName()
@@ -59,8 +65,11 @@ func from_profile(profile) -> void:
 func apply_to_profile(profile) -> void:
 	profile.level = level
 	profile.experience = experience
+	profile.attributes = attributes.duplicate(true)
+	profile.attribute_points = attribute_points
 
 	profile.inventory = inventory.duplicate(true)
+	profile.quickslots = quickslots.duplicate(true)
 	profile.equipment = equipment.duplicate(true)
 
 func debug_print():

@@ -1,12 +1,13 @@
 # SaveManager.gd — Autoload
 #
-# По умолчанию сохранение привязано к Steam ID: user://saves/<steam_id>.json
-# Каждое ИМЕНОВАННОЕ сохранение — это отдельный персонаж:
-#   user://saves/<steam_id>__<slug>.json
-# Текущий активный файл хранится в _active_save_name (пусто = сохранение по умолчанию).
+# Персонажи и миры хранятся в разных файлах, как в Valheim.
+# Старые user://saves/*.json мигрируются в user://characters/.
 extends Node
 
-const SAVE_DIR := "user://saves/"
+const CHARACTER_DIR := "user://characters/"
+const WORLD_DIR := "user://worlds/"
+const LEGACY_SAVE_DIR := "user://saves/"
+const SAVE_VERSION := 2
 
 # Сцена, которую хаб/миссия инстанцируют для ЛЮБОГО созданного персонажа.
 # В ней уже должны быть player.gd и все компоненты (Stats, Equipment,
@@ -30,6 +31,7 @@ const EMPTY_EQUIPMENT := {
 
 # Имя текущего активного именованного сохранения. Пусто = сохранение по умолчанию (steam_id.json)
 var _active_save_name: String = ""
+var _active_world_name: String = "default"
 
 
 # =========================================================
@@ -40,9 +42,20 @@ func get_save_path() -> String:
 	var prefix: String = _save_prefix()
 
 	if _active_save_name.is_empty():
-		return SAVE_DIR + prefix + ".json"
+		return CHARACTER_DIR + prefix + ".json"
 
-	return SAVE_DIR + prefix + "__" + _active_save_name + ".json"
+	return CHARACTER_DIR + prefix + "__" + _active_save_name + ".json"
+
+
+func get_world_save_path(world_name: String = "") -> String:
+	var clean_world := world_name.strip_edges().validate_filename()
+	if clean_world.is_empty():
+		clean_world = _active_world_name
+	return WORLD_DIR + _save_prefix() + "__" + clean_world + ".json"
+
+
+func get_active_world_name() -> String:
+	return _active_world_name
 
 
 # Префикс файла сохранения. Если Steam не запущен/не инициализирован —
@@ -84,12 +97,13 @@ func has_valid_hero_scene() -> bool:
 # =========================================================
 func list_saves() -> Array:
 
-	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+	_migrate_legacy_characters()
+	DirAccess.make_dir_recursive_absolute(CHARACTER_DIR)
 
 	var prefix: String = _save_prefix()
 
 	var result: Array = []
-	var dir := DirAccess.open(SAVE_DIR)
+	var dir := DirAccess.open(CHARACTER_DIR)
 	if dir == null:
 		return result
 
@@ -97,7 +111,7 @@ func list_saves() -> Array:
 	var file_name: String = dir.get_next()
 	while file_name != "":
 		if file_name.ends_with(".json") and file_name.begins_with(prefix):
-			var path: String = SAVE_DIR + file_name
+			var path: String = CHARACTER_DIR + file_name
 			var is_default: bool = file_name == prefix + ".json"
 			var is_named: bool = file_name.begins_with(prefix + "__")
 
@@ -208,6 +222,8 @@ func create_character(character_name: String, appearance: Dictionary = {}) -> bo
 	PlayerProfile.hero_scene     = default_hero_scene
 	PlayerProfile.level          = 1
 	PlayerProfile.experience     = 0
+	PlayerProfile.attributes     = _empty_attributes()
+	PlayerProfile.attribute_points = 0
 	PlayerProfile.inventory      = []
 	PlayerProfile.quickslots     = ["", "", ""]
 	PlayerProfile.equipment      = EMPTY_EQUIPMENT.duplicate()
@@ -228,7 +244,7 @@ func _unique_slug(base_slug: String) -> String:
 	var candidate: String = base_slug
 	var suffix: int = 2
 
-	while FileAccess.file_exists(SAVE_DIR + prefix + "__" + candidate + ".json"):
+	while FileAccess.file_exists(CHARACTER_DIR + prefix + "__" + candidate + ".json"):
 		candidate = "%s_%d" % [base_slug, suffix]
 		suffix += 1
 
@@ -256,7 +272,7 @@ func delete_character(save_info: Dictionary) -> bool:
 	var path: String = str(save_info.get("path", ""))
 
 	# Страховка: трогаем только .json внутри папки сохранений
-	if not path.begins_with(SAVE_DIR) or not path.ends_with(".json"):
+	if not path.begins_with(CHARACTER_DIR) or not path.ends_with(".json"):
 		push_error("SaveManager: отказ удалять файл вне папки сохранений: '%s'" % path)
 		return false
 
@@ -279,6 +295,8 @@ func delete_character(save_info: Dictionary) -> bool:
 		PlayerProfile.appearance     = DEFAULT_APPEARANCE.duplicate()
 		PlayerProfile.level          = 1
 		PlayerProfile.experience     = 0
+		PlayerProfile.attributes     = _empty_attributes()
+		PlayerProfile.attribute_points = 0
 		PlayerProfile.inventory      = []
 		PlayerProfile.quickslots     = ["", "", ""]
 		PlayerProfile.equipment      = EMPTY_EQUIPMENT.duplicate()
@@ -292,15 +310,18 @@ func delete_character(save_info: Dictionary) -> bool:
 # =========================================================
 func save_profile() -> void:
 
-	DirAccess.make_dir_recursive_absolute(SAVE_DIR)
+	DirAccess.make_dir_recursive_absolute(CHARACTER_DIR)
 
 	var data := {
+		"save_version":   SAVE_VERSION,
 		"character_name": PlayerProfile.character_name,
 		"appearance":     PlayerProfile.appearance,
 		"created_at":     PlayerProfile.created_at,
 		"hero_scene":     PlayerProfile.hero_scene,
 		"level":          PlayerProfile.level,
 		"experience":     PlayerProfile.experience,
+		"attributes":     PlayerProfile.attributes,
+		"attribute_points": PlayerProfile.attribute_points,
 		"inventory":      _serialize_inventory(),
 		"quickslots":     _serialize_quickslots(),
 		"equipment":      _serialize_equipment(),
@@ -321,6 +342,7 @@ func save_profile() -> void:
 # =========================================================
 func load_profile() -> void:
 
+	_migrate_legacy_characters()
 	var path: String = get_save_path()
 
 	if not FileAccess.file_exists(path):
@@ -329,6 +351,13 @@ func load_profile() -> void:
 		PlayerProfile.hero_scene     = ""
 		PlayerProfile.created_at     = 0.0
 		PlayerProfile.appearance     = DEFAULT_APPEARANCE.duplicate()
+		PlayerProfile.level          = 1
+		PlayerProfile.experience     = 0
+		PlayerProfile.attributes     = _empty_attributes()
+		PlayerProfile.attribute_points = 0
+		PlayerProfile.inventory      = []
+		PlayerProfile.quickslots     = ["", "", ""]
+		PlayerProfile.equipment      = EMPTY_EQUIPMENT.duplicate()
 		return
 
 	var file := FileAccess.open(path, FileAccess.READ)
@@ -354,6 +383,8 @@ func load_profile() -> void:
 	PlayerProfile.hero_scene     = saved_hero_scene
 	PlayerProfile.level          = data.get("level",      1)
 	PlayerProfile.experience     = data.get("experience", 0)
+	PlayerProfile.attributes     = _normalize_attributes(data.get("attributes", {}))
+	PlayerProfile.attribute_points = max(0, int(data.get("attribute_points", 0)))
 	PlayerProfile.inventory      = data.get("inventory", [])
 	PlayerProfile.quickslots     = data.get("quickslots", ["", "", ""])
 	PlayerProfile.equipment      = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
@@ -365,6 +396,73 @@ func load_profile() -> void:
 		PlayerProfile.appearance = DEFAULT_APPEARANCE.duplicate()
 
 	print("SaveManager: загружено ← %s" % path)
+
+
+# =========================================================
+# СОХРАНЕНИЕ МИРА
+# Данные героя сюда никогда не попадают.
+# =========================================================
+func save_world_progress(progress: Dictionary, world_name: String = "") -> bool:
+	DirAccess.make_dir_recursive_absolute(WORLD_DIR)
+	var selected_name := world_name.strip_edges().validate_filename()
+	if selected_name.is_empty():
+		selected_name = _active_world_name
+	var data := {
+		"save_version": SAVE_VERSION,
+		"world_name": selected_name,
+		"updated_at": Time.get_unix_time_from_system(),
+		"progress": progress.duplicate(true),
+	}
+	return _write_json(get_world_save_path(selected_name), data)
+
+
+func load_world_progress(world_name: String = "") -> Dictionary:
+	var data := _peek_save(get_world_save_path(world_name))
+	var progress: Variant = data.get("progress", {})
+	return progress.duplicate(true) if progress is Dictionary else {}
+
+
+func list_worlds() -> Array:
+	DirAccess.make_dir_recursive_absolute(WORLD_DIR)
+	var result: Array = []
+	var dir := DirAccess.open(WORLD_DIR)
+	if dir == null:
+		return result
+	var prefix := _save_prefix() + "__"
+	dir.list_dir_begin()
+	var file_name := dir.get_next()
+	while not file_name.is_empty():
+		if file_name.begins_with(prefix) and file_name.ends_with(".json"):
+			var path := WORLD_DIR + file_name
+			var data := _peek_save(path)
+			var fallback := file_name.trim_prefix(prefix).trim_suffix(".json")
+			result.append({
+				"name": str(data.get("world_name", fallback)),
+				"path": path,
+				"updated_at": float(data.get("updated_at", FileAccess.get_modified_time(path))),
+			})
+		file_name = dir.get_next()
+	dir.list_dir_end()
+	result.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
+		return float(a.get("updated_at", 0.0)) > float(b.get("updated_at", 0.0)))
+	return result
+
+
+func create_world(world_name: String) -> bool:
+	var clean_world := world_name.strip_edges().validate_filename()
+	if clean_world.is_empty():
+		return false
+	if FileAccess.file_exists(get_world_save_path(clean_world)):
+		push_warning("SaveManager: мир '%s' уже существует" % clean_world)
+		return false
+	_active_world_name = clean_world
+	return save_world_progress({}, clean_world)
+
+
+func select_world(world: Variant) -> void:
+	var world_name := str(world.get("name", "")) if world is Dictionary else str(world)
+	var clean_world := world_name.strip_edges().validate_filename()
+	_active_world_name = clean_world if not clean_world.is_empty() else "default"
 
 
 # =========================================================
@@ -432,3 +530,49 @@ func ensure_starter_inventory_if_empty() -> void:
 	PlayerProfile.inventory = filled
 	save_profile()
 	print("SaveManager: выдан стартовый инвентарь")
+
+
+func _empty_attributes() -> Dictionary:
+	return {"strength": 0, "agility": 0, "intellect": 0, "wisdom": 0}
+
+
+func _normalize_attributes(raw: Variant) -> Dictionary:
+	var result := _empty_attributes()
+	if raw is Dictionary:
+		for key in result:
+			result[key] = max(0, int(raw.get(key, 0)))
+	return result
+
+
+func _write_json(path: String, data: Dictionary) -> bool:
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		push_error("SaveManager: не удалось открыть файл для записи: %s" % path)
+		return false
+	file.store_string(JSON.stringify(data, "\t"))
+	file.close()
+	return true
+
+
+# Бесшовная миграция старой схемы, где персонаж лежал в saves.
+func _migrate_legacy_characters() -> void:
+	DirAccess.make_dir_recursive_absolute(CHARACTER_DIR)
+	var legacy := DirAccess.open(LEGACY_SAVE_DIR)
+	if legacy == null:
+		return
+	var prefix := _save_prefix()
+	legacy.list_dir_begin()
+	var file_name := legacy.get_next()
+	while not file_name.is_empty():
+		var belongs_to_player := file_name == prefix + ".json" or file_name.begins_with(prefix + "__")
+		if file_name.ends_with(".json") and belongs_to_player:
+			var target := CHARACTER_DIR + file_name
+			if not FileAccess.file_exists(target):
+				var legacy_data := _peek_save(LEGACY_SAVE_DIR + file_name)
+				if not legacy_data.is_empty():
+					legacy_data["save_version"] = SAVE_VERSION
+					legacy_data["attributes"] = _normalize_attributes(legacy_data.get("attributes", {}))
+					legacy_data["attribute_points"] = max(0, int(legacy_data.get("attribute_points", 0)))
+					_write_json(target, legacy_data)
+		file_name = legacy.get_next()
+	legacy.list_dir_end()

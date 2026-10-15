@@ -1,6 +1,6 @@
 extends Node
 
-var save_version: int = 1
+var save_version: int = 2
 var hero_scene: String = ""
 
 # Имя, которое игрок дал персонажу при создании. Пусто = персонаж ещё
@@ -16,6 +16,17 @@ var created_at: float = 0.0
 
 var level: int = 1
 var experience: int = 0
+
+# Очки, которые игрок вручную вложил в четыре основные характеристики.
+# Базовые значения задаются в сцене Player, здесь хранится только развитие
+# конкретного созданного персонажа.
+var attributes: Dictionary = {
+	"strength": 0,
+	"agility": 0,
+	"intellect": 0,
+	"wisdom": 0,
+}
+var attribute_points: int = 0
 
 var inventory: Array = []
 

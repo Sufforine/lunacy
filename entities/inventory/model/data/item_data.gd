@@ -22,6 +22,7 @@ enum Slot { NONE, WEAPON, HELMET, CHESTPLATE, LEGGINGS, CLOAK, TRINKET }
 @export_group("On Use")
 @export var heal_hp: int = 0
 @export var heal_mana: int = 0
+@export var experience_amount: int = 0
 
 # Бонусы к статам (снаряжение)
 @export_group("Characteristic Bonuses")

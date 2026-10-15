@@ -7,18 +7,32 @@ class_name StatsComponent
 
 # ── сигналы ─────────────────────────────────────────────
 signal stats_changed
+signal level_increased(new_level: int)
 signal downed
 signal died
 signal revived
 
 # ── базовые статы героя ──────────────────────────────────
-@export var base_stats: HeroStat
+@export var base_stats: CharacterStats
+@export var uses_player_progress: bool = true
 
-@onready var equipment: EquipmentComponent = $"../EquipmentComponent"
-@onready var effects: EffectsComponent     = $"../EffectsComponent"
+@onready var equipment: EquipmentComponent = get_node_or_null("../EquipmentComponent") as EquipmentComponent
+@onready var effects: EffectsComponent     = get_node_or_null("../EffectsComponent") as EffectsComponent
 
 # ── текущий уровень (берётся из PlayerProfile) ───────────
 var level: int = 1
+var experience: int = 0
+var attribute_points: int = 0
+var attributes: Dictionary = {
+	"strength": 0,
+	"agility": 0,
+	"intellect": 0,
+	"wisdom": 0,
+}
+
+const ATTRIBUTE_NAMES := ["strength", "agility", "intellect", "wisdom"]
+const EXPERIENCE_PER_LEVEL := 100
+const ATTRIBUTE_POINTS_PER_LEVEL := 1
 
 # ── текущие значения ─────────────────────────────────────
 var current_health: int = 0
@@ -41,9 +55,17 @@ func _ready() -> void:
 		push_error("StatsComponent: base_stats не назначен в инспекторе")
 		return
 
-	# У героя из сети уровень приходит в network_state, а не из локального профиля
-	var net_state: Dictionary = get_parent().get_meta("network_state", {})
-	level = int(net_state.get("level", PlayerProfile.level))
+	# Свой герой берёт прогресс из локального файла персонажа,
+	# чужой — из проверенного хостом network_state.
+	if uses_player_progress:
+		var net_state: Dictionary = get_parent().get_meta("network_state", {})
+		level = int(net_state.get("level", PlayerProfile.level))
+		experience = int(net_state.get("experience", PlayerProfile.experience))
+		attribute_points = int(net_state.get("attribute_points", PlayerProfile.attribute_points))
+		var loaded_attributes: Variant = net_state.get("attributes", PlayerProfile.attributes)
+		if loaded_attributes is Dictionary:
+			for attribute_name in ATTRIBUTE_NAMES:
+				attributes[attribute_name] = max(0, int(loaded_attributes.get(attribute_name, 0)))
 
 	if equipment:
 		equipment.changed.connect(_on_equipment_changed)
@@ -79,7 +101,8 @@ func get_characteristic(name: String) -> float:
 	if base_stats == null:
 		return 0.0
 
-	var value: float = base_stats.get_characteristic(name, level)
+	var value: float = base_stats.get_characteristic(name)
+	value += float(attributes.get(name, 0))
 
 	if equipment:
 		for item in equipment.get_all_items():
@@ -91,6 +114,86 @@ func get_characteristic(name: String) -> float:
 		value += effects.get_characteristic_bonus(name)
 
 	return value
+
+
+# ════════════════════════════════════════════════
+# РАЗВИТИЕ ПЕРСОНАЖА
+# В сетевой игре любое изменение сначала проверяет хост.
+# ════════════════════════════════════════════════
+func request_spend_attribute(attribute_name: String) -> void:
+	if not uses_player_progress:
+		return
+	if not ATTRIBUTE_NAMES.has(attribute_name) or attribute_points <= 0:
+		return
+	if SteamLobby.is_session_active():
+		SteamLobby.request_spend_attribute(attribute_name)
+		return
+	_apply_spent_attribute(attribute_name)
+	_save_local_progress()
+
+
+func add_experience(amount: int) -> void:
+	if not uses_player_progress or amount <= 0:
+		return
+	experience += amount
+	while experience >= EXPERIENCE_PER_LEVEL:
+		experience -= EXPERIENCE_PER_LEVEL
+		level += 1
+		attribute_points += ATTRIBUTE_POINTS_PER_LEVEL
+		level_increased.emit(level)
+	_save_local_progress()
+	stats_changed.emit()
+
+
+func _apply_spent_attribute(attribute_name: String) -> bool:
+	if not ATTRIBUTE_NAMES.has(attribute_name) or attribute_points <= 0:
+		return false
+	attributes[attribute_name] = int(attributes.get(attribute_name, 0)) + 1
+	attribute_points -= 1
+	_clamp_resources_to_maximums()
+	stats_changed.emit()
+	return true
+
+
+func get_progress_data() -> Dictionary:
+	return {
+		"level": level,
+		"experience": experience,
+		"attributes": attributes.duplicate(true),
+		"attribute_points": attribute_points,
+	}
+
+
+func apply_progress_data(data: Dictionary, persist_for_owner: bool = true) -> void:
+	var previous_level := level
+	level = max(1, int(data.get("level", level)))
+	experience = max(0, int(data.get("experience", experience)))
+	attribute_points = max(0, int(data.get("attribute_points", attribute_points)))
+	var incoming: Variant = data.get("attributes", attributes)
+	if incoming is Dictionary:
+		for attribute_name in ATTRIBUTE_NAMES:
+			attributes[attribute_name] = max(0, int(incoming.get(attribute_name, 0)))
+	_clamp_resources_to_maximums()
+	if level > previous_level:
+		level_increased.emit(level)
+	if uses_player_progress and persist_for_owner and get_parent().is_multiplayer_authority():
+		_save_local_progress()
+	stats_changed.emit()
+
+
+func _save_local_progress() -> void:
+	if not uses_player_progress or not get_parent().is_multiplayer_authority():
+		return
+	PlayerProfile.level = level
+	PlayerProfile.experience = experience
+	PlayerProfile.attributes = attributes.duplicate(true)
+	PlayerProfile.attribute_points = attribute_points
+	SaveManager.save_profile()
+
+
+func _clamp_resources_to_maximums() -> void:
+	current_health = clamp(current_health, 0, int(get_stat("health")))
+	current_mana = clamp(current_mana, 0, int(get_stat("mana")))
 
 
 # ════════════════════════════════════════════════════════
@@ -236,7 +339,7 @@ func _on_equipment_changed() -> void:
 # INTERNAL
 # ════════════════════════════════════════════════════════
 
-# Базовое значение показателя из HeroStat (без характеристик и снаряжения)
+# Базовое значение показателя из CharacterStats (без характеристик и снаряжения)
 func _base(stat_name: String) -> float:
 	var val: Variant = base_stats.get(stat_name)
 	if val == null:
