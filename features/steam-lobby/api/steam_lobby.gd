@@ -36,6 +36,15 @@ var _pending_mission: Node3D
 var _pending_mission_spawns: Array = []
 var _mission_spawn_waiting: Dictionary = {}
 
+# Смена сетевой сцены проходит через prepare/commit. Пока все клиенты не
+# отключили старые MultiplayerSynchronizer, сцена остаётся в дереве и может
+# безопасно принять уже отправленные пакеты синхронизации.
+var _scene_transition_id: int = 0
+var _scene_transition_path: String = ""
+var _scene_transition_waiting: Dictionary = {}
+var _scene_transition_active: bool = false
+var _scene_transition_commit_scheduled: bool = false
+
 
 func _ready() -> void:
 	if not _steam_available():
@@ -101,6 +110,7 @@ func join_lobby(id: int) -> void:
 
 func disconnect_lobby() -> void:
 	_reset_pending_scene_spawns()
+	_reset_scene_transition()
 	_clear_autoload_spawns()
 	_drops.clear()
 	if _steam_ready and lobby_id != 0:
@@ -133,7 +143,7 @@ func start_game() -> void:
 
 	# Мир принадлежит хосту; профили персонажей в этот файл не пишутся.
 	SaveManager.save_world_progress(SaveManager.load_world_progress())
-	_rpc_load_gameplay_scene.rpc(HUB_SCENE)
+	_begin_network_scene_change(HUB_SCENE)
 
 
 func request_scene_change(scene_path: String) -> void:
@@ -144,7 +154,7 @@ func request_scene_change(scene_path: String) -> void:
 		get_tree().change_scene_to_file(scene_path)
 		return
 	if multiplayer.is_server():
-		_rpc_load_gameplay_scene.rpc(scene_path)
+		_begin_network_scene_change(scene_path)
 	else:
 		_rpc_request_scene_change.rpc_id(1, scene_path)
 
@@ -153,17 +163,94 @@ func request_scene_change(scene_path: String) -> void:
 func _rpc_request_scene_change(scene_path: String) -> void:
 	if not multiplayer.is_server() or not _is_allowed_gameplay_scene(scene_path):
 		return
-	_rpc_load_gameplay_scene.rpc(scene_path)
+	_begin_network_scene_change(scene_path)
+
+
+func _begin_network_scene_change(scene_path: String) -> void:
+	if not multiplayer.is_server() or _scene_transition_active:
+		return
+	if not _is_allowed_gameplay_scene(scene_path):
+		return
+
+	_scene_transition_id += 1
+	_scene_transition_path = scene_path
+	_scene_transition_waiting = _connected_peer_set()
+	_scene_transition_active = true
+	_scene_transition_commit_scheduled = false
+	_rpc_prepare_scene_change.rpc(_scene_transition_id, scene_path)
 
 
 @rpc("authority", "call_local", "reliable")
-func _rpc_load_gameplay_scene(scene_path: String) -> void:
+func _rpc_prepare_scene_change(transition_id: int, scene_path: String) -> void:
+	if not _is_allowed_gameplay_scene(scene_path):
+		return
+
+	_scene_transition_id = transition_id
+	_scene_transition_path = scene_path
+	_scene_transition_active = true
+	_disable_current_scene_synchronizers()
+
+	var local_peer_id := multiplayer.get_unique_id()
+	if multiplayer.is_server():
+		_mark_scene_change_prepared(local_peer_id, transition_id)
+	else:
+		_rpc_scene_change_prepared.rpc_id(1, transition_id)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_scene_change_prepared(transition_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	_mark_scene_change_prepared(multiplayer.get_remote_sender_id(), transition_id)
+
+
+func _mark_scene_change_prepared(peer_id: int, transition_id: int) -> void:
+	if not multiplayer.is_server() or transition_id != _scene_transition_id:
+		return
+	_scene_transition_waiting.erase(peer_id)
+	if _scene_transition_waiting.is_empty() and not _scene_transition_commit_scheduled:
+		_scene_transition_commit_scheduled = true
+		_finish_scene_change_prepare(transition_id)
+
+
+func _finish_scene_change_prepare(transition_id: int) -> void:
+	# Даём старым ненадёжным sync-пакетам дойти, пока их узлы ещё существуют.
+	await get_tree().create_timer(0.25, true).timeout
+	if not multiplayer.is_server() or transition_id != _scene_transition_id:
+		return
+	_rpc_load_gameplay_scene.rpc(transition_id, _scene_transition_path)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_load_gameplay_scene(transition_id: int, scene_path: String) -> void:
+	if transition_id != _scene_transition_id:
+		return
 	if not _is_allowed_gameplay_scene(scene_path):
 		return
 	_reset_pending_scene_spawns()
 	_clear_autoload_spawns()
 	_drops.clear()
+	_reset_scene_transition()
 	get_tree().change_scene_to_file(scene_path)
+
+
+func _disable_current_scene_synchronizers() -> void:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return
+	for node in scene.find_children("*", "MultiplayerSynchronizer", true, false):
+		var synchronizer := node as MultiplayerSynchronizer
+		if synchronizer != null:
+			synchronizer.public_visibility = false
+			for peer_id in multiplayer.get_peers():
+				synchronizer.set_visibility_for(int(peer_id), false)
+
+
+func _reset_scene_transition() -> void:
+	_scene_transition_path = ""
+	_scene_transition_waiting.clear()
+	_scene_transition_active = false
+	_scene_transition_commit_scheduled = false
 
 
 func _is_allowed_gameplay_scene(scene_path: String) -> bool:
@@ -434,6 +521,11 @@ func _on_peer_disconnected(id: int) -> void:
 	print("SteamLobby: отключился peer ", id)
 	_session.remove_player(id)
 	_resolve_disconnected_spawn_wait(id)
+	if multiplayer.is_server() and _scene_transition_waiting.has(id):
+		_scene_transition_waiting.erase(id)
+		if _scene_transition_waiting.is_empty() and not _scene_transition_commit_scheduled:
+			_scene_transition_commit_scheduled = true
+			_finish_scene_change_prepare(_scene_transition_id)
 	if multiplayer.is_server():
 		_rpc_despawn_hub_player.rpc(id)
 	else:
