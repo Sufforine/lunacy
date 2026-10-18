@@ -1,6 +1,7 @@
 extends CharacterBody3D
 class_name Player
 
+const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 const ANIM_IDLE := [&"idle", &"T"]
 const ANIM_RUN := [&"walk", &"Run"]
 const ANIM_CRAWL := [&"downed", &"Crawl"]
@@ -71,9 +72,13 @@ func _ready() -> void:
 	stats.revived.connect(_on_revived)
 
 	if is_multiplayer_authority():
+		inventory_ui.set_process_input(true)
 		hud_bars = HUDBars.new()
 		$CanvasLayer.add_child(hud_bars)
 		hud_bars.bind(stats)
+		# Меню создаётся только у владельца этого Player. Поэтому Escape и
+		# полноэкранный интерфейс не дублируются для сетевых копий героев.
+		$CanvasLayer.add_child(PAUSE_MENU_SCENE.instantiate())
 		# CameraRig готовится раньше корневого Player. Повторная отложенная
 		# активация гарантирует, что после спавна всех сетевых игроков текущей
 		# останется камера владельца, а мышь снова будет захвачена после меню.
@@ -83,6 +88,9 @@ func _ready() -> void:
 		equipment.changed.connect(_on_local_equipment_changed)
 	else:
 		# Интерфейс чужого героя на моём экране не нужен
+		# и не должен реагировать на глобальные I/Escape. Иначе каждый
+		# сетевой Player меняет общий Input.mouse_mode при открытии/закрытии.
+		inventory_ui.set_process_input(false)
 		$CanvasLayer.visible = false
 
 	call_deferred("_init_inventory")
@@ -102,6 +110,7 @@ func _init_inventory() -> void:
 	inventory_ui.bind(inventory, equipment, stats)
 	inventory.set_quickslot_data(PlayerProfile.quickslots)
 	inventory.add_item(ItemLibrary.get_item("experience_relic"))
+	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
 
 
 # ════════════════════════════════════════════════════════

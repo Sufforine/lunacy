@@ -61,7 +61,7 @@ func use(player: Node) -> bool:
 	if heal_hp > 0 and player.has_node("StatsComponent"):
 		var stats: StatsComponent = player.get_node("StatsComponent")
 		var before := stats.current_health
-		stats.current_health = min(stats.current_health + heal_hp, int(stats.get_stat("health")))
+		stats.heal(heal_hp)
 		if stats.current_health > before:
 			print("ItemData: HP +", heal_hp)
 			used = true
@@ -69,7 +69,7 @@ func use(player: Node) -> bool:
 	if heal_mana > 0 and player.has_node("StatsComponent"):
 		var stats: StatsComponent = player.get_node("StatsComponent")
 		var before := stats.current_mana
-		stats.current_mana = min(stats.current_mana + heal_mana, int(stats.get_stat("mana")))
+		stats.restore_mana(heal_mana)
 		if stats.current_mana > before:
 			print("ItemData: Mana +", heal_mana)
 			used = true

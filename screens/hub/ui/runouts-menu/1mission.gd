@@ -1,7 +1,7 @@
 extends Button
 
-func _ready() -> void:
-	pass
+const MISSION_SCENE := "res://screens/mission/ui/mission.tscn"
+
 
 func _on_pressed() -> void:
-		get_tree().change_scene_to_file("res://screens/mission/ui/mission.tscn")
+	SteamLobby.request_scene_change(MISSION_SCENE)

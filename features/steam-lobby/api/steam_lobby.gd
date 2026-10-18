@@ -13,6 +13,9 @@ const NetDrops := preload("res://features/net/sync/net_drops.gd")
 
 const LOBBY_TYPE_PUBLIC := 2
 const RESULT_OK := 1
+const HUB_SCENE := "res://screens/hub/ui/hub.tscn"
+const RUNOUTS_MENU_SCENE := "res://screens/hub/ui/runouts-menu/RunoutsMenu.tscn"
+const MISSION_SCENE := "res://screens/mission/ui/mission.tscn"
 
 var _steam_ready: bool = false
 
@@ -28,7 +31,10 @@ var _drops := NetDrops.new()
 
 var _pending_hub: Node3D
 var _pending_spawns: Array = []
-var _spawn_sync_remaining: int = 0
+var _hub_spawn_waiting: Dictionary = {}
+var _pending_mission: Node3D
+var _pending_mission_spawns: Array = []
+var _mission_spawn_waiting: Dictionary = {}
 
 
 func _ready() -> void:
@@ -94,6 +100,7 @@ func join_lobby(id: int) -> void:
 
 
 func disconnect_lobby() -> void:
+	_reset_pending_scene_spawns()
 	_clear_autoload_spawns()
 	_drops.clear()
 	if _steam_ready and lobby_id != 0:
@@ -126,9 +133,141 @@ func start_game() -> void:
 
 	# Мир принадлежит хосту; профили персонажей в этот файл не пишутся.
 	SaveManager.save_world_progress(SaveManager.load_world_progress())
+	_rpc_load_gameplay_scene.rpc(HUB_SCENE)
+
+
+func request_scene_change(scene_path: String) -> void:
+	if not _is_allowed_gameplay_scene(scene_path):
+		push_warning("SteamLobby: запрещён переход на сцену '%s'" % scene_path)
+		return
+	if not is_session_active():
+		get_tree().change_scene_to_file(scene_path)
+		return
+	if multiplayer.is_server():
+		_rpc_load_gameplay_scene.rpc(scene_path)
+	else:
+		_rpc_request_scene_change.rpc_id(1, scene_path)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_request_scene_change(scene_path: String) -> void:
+	if not multiplayer.is_server() or not _is_allowed_gameplay_scene(scene_path):
+		return
+	_rpc_load_gameplay_scene.rpc(scene_path)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_load_gameplay_scene(scene_path: String) -> void:
+	if not _is_allowed_gameplay_scene(scene_path):
+		return
+	_reset_pending_scene_spawns()
 	_clear_autoload_spawns()
 	_drops.clear()
-	_rpc_load_hub.rpc()
+	get_tree().change_scene_to_file(scene_path)
+
+
+func _is_allowed_gameplay_scene(scene_path: String) -> bool:
+	return scene_path == HUB_SCENE or scene_path == RUNOUTS_MENU_SCENE or scene_path == MISSION_SCENE
+
+
+func _connected_peer_set() -> Dictionary:
+	var waiting := {multiplayer.get_unique_id(): true}
+	for peer_id in multiplayer.get_peers():
+		waiting[int(peer_id)] = true
+	return waiting
+
+
+func _reset_pending_scene_spawns() -> void:
+	_pending_hub = null
+	_pending_spawns = []
+	_hub_spawn_waiting.clear()
+	_pending_mission = null
+	_pending_mission_spawns = []
+	_mission_spawn_waiting.clear()
+
+
+func _resolve_disconnected_spawn_wait(peer_id: int) -> void:
+	if _hub_spawn_waiting.has(peer_id):
+		_hub_spawn_waiting.erase(peer_id)
+		if _hub_spawn_waiting.is_empty():
+			_finalize_hub_spawn()
+	if _mission_spawn_waiting.has(peer_id):
+		_mission_spawn_waiting.erase(peer_id)
+		if _mission_spawn_waiting.is_empty():
+			_finalize_mission_spawn()
+
+
+func spawn_mission_players(mission: Node3D, spawn_points: Array) -> void:
+	if not is_session_active() or not multiplayer.is_server():
+		return
+	if spawn_points.is_empty():
+		push_error("SteamLobby: нет точек спавна в миссии")
+		return
+
+	_pending_mission = mission
+	_pending_mission_spawns = spawn_points
+	_mission_spawn_waiting = _connected_peer_set()
+	_rpc_sync_mission_profile_before_spawn.rpc()
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_sync_mission_profile_before_spawn() -> void:
+	SaveManager.ensure_starter_inventory_if_empty()
+	var peer_id := multiplayer.get_unique_id()
+	var state_data := _session.register_local_player(peer_id)
+	if multiplayer.is_server():
+		_on_mission_spawn_profile_sync_done(peer_id)
+	else:
+		_rpc_mission_spawn_profile_sync.rpc_id(1, state_data)
+
+
+@rpc("any_peer", "reliable")
+func _rpc_mission_spawn_profile_sync(state_data: Dictionary) -> void:
+	if not multiplayer.is_server():
+		return
+	var sender_id := multiplayer.get_remote_sender_id()
+	_session.register_remote_player(sender_id, state_data)
+	_on_mission_spawn_profile_sync_done(sender_id)
+
+
+func _on_mission_spawn_profile_sync_done(peer_id: int) -> void:
+	if not multiplayer.is_server():
+		return
+	if not _mission_spawn_waiting.has(peer_id):
+		return
+	_mission_spawn_waiting.erase(peer_id)
+	if not _mission_spawn_waiting.is_empty():
+		return
+	_finalize_mission_spawn()
+
+
+func _finalize_mission_spawn() -> void:
+	if not is_instance_valid(_pending_mission) or _pending_mission_spawns.is_empty():
+		return
+
+	for peer_id in _session.player_states:
+		var state_data := _session.player_state_data(peer_id)
+		var spawn_index := (maxi(1, int(peer_id)) - 1) % _pending_mission_spawns.size()
+		var spawn_position: Vector3 = _pending_mission_spawns[spawn_index].global_position
+		_rpc_spawn_mission_player.rpc(state_data, spawn_position)
+
+	_pending_mission = null
+	_pending_mission_spawns = []
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_spawn_mission_player(state_data: Dictionary, spawn_position: Vector3) -> void:
+	call_deferred("_deferred_spawn_mission_player", state_data, spawn_position)
+
+
+func _deferred_spawn_mission_player(state_data: Dictionary, spawn_position: Vector3) -> void:
+	for _frame in range(600):
+		var scene := get_tree().current_scene
+		if scene != null and scene.scene_file_path == MISSION_SCENE:
+			_spawner.spawn_player(scene, state_data, spawn_position)
+			return
+		await get_tree().process_frame
+	push_error("SteamLobby: не удалось заспавнить игрока — миссия не загружена")
 
 
 func spawn_hub_players(hub: Node3D, spawn_points: Array) -> void:
@@ -144,7 +283,7 @@ func spawn_hub_players(hub: Node3D, spawn_points: Array) -> void:
 
 	_pending_hub = hub
 	_pending_spawns = spawn_points
-	_spawn_sync_remaining = _session.player_states.size()
+	_hub_spawn_waiting = _connected_peer_set()
 	_rpc_sync_profile_before_spawn.rpc()
 
 
@@ -155,7 +294,7 @@ func _rpc_sync_profile_before_spawn() -> void:
 	var state_data := _session.register_local_player(peer_id)
 
 	if multiplayer.is_server():
-		_on_spawn_profile_sync_done()
+		_on_spawn_profile_sync_done(peer_id)
 	else:
 		_rpc_spawn_profile_sync.rpc_id(1, state_data)
 
@@ -167,17 +306,21 @@ func _rpc_spawn_profile_sync(state_data: Dictionary) -> void:
 
 	var sender_id := multiplayer.get_remote_sender_id()
 	_session.register_remote_player(sender_id, state_data)
-	_on_spawn_profile_sync_done()
+	_on_spawn_profile_sync_done(sender_id)
 
 
-func _on_spawn_profile_sync_done() -> void:
+func _on_spawn_profile_sync_done(peer_id: int) -> void:
 	if not multiplayer.is_server():
 		return
-
-	_spawn_sync_remaining -= 1
-	if _spawn_sync_remaining > 0:
+	if not _hub_spawn_waiting.has(peer_id):
 		return
+	_hub_spawn_waiting.erase(peer_id)
+	if not _hub_spawn_waiting.is_empty():
+		return
+	_finalize_hub_spawn()
 
+
+func _finalize_hub_spawn() -> void:
 	if _pending_hub == null or _pending_spawns.is_empty():
 		return
 
@@ -188,7 +331,7 @@ func _on_spawn_profile_sync_done() -> void:
 
 	for peer_id in _session.player_states:
 		var state_data := _session.player_state_data(peer_id)
-		var spawn_index := int(peer_id) % _pending_spawns.size()
+		var spawn_index := (maxi(1, int(peer_id)) - 1) % _pending_spawns.size()
 		var spawn_pos: Vector3 = _pending_spawns[spawn_index].global_position
 		_rpc_spawn_hub_player.rpc(state_data, spawn_pos)
 
@@ -197,27 +340,18 @@ func _on_spawn_profile_sync_done() -> void:
 
 
 @rpc("authority", "call_local", "reliable")
-func _rpc_load_hub() -> void:
-	get_tree().change_scene_to_file("res://screens/hub/ui/hub.tscn")
-
-
-@rpc("authority", "call_local", "reliable")
 func _rpc_spawn_hub_player(state_data: Dictionary, spawn_position: Vector3) -> void:
 	call_deferred("_deferred_spawn_hub_player", state_data, spawn_position)
 
 
 func _deferred_spawn_hub_player(state_data: Dictionary, spawn_position: Vector3) -> void:
-	var hub := _get_hub_scene()
-	if hub == null:
-		# Клиент может ещё загружать хаб — повторить на следующем кадре.
+	for _frame in range(600):
+		var hub := _get_hub_scene()
+		if hub != null:
+			_spawner.spawn_player(hub, state_data, spawn_position)
+			return
 		await get_tree().process_frame
-		hub = _get_hub_scene()
-
-	if hub == null:
-		push_error("SteamLobby: не удалось заспавнить игрока — хаб не загружен")
-		return
-
-	_spawner.spawn_player(hub, state_data, spawn_position)
+	push_error("SteamLobby: не удалось заспавнить игрока — хаб не загружен")
 
 
 func _get_hub_scene() -> Node:
@@ -299,7 +433,15 @@ func _on_peer_connected(id: int) -> void:
 func _on_peer_disconnected(id: int) -> void:
 	print("SteamLobby: отключился peer ", id)
 	_session.remove_player(id)
-	_rpc_despawn_hub_player.rpc(id)
+	_resolve_disconnected_spawn_wait(id)
+	if multiplayer.is_server():
+		_rpc_despawn_hub_player.rpc(id)
+	else:
+		# Клиент не имеет права вызывать authority RPC. При потере хоста
+		# удаляем его копию локально, не создавая сетевую ошибку поверх разрыва.
+		var scene := get_tree().current_scene
+		if scene != null:
+			_spawner.despawn_player(scene, id)
 
 
 @rpc("any_peer", "reliable")
@@ -492,6 +634,22 @@ func _server_spawn_drop(item_id: String, position: Vector3, direction: Vector3, 
 	if not ItemLibrary.has_item(item_id):
 		push_warning("SteamLobby: неизвестный предмет '%s' в запросе на выброс" % item_id)
 		return
+	# У хоста UI и серверная копия совпадают, поэтому предмет уже удалён до
+	# запроса. Для удалённого игрока сервер хранит отдельную копию инвентаря:
+	# удаляем предмет и отклоняем поддельный либо повторный запрос.
+	if thrower_peer != multiplayer.get_unique_id():
+		var inventory := _inventory_for_peer(thrower_peer)
+		if inventory == null:
+			return
+		var location := inventory.find_item_location(item_id)
+		if location.is_empty():
+			push_warning("SteamLobby: peer %d попытался выбросить отсутствующий '%s'" % [thrower_peer, item_id])
+			return
+		inventory.consume_network_item(
+			str(location["source"]),
+			int(location["slot_index"]),
+			item_id
+		)
 	_rpc_spawn_drop.rpc(_drops.allocate_id(), item_id, position, direction, thrower_peer)
 
 

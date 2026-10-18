@@ -18,6 +18,7 @@ extends Node3D
 
 const SOLO_SCENE  := "res://screens/hub/ui/hub.tscn"
 const LOBBY_SCENE := "res://features/steam-lobby/ui/lobby_menu.tscn"
+const OPTIONS_SCENE := "res://screens/options/ui/options.tscn"
 
 const NAME_MAX_LENGTH := 24
 
@@ -29,6 +30,8 @@ enum State { TITLE, MOVING, STAGE, CHOOSE_BODY, EDITING, MODE_SELECT, WORLD_SELE
 # в инспекторе: так она используется для любого созданного персонажа.
 # Модель внутри неё подменяется моделью персонажа при спавне (см. player.gd).
 @export var hero_scene: PackedScene
+@export var start_in_character_editor: bool = false
+@export_file("*.tscn") var return_scene_after_character_select: String = ""
 
 @export var game_title: String = "НАЗВАНИЕ ИГРЫ"
 @export var title_camera_position: Vector3 = Vector3(0.0, 1.8, 7.0)
@@ -111,7 +114,11 @@ func _ready() -> void:
 
 	_build_world()
 	_build_ui()
-	_set_state(State.TITLE)
+	if start_in_character_editor:
+		_camera.position = stage_camera_position
+		_show_stage()
+	else:
+		_set_state(State.TITLE)
 
 
 func _process(delta: float) -> void:
@@ -274,6 +281,7 @@ func _build_title_ui() -> Control:
 	box.add_child(gap)
 
 	box.add_child(_make_button("Играть", _on_play_pressed))
+	box.add_child(_make_button("Настройки", _on_options_pressed))
 	box.add_child(_make_button("Выход", _on_quit_pressed))
 
 	return center
@@ -737,12 +745,21 @@ func _on_play_pressed() -> void:
 	_show_stage()
 
 
+func _on_options_pressed() -> void:
+	if _state != State.TITLE:
+		return
+	get_tree().change_scene_to_file(OPTIONS_SCENE)
+
+
 func _on_quit_pressed() -> void:
 	get_tree().quit()
 
 
 func _on_back_pressed() -> void:
 	if _state != State.STAGE:
+		return
+	if start_in_character_editor and not return_scene_after_character_select.is_empty():
+		_leave_character_editor()
 		return
 	_hide_all_figures()
 	_set_state(State.MOVING)
@@ -824,6 +841,9 @@ func _on_select_pressed() -> void:
 		return
 
 	SaveManager.select_save(_last_character)
+	if start_in_character_editor and not return_scene_after_character_select.is_empty():
+		_leave_character_editor()
+		return
 
 	# Без сцены героя хаб останется пустым — лучше сказать об этом сразу
 	var hero_ready: bool = SaveManager.has_valid_hero_scene()
@@ -842,6 +862,13 @@ func _on_select_pressed() -> void:
 		_multiplayer_button.tooltip_text = ""
 
 	_set_state(State.MODE_SELECT)
+
+
+func _leave_character_editor() -> void:
+	if SteamLobby.is_session_active():
+		SteamLobby.request_scene_change(return_scene_after_character_select)
+	else:
+		get_tree().change_scene_to_file(return_scene_after_character_select)
 
 
 func _on_delete_pressed() -> void:

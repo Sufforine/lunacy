@@ -127,6 +127,11 @@ func bind(inventory: InventoryComponent, equipment: EquipmentComponent, stats: S
 # INPUT
 # ════════════════════════════════════════════════════════
 func _input(event: InputEvent) -> void:
+	# В мультиплеере у каждого героя есть свой InventoryUI, но глобальный
+	# режим мыши один на всё окно. Управлять им может только локальный герой.
+	var owner_player := _find_owner_player()
+	if owner_player != null and not owner_player.is_multiplayer_authority():
+		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.keycode == KEY_I:
@@ -1013,4 +1018,11 @@ func is_main_panel_open() -> bool:
 
 func _close_main_panel() -> void:
 	main_panel.visible = false
-	Input.mouse_mode = _mouse_mode_before_open
+	var owner_player := _find_owner_player()
+	var camera_rig: CameraRig = null
+	if owner_player != null:
+		camera_rig = owner_player.get_node_or_null("CameraRig") as CameraRig
+	if camera_rig != null and camera_rig.enabled:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	else:
+		Input.mouse_mode = _mouse_mode_before_open

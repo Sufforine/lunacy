@@ -40,6 +40,12 @@ var current_mana: int   = 0
 var current_morale: int = 0
 var current_shield: float = 0.0  # поглощает урон до HP; наполняется эффектами
 
+# Последние максимумы нужны, потому что сигнал EquipmentComponent.changed
+# приходит уже после замены предмета.
+var _last_max_health: int = 1
+var _last_max_mana: int = 1
+var _last_max_morale: int = 0
+
 # ── агония ───────────────────────────────────────────────
 var is_downed: bool  = false
 var is_dead: bool    = false
@@ -73,6 +79,7 @@ func _ready() -> void:
 	current_health = int(get_stat("health"))
 	current_mana   = int(get_stat("mana"))
 	current_morale = int(get_stat("morale"))
+	_remember_resource_maximums()
 
 
 # ════════════════════════════════════════════════════════
@@ -150,7 +157,7 @@ func _apply_spent_attribute(attribute_name: String) -> bool:
 		return false
 	attributes[attribute_name] = int(attributes.get(attribute_name, 0)) + 1
 	attribute_points -= 1
-	_clamp_resources_to_maximums()
+	_preserve_resource_ratios_after_stat_change()
 	stats_changed.emit()
 	return true
 
@@ -173,7 +180,7 @@ func apply_progress_data(data: Dictionary, persist_for_owner: bool = true) -> vo
 	if incoming is Dictionary:
 		for attribute_name in ATTRIBUTE_NAMES:
 			attributes[attribute_name] = max(0, int(incoming.get(attribute_name, 0)))
-	_clamp_resources_to_maximums()
+	_preserve_resource_ratios_after_stat_change()
 	if level > previous_level:
 		level_increased.emit(level)
 	if uses_player_progress and persist_for_owner and get_parent().is_multiplayer_authority():
@@ -194,6 +201,7 @@ func _save_local_progress() -> void:
 func _clamp_resources_to_maximums() -> void:
 	current_health = clamp(current_health, 0, int(get_stat("health")))
 	current_mana = clamp(current_mana, 0, int(get_stat("mana")))
+	_remember_resource_maximums()
 
 
 # ════════════════════════════════════════════════════════
@@ -312,27 +320,41 @@ func revive(revive_health: int = 1) -> void:
 # ПЕРЕСЧЁТ ПРИ СМЕНЕ СНАРЯЖЕНИЯ
 # ════════════════════════════════════════════════════════
 func _on_equipment_changed() -> void:
+	_preserve_resource_ratios_after_stat_change()
+	stats_changed.emit()
 
-	var old_max_hp:    float = get_stat("health")
-	var old_max_mana:  float = get_stat("mana")
-	var old_max_morale: int  = int(get_stat("morale"))
 
-	var new_max_hp:    int   = int(get_stat("health"))
-	var new_max_mana:  int   = int(get_stat("mana"))
-	var new_max_morale: int  = int(get_stat("morale"))
+func _preserve_resource_ratios_after_stat_change() -> void:
+	var new_max_health: int = maxi(0, int(get_stat("health")))
+	var new_max_mana: int = maxi(0, int(get_stat("mana")))
+	var new_max_morale: int = int(get_stat("morale"))
 
-	if old_max_hp > 0:
-		current_health = int(float(current_health) / old_max_hp * float(new_max_hp))
-	current_health = clamp(current_health, 0, new_max_hp)
+	current_health = _scaled_resource(current_health, _last_max_health, new_max_health, true)
+	current_mana = _scaled_resource(current_mana, _last_max_mana, new_max_mana, false)
 
-	if old_max_mana > 0:
-		current_mana = int(float(current_mana) / old_max_mana * float(new_max_mana))
-	current_mana = clamp(current_mana, 0, new_max_mana)
-
-	var morale_penalty := old_max_morale - current_morale
+	var morale_penalty := _last_max_morale - current_morale
 	current_morale = clamp(new_max_morale - morale_penalty, -100, 100)
 
-	stats_changed.emit()
+	_last_max_health = new_max_health
+	_last_max_mana = new_max_mana
+	_last_max_morale = new_max_morale
+
+
+func _scaled_resource(current: int, old_maximum: int, new_maximum: int, keep_alive: bool) -> int:
+	if new_maximum <= 0:
+		return 0
+	if old_maximum <= 0:
+		return clamp(current, 0, new_maximum)
+	var scaled := roundi(float(current) / float(old_maximum) * float(new_maximum))
+	if keep_alive and current > 0:
+		scaled = max(1, scaled)
+	return clamp(scaled, 0, new_maximum)
+
+
+func _remember_resource_maximums() -> void:
+	_last_max_health = max(0, int(get_stat("health")))
+	_last_max_mana = max(0, int(get_stat("mana")))
+	_last_max_morale = int(get_stat("morale"))
 
 
 # ════════════════════════════════════════════════════════

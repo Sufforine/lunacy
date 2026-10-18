@@ -3,9 +3,12 @@ extends Node3D
 const NetSpawner := preload("res://features/net/spawn/net_spawner.gd")
 const DogScene := preload("res://entities/enemies/dog/dog.tscn")
 
+@export_range(0.5, 10.0, 0.1) var interaction_distance: float = 2.5
+
 var spawns: Array = []
 var world_progress: Dictionary = {}
 var _owns_world_save: bool = false
+var _focused_interactable: Node3D = null
 
 var _spawner := NetSpawner.new()
 
@@ -34,6 +37,71 @@ func _ready() -> void:
 
 	if not SteamLobby.is_session_active():
 		_spawn_test_dog()
+
+
+func _process(_delta: float) -> void:
+	_update_interaction_focus()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not event.is_action_pressed("interact") or event.is_echo():
+		return
+
+	var local_player := _get_local_player()
+	if local_player == null or not _player_can_interact(local_player):
+		return
+	if _focused_interactable == null or not is_instance_valid(_focused_interactable):
+		return
+	if not _focused_interactable.has_method("interact"):
+		return
+
+	get_viewport().set_input_as_handled()
+	# interact() может синхронно сменить сцену и удалить Hub, поэтому после
+	# него обращаться к viewport уже нельзя.
+	_focused_interactable.call("interact", local_player)
+
+
+func _update_interaction_focus() -> void:
+	var local_player := _get_local_player()
+	var closest: Node3D = null
+	var closest_distance_squared := interaction_distance * interaction_distance
+
+	if local_player != null and _player_can_interact(local_player):
+		for node in get_tree().get_nodes_in_group("hub_interactable"):
+			if not node is Node3D or not node.has_method("interact"):
+				continue
+			var interactable := node as Node3D
+			var distance_squared := local_player.global_position.distance_squared_to(interactable.global_position)
+			if distance_squared <= closest_distance_squared:
+				closest = interactable
+				closest_distance_squared = distance_squared
+
+	_set_focused_interactable(closest)
+
+
+func _set_focused_interactable(interactable: Node3D) -> void:
+	if _focused_interactable == interactable:
+		return
+	if is_instance_valid(_focused_interactable) and _focused_interactable.has_method("set_interaction_focus"):
+		_focused_interactable.call("set_interaction_focus", false)
+	_focused_interactable = interactable
+	if is_instance_valid(_focused_interactable) and _focused_interactable.has_method("set_interaction_focus"):
+		_focused_interactable.call("set_interaction_focus", true)
+
+
+func _get_local_player() -> Player:
+	for node in get_tree().get_nodes_in_group("player"):
+		if node is Player:
+			var candidate := node as Player
+			if candidate.is_multiplayer_authority():
+				return candidate
+	return null
+
+
+func _player_can_interact(player: Player) -> bool:
+	if player.stats.is_dead or player.stats.is_downed:
+		return false
+	return player.inventory_ui == null or not player.inventory_ui.is_main_panel_open()
 
 
 func _exit_tree() -> void:

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://64outvr4uc8i"]
+[gd_scene load_steps=4 format=3 uid="uid://64outvr4uc8i"]
 
 [ext_resource type="Script" uid="uid://db203ai8ow43x" path="res://screens/hub/ui/runouts-menu/back.gd" id="1_tvdyc"]
 [ext_resource type="Script" uid="uid://bvebx2jykvy2n" path="res://screens/hub/ui/runouts-menu/1mission.gd" id="2_hld3y"]
+[ext_resource type="Script" path="res://screens/hub/ui/runouts-menu/runouts_menu.gd" id="3_menu"]
 
 [node name="RunoutsMenu" type="Control"]
 layout_mode = 3
@@ -10,6 +11,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("3_menu")
 
 [node name="Panel" type="Panel" parent="."]
 layout_mode = 0

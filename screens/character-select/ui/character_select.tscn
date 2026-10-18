@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://screens/main-menu/ui/main_menu.gd" id="1_editor"]
+[ext_resource type="PackedScene" path="res://entities/characters/model/Player.tscn" id="2_player"]
+
+[node name="CharacterSelect" type="Node3D"]
+script = ExtResource("1_editor")
+hero_scene = ExtResource("2_player")
+start_in_character_editor = true
+return_scene_after_character_select = "res://screens/hub/ui/hub.tscn"

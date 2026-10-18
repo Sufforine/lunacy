@@ -1,7 +1,7 @@
 extends Button
 
-func _ready() -> void:
-	pass
+const HUB_SCENE := "res://screens/hub/ui/hub.tscn"
+
 
 func _on_pressed() -> void:
-		get_tree().change_scene_to_file("res://screens/hub/ui/hub.tscn")
+	SteamLobby.request_scene_change(HUB_SCENE)
