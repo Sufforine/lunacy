@@ -50,6 +50,7 @@ func player_list() -> Array:
 		var state: PlayerState = player_states[peer_id]
 		list.append({
 			"peer_id": state.peer_id,
+			"steam_id": state.steam_id,
 			"nickname": state.nickname,
 			"character_name": state.character_name,
 			"hero_scene": state.hero_scene,

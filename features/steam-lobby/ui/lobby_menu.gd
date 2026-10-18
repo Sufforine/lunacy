@@ -12,7 +12,6 @@ extends Control
 @onready var code_label: Label             = $LobbyPanel/LobbyCodeBox/HBox/CodeLabel
 @onready var copy_button: Button           = $LobbyPanel/LobbyCodeBox/HBox/CopyButton
 
-@onready var nickname_label: Label         = $LobbyPanel/HeroSelectBox/VBox/NicknameLabel
 @onready var hero_name_label: Label        = $LobbyPanel/HeroSelectBox/VBox/HeroNameLabel
 @onready var hero_grid: GridContainer      = $LobbyPanel/HeroSelectBox/VBox/HeroGrid
 
@@ -33,6 +32,9 @@ extends Control
 
 @onready var steam_lobby = SteamLobby
 
+var _avatar_cache: Dictionary = {}
+var _avatar_targets: Dictionary = {}
+var _avatar_placeholder: ImageTexture
 
 
 
@@ -53,13 +55,15 @@ func _ready() -> void:
 
 	_refresh_character_label()
 	_update_save_label()
-	_update_nickname_label()
 	_clear_players_list()
+	_avatar_placeholder = _make_avatar_placeholder()
 
 	if steam_lobby:
 		steam_lobby.lobby_ready.connect(_on_lobby_ready)
 		steam_lobby.lobby_failed.connect(_on_lobby_failed)
 		steam_lobby.players_updated.connect(_on_players_updated)
+	if not Steam.avatar_loaded.is_connected(_on_avatar_loaded):
+		Steam.avatar_loaded.connect(_on_avatar_loaded)
 
 
 # ════════════════════════════════════════════════════════
@@ -133,23 +137,46 @@ func _refresh_character_label() -> void:
 # ════════════════════════════════════════════════════════
 # СПИСОК ИГРОКОВ В ЛОББИ
 # Вызывается сигналом players_updated(players: Array)
-# где players = [{ peer_id, nickname, hero_scene }, ...]
-#
-# TODO: сейчас показывается только Steam-ник. Чтобы показать реальное
-# имя персонажа (character_name) других игроков, нужно чтобы оно тоже
-# передавалось по сети — добавь его в payload рядом с nickname там,
-# где сервер формирует список игроков.
+# где players = [{ peer_id, steam_id, nickname, character_name, ... }, ...]
 # ════════════════════════════════════════════════════════
 func _on_players_updated(players: Array) -> void:
 
 	_clear_players_list()
+	_avatar_targets.clear()
 
 	for info in players:
-		var label := Label.new()
+		var row := HBoxContainer.new()
+		row.custom_minimum_size = Vector2(0.0, 68.0)
+		row.add_theme_constant_override("separation", 12)
+		players_list.add_child(row)
+
+		var avatar := TextureRect.new()
+		avatar.custom_minimum_size = Vector2(64.0, 64.0)
+		avatar.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
+		avatar.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		avatar.texture = _avatar_placeholder
+		row.add_child(avatar)
+
+		var names := VBoxContainer.new()
+		names.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		names.alignment = BoxContainer.ALIGNMENT_CENTER
+		row.add_child(names)
+
 		var nick: String = info.get("nickname", "Игрок")
 		var character_name: String = info.get("character_name", "")
-		label.text = "%s — %s" % [nick, character_name] if not character_name.is_empty() else nick
-		players_list.add_child(label)
+		var nickname := Label.new()
+		nickname.text = nick
+		nickname.add_theme_font_size_override("font_size", 18)
+		names.add_child(nickname)
+
+		if not character_name.is_empty():
+			var character := Label.new()
+			character.text = character_name
+			character.modulate = Color(0.72, 0.76, 0.84)
+			names.add_child(character)
+
+		var steam_id := int(info.get("steam_id", 0))
+		_set_or_request_avatar(steam_id, avatar)
 
 
 func _clear_players_list() -> void:
@@ -157,11 +184,47 @@ func _clear_players_list() -> void:
 		child.queue_free()
 
 
-# ════════════════════════════════════════════════════════
-# НИК
-# ════════════════════════════════════════════════════════
-func _update_nickname_label() -> void:
-	nickname_label.text = Steam.getPersonaName()
+func _set_or_request_avatar(steam_id: int, target: TextureRect) -> void:
+	if steam_id <= 0:
+		return
+	if _avatar_cache.has(steam_id):
+		target.texture = _avatar_cache[steam_id]
+		return
+
+	if not _avatar_targets.has(steam_id):
+		_avatar_targets[steam_id] = []
+	var targets: Array = _avatar_targets[steam_id]
+	targets.append(target)
+	Steam.getPlayerAvatar(Steam.AVATAR_MEDIUM, steam_id)
+
+
+func _on_avatar_loaded(steam_id: int, avatar_size: int, avatar_data: PackedByteArray) -> void:
+	if avatar_size <= 0 or avatar_data.is_empty():
+		return
+	var image := Image.create_from_data(
+		avatar_size,
+		avatar_size,
+		false,
+		Image.FORMAT_RGBA8,
+		avatar_data
+	)
+	if image == null or image.is_empty():
+		return
+
+	var texture := ImageTexture.create_from_image(image)
+	_avatar_cache[steam_id] = texture
+	if not _avatar_targets.has(steam_id):
+		return
+	for target in _avatar_targets[steam_id]:
+		if is_instance_valid(target):
+			target.texture = texture
+	_avatar_targets.erase(steam_id)
+
+
+func _make_avatar_placeholder() -> ImageTexture:
+	var image := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	image.fill(Color(0.2, 0.23, 0.29, 1.0))
+	return ImageTexture.create_from_image(image)
 
 
 # ════════════════════════════════════════════════════════

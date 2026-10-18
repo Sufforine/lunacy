@@ -88,23 +88,18 @@ layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -280.0
+offset_left = -360.0
 offset_top = 16.0
 offset_right = -16.0
-offset_bottom = 420.0
+offset_bottom = 520.0
 grow_horizontal = 0
 
 [node name="VBox" type="VBoxContainer" parent="LobbyPanel/HeroSelectBox"]
 layout_mode = 2
 
-[node name="NicknameLabel" type="Label" parent="LobbyPanel/HeroSelectBox/VBox"]
-layout_mode = 2
-text = "Игрок"
-horizontal_alignment = 1
-
 [node name="HeroNameLabel" type="Label" parent="LobbyPanel/HeroSelectBox/VBox"]
 layout_mode = 2
-text = "Выберите героя"
+text = "Персонаж не выбран"
 horizontal_alignment = 1
 
 [node name="HeroGrid" type="GridContainer" parent="LobbyPanel/HeroSelectBox/VBox"]
