@@ -1,6 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://screens/options/ui/settings_panel.gd" id="1_settings"]
+
+[ext_resource type="Script" path="res://shared/camera/crosshair.gd" id="2_crosshair"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.075, 0.09, 0.12, 0.98)
@@ -54,13 +56,13 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 46
-theme_override_constants/margin_top = 36
+theme_override_constants/margin_top = 24
 theme_override_constants/margin_right = 46
-theme_override_constants/margin_bottom = 36
+theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 18
+theme_override_constants/separation = 10
 
 [node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -157,6 +159,61 @@ layout_mode = 2
 max_value = 100.0
 step = 1.0
 value = 100.0
+
+[node name="CrosshairTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
+theme_override_font_sizes/font_size = 20
+text = "Прицел"
+
+[node name="CrosshairRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CrosshairRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Форма"
+
+[node name="Preview" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CrosshairRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_crosshair")
+preview_mode = true
+
+[node name="CrosshairOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CrosshairRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+
+[node name="ThicknessRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ThicknessRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Толщина / диаметр точки"
+
+[node name="ThicknessSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ThicknessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(160, 30)
+layout_mode = 2
+min_value = 1.0
+max_value = 8.0
+step = 1.0
+value = 3.0
+
+[node name="ThicknessValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ThicknessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "3"
 
 [node name="Back" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 46)

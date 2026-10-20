@@ -1,5 +1,9 @@
 extends Node
 
+signal crosshair_changed
+
+enum CrosshairShape { DOT, CROSS, CIRCLE }
+
 const SETTINGS_PATH := "user://settings.cfg"
 const ENVIRONMENT_BUS := &"Environment"
 const MIN_VOLUME_DB := -80.0
@@ -8,6 +12,20 @@ var resolution: Vector2i = Vector2i.ZERO
 var refresh_rate: int = 60
 var master_volume: float = 100.0
 var environment_volume: float = 100.0
+var crosshair_shape: int = CrosshairShape.DOT
+var crosshair_thickness: float = 3.0
+
+
+func set_crosshair_shape(value: int) -> void:
+	crosshair_shape = clampi(value, CrosshairShape.DOT, CrosshairShape.CIRCLE)
+	crosshair_changed.emit()
+	_save_settings()
+
+
+func set_crosshair_thickness(value: float) -> void:
+	crosshair_thickness = clampf(value, 1.0, 8.0)
+	crosshair_changed.emit()
+	_save_settings()
 
 
 func _ready() -> void:
@@ -140,6 +158,8 @@ func _load_settings() -> void:
 	refresh_rate = maxi(30, int(config.get_value("display", "refresh_rate", refresh_rate)))
 	master_volume = clampf(float(config.get_value("audio", "master", master_volume)), 0.0, 100.0)
 	environment_volume = clampf(float(config.get_value("audio", "environment", environment_volume)), 0.0, 100.0)
+	crosshair_shape = clampi(int(config.get_value("crosshair", "shape", crosshair_shape)), CrosshairShape.DOT, CrosshairShape.CIRCLE)
+	crosshair_thickness = clampf(float(config.get_value("crosshair", "thickness", crosshair_thickness)), 1.0, 8.0)
 
 
 func _save_settings() -> void:
@@ -148,6 +168,8 @@ func _save_settings() -> void:
 	config.set_value("display", "refresh_rate", refresh_rate)
 	config.set_value("audio", "master", master_volume)
 	config.set_value("audio", "environment", environment_volume)
+	config.set_value("crosshair", "shape", crosshair_shape)
+	config.set_value("crosshair", "thickness", crosshair_thickness)
 	var error := config.save(SETTINGS_PATH)
 	if error != OK:
 		push_warning("GameSettings: не удалось сохранить настройки (%s)" % error_string(error))

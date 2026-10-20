@@ -19,6 +19,7 @@ func _ready() -> void:
 	_owns_world_save = not SteamLobby.is_session_active() or multiplayer.is_server()
 	if _owns_world_save:
 		world_progress = SaveManager.load_world_progress()
+	_apply_world_progress_to_scene()
 
 	# Дождаться полной инициализации сцены после change_scene.
 	await get_tree().process_frame
@@ -82,11 +83,14 @@ func _update_interaction_focus() -> void:
 func _set_focused_interactable(interactable: Node3D) -> void:
 	if _focused_interactable == interactable:
 		return
+	var local_player := _get_local_player()
 	if is_instance_valid(_focused_interactable) and _focused_interactable.has_method("set_interaction_focus"):
 		_focused_interactable.call("set_interaction_focus", false)
 	_focused_interactable = interactable
 	if is_instance_valid(_focused_interactable) and _focused_interactable.has_method("set_interaction_focus"):
 		_focused_interactable.call("set_interaction_focus", true)
+	if local_player != null:
+		local_player.set_interaction_available(is_instance_valid(_focused_interactable))
 
 
 func _get_local_player() -> Player:
@@ -101,10 +105,15 @@ func _get_local_player() -> Player:
 func _player_can_interact(player: Player) -> bool:
 	if player.stats.is_dead or player.stats.is_downed:
 		return false
+	if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		return false
 	return player.inventory_ui == null or not player.inventory_ui.is_main_panel_open()
 
 
 func _exit_tree() -> void:
+	var local_player := _get_local_player()
+	if local_player != null:
+		local_player.set_interaction_available(false)
 	_save_authoritative_world()
 
 
@@ -132,6 +141,13 @@ func sync_world_progress_to_peers(progress: Dictionary) -> void:
 @rpc("authority", "call_local", "reliable")
 func _rpc_apply_world_progress(progress: Dictionary) -> void:
 	world_progress = progress.duplicate(true)
+	_apply_world_progress_to_scene()
+
+
+func _apply_world_progress_to_scene() -> void:
+	for node in get_tree().get_nodes_in_group("world_state_consumer"):
+		if node.has_method("apply_world_progress"):
+			node.call("apply_world_progress", world_progress)
 
 
 func _save_authoritative_world() -> void:

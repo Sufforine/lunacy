@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://186xvhxfq3q2"]
+[gd_scene load_steps=14 format=3 uid="uid://186xvhxfq3q2"]
 
 [ext_resource type="Script" path="res://entities/player/model/player.gd" id="1_m0quj"]
 [ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Player.glb" id="2_u0fdg"]
@@ -9,6 +9,7 @@
 [ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/characters/model/character_stats.gd" id="7_gey0r"]
 [ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/data/inventory_component.gd" id="8_kvg34"]
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="9_35bxx"]
+[ext_resource type="PackedScene" path="res://shared/ui/interaction_prompt.tscn" id="10_prompt"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 radius = 0.45
@@ -63,6 +64,8 @@ script = ExtResource("8_kvg34")
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="InventoryUI" parent="CanvasLayer" instance=ExtResource("9_35bxx")]
+
+[node name="InteractionPrompt" parent="CanvasLayer" instance=ExtResource("10_prompt")]
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_thwtu")

@@ -28,6 +28,7 @@ const ANIM_JUMP := [&"jump", &"Jump"]
 @onready var effects: EffectsComponent     = $EffectsComponent
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
+@onready var interaction_prompt: InteractionPrompt = $CanvasLayer/InteractionPrompt
 var hud_bars: HUDBars = null
 
 
@@ -101,6 +102,15 @@ func _ready() -> void:
 func _activate_local_camera() -> void:
 	if is_multiplayer_authority() and camera_rig != null:
 		camera_rig.activate_for_local_player()
+
+
+func set_interaction_available(available: bool) -> void:
+	if not is_multiplayer_authority() or interaction_prompt == null:
+		return
+	if available:
+		interaction_prompt.show_action(&"interact")
+	else:
+		interaction_prompt.hide_prompt()
 
 
 func _init_inventory() -> void:

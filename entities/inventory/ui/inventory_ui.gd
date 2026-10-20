@@ -67,6 +67,15 @@ var _drag_source:   DragSource = DragSource.NONE
 var _drag_from_idx: int        = -1
 var _drag_preview:  Control    = null
 
+# ── сундук ──────────────────────────────────────────────
+var _open_chest: Node = null
+var _chest_section: Control = null
+var _chest_grid: GridContainer = null
+var _chest_buttons: Array[Button] = []
+var _chest_icons: Array[TextureRect] = []
+var _player_inventory_label: Label = null
+var _inventory_section_default_position := Vector2.ZERO
+
 
 # ════════════════════════════════════════════════════════
 # READY
@@ -89,6 +98,7 @@ func _ready() -> void:
 	_collect_quickslots()
 	_build_tab_buttons()
 	_build_stats_tab()
+	_build_chest_section()
 	_show_inventory_tab()
 
 
@@ -134,7 +144,10 @@ func _input(event: InputEvent) -> void:
 		return
 
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.keycode == KEY_I:
+		if event.is_action_pressed("interact") and _open_chest != null:
+			_close_main_panel()
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_I:
 			if main_panel.visible:
 				_close_main_panel()
 			else:
@@ -296,9 +309,12 @@ func _on_inv_gui_input(event: InputEvent, idx: int) -> void:
 		return
 	if mb.pressed:
 		if _inventory and not _inventory.is_empty(idx):
-			# Ctrl+клик — быстрое надевание в подходящий слот
+			# При открытом сундуке Ctrl+клик переносит предмет в него.
 			if mb.ctrl_pressed:
-				_quick_equip(idx)
+				if _open_chest != null and _open_chest.has_method("request_transfer_from_player"):
+					_open_chest.call("request_transfer_from_player", idx, _inventory)
+				else:
+					_quick_equip(idx)
 				return
 			_drag_source = DragSource.INVENTORY
 			_drag_from_idx = idx
@@ -592,6 +608,141 @@ func _set_icon(tex: TextureRect, icon: Texture2D) -> void:
 		return
 	tex.texture = icon
 	tex.modulate = Color.WHITE
+
+
+func _build_chest_section() -> void:
+	_chest_section = Control.new()
+	_chest_section.name = "ChestSection"
+	_chest_section.position = Vector2(8, 34)
+	_chest_section.size = Vector2(624, 166)
+	_chest_section.visible = false
+	main_panel.add_child(_chest_section)
+
+	var chest_title := Label.new()
+	chest_title.text = "Сундук"
+	chest_title.position = Vector2(0, 0)
+	chest_title.size = Vector2(624, 24)
+	chest_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	chest_title.add_theme_font_size_override("font_size", 18)
+	_chest_section.add_child(chest_title)
+
+	var grid_center := CenterContainer.new()
+	grid_center.position = Vector2(0, 28)
+	grid_center.size = Vector2(624, 124)
+	_chest_section.add_child(grid_center)
+
+	_chest_grid = GridContainer.new()
+	_chest_grid.columns = 6
+	_chest_grid.add_theme_constant_override("h_separation", 6)
+	_chest_grid.add_theme_constant_override("v_separation", 6)
+	grid_center.add_child(_chest_grid)
+
+	for index in 12:
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(52, 52)
+		button.tooltip_text = "Ctrl + ЛКМ — забрать"
+		_chest_grid.add_child(button)
+		var icon := TextureRect.new()
+		_setup_icon(icon)
+		button.add_child(icon)
+		button.gui_input.connect(func(event: InputEvent) -> void: _on_chest_gui_input(event, index))
+		_chest_buttons.append(button)
+		_chest_icons.append(icon)
+
+	_player_inventory_label = Label.new()
+	_player_inventory_label.text = "Инвентарь"
+	_player_inventory_label.position = Vector2(8, 202)
+	_player_inventory_label.size = Vector2(624, 24)
+	_player_inventory_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_player_inventory_label.add_theme_font_size_override("font_size", 18)
+	_player_inventory_label.visible = false
+	main_panel.add_child(_player_inventory_label)
+
+	var inventory_section := main_panel.get_node_or_null("InventorySection") as Control
+	if inventory_section != null:
+		_inventory_section_default_position = inventory_section.position
+
+
+func _on_chest_gui_input(event: InputEvent, slot_index: int) -> void:
+	if not event is InputEventMouseButton:
+		return
+	var mouse_event := event as InputEventMouseButton
+	if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.ctrl_pressed:
+		if _open_chest != null and _open_chest.has_method("request_transfer_to_player"):
+			_open_chest.call("request_transfer_to_player", slot_index, _inventory)
+		accept_event()
+
+
+func _refresh_chest() -> void:
+	for index in _chest_icons.size():
+		var item: ItemData = null
+		if _open_chest != null and _open_chest.has_method("get_item"):
+			item = _open_chest.call("get_item", index) as ItemData
+		_set_icon(_chest_icons[index], item.icon if item != null and item.icon != null else null)
+
+
+func open_chest(chest: Node) -> void:
+	if chest == null:
+		return
+	if _open_chest == chest and main_panel.visible:
+		_close_main_panel()
+		return
+	_disconnect_chest()
+	_open_chest = chest
+	if _open_chest.has_signal("contents_changed"):
+		_open_chest.connect("contents_changed", _refresh_chest)
+
+	_mouse_mode_before_open = Input.mouse_mode
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	main_panel.visible = true
+	var title := main_panel.get_node("Title") as Label
+	title.text = "Хранилище"
+	main_panel.get_node("TopRow").visible = false
+	main_panel.get_node("TabBar").visible = false
+	_stats_tab.visible = false
+	_chest_section.visible = true
+	_player_inventory_label.visible = true
+	var inventory_section := main_panel.get_node("InventorySection") as Control
+	inventory_section.visible = true
+	inventory_section.position = Vector2(_inventory_section_default_position.x, 230.0)
+	_refresh_chest()
+	_refresh_inventory()
+
+
+func is_chest_open(chest: Node = null) -> bool:
+	if chest == null:
+		return _open_chest != null and main_panel.visible
+	return _open_chest == chest and main_panel.visible
+
+
+func close_chest() -> void:
+	if _open_chest != null:
+		_close_main_panel()
+
+
+func _disconnect_chest() -> void:
+	if _open_chest == null:
+		return
+	if _open_chest.has_signal("contents_changed") and _open_chest.is_connected("contents_changed", _refresh_chest):
+		_open_chest.disconnect("contents_changed", _refresh_chest)
+	if _open_chest.has_method("set_open_visual"):
+		_open_chest.call("set_open_visual", false)
+	_open_chest = null
+
+
+func _leave_chest_layout() -> void:
+	_disconnect_chest()
+	if _chest_section != null:
+		_chest_section.visible = false
+	if _player_inventory_label != null:
+		_player_inventory_label.visible = false
+	if main_panel != null:
+		var title := main_panel.get_node("Title") as Label
+		title.text = "Инвентарь  [I]"
+		main_panel.get_node("TabBar").visible = true
+		var inventory_section := main_panel.get_node("InventorySection") as Control
+		inventory_section.position = _inventory_section_default_position
+	_show_inventory_tab()
 
 func _use_quickslot_item(slot_index: int) -> void:
 	if _inventory == null:
@@ -1007,6 +1158,7 @@ func _find_owner_player() -> Node3D:
 # по слотам. При закрытии возвращаем тот режим, что был до открытия.
 # ════════════════════════════════════════════════════════
 func _open_main_panel() -> void:
+	_leave_chest_layout()
 	_mouse_mode_before_open = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	main_panel.visible = true
@@ -1018,6 +1170,7 @@ func is_main_panel_open() -> bool:
 
 func _close_main_panel() -> void:
 	main_panel.visible = false
+	_leave_chest_layout()
 	var owner_player := _find_owner_player()
 	var camera_rig: CameraRig = null
 	if owner_player != null:

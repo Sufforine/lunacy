@@ -3,6 +3,7 @@ extends Node3D
 
 const WORLD_LAYER := 1 << 0
 const CAMERA_LAYER := 1 << 9
+const CROSSHAIR_SCRIPT := preload("res://shared/camera/crosshair.gd")
 
 @onready var camera: Camera3D = $Camera3D
 
@@ -37,6 +38,7 @@ var _current_distance := 5.5
 var _yaw := 0.0
 var _pitch := 0.0
 var _collision_shape := SphereShape3D.new()
+var _crosshair_layer: CanvasLayer
 
 
 func _ready() -> void:
@@ -70,11 +72,23 @@ func activate_for_local_player() -> void:
 	global_position = _focus_position()
 	camera.position = _camera_offset(_current_distance)
 	camera.make_current()
+	if _crosshair_layer == null:
+		_crosshair_layer = CanvasLayer.new()
+		_crosshair_layer.name = "CrosshairLayer"
+		_crosshair_layer.layer = 0
+		add_child(_crosshair_layer)
+		var crosshair := CROSSHAIR_SCRIPT.new()
+		crosshair.camera = camera
+		_crosshair_layer.add_child(crosshair)
+		crosshair.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_crosshair_layer.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 
 func deactivate() -> void:
 	enabled = false
+	if _crosshair_layer != null:
+		_crosshair_layer.visible = false
 	if camera != null:
 		camera.current = false
 

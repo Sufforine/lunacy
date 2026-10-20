@@ -282,10 +282,19 @@ func delete_character(save_info: Dictionary) -> bool:
 
 	var was_active: bool = path == get_save_path()
 
-	var result: Error = DirAccess.remove_absolute(path)
+	var result: Error = _remove_file(path)
 	if result != OK:
 		push_error("SaveManager: не удалось удалить '%s' (ошибка %d)" % [path, result])
 		return false
+
+	# До разделения сохранений файл персонажа находился в user://saves.
+	# Если оставить старую копию, list_characters() мигрирует её снова и
+	# удалённый персонаж немедленно появится в списке.
+	var legacy_path := LEGACY_SAVE_DIR + path.get_file()
+	if FileAccess.file_exists(legacy_path):
+		var legacy_result := _remove_file(legacy_path)
+		if legacy_result != OK:
+			push_warning("SaveManager: не удалось удалить старую копию '%s' (ошибка %d)" % [legacy_path, legacy_result])
 
 	if was_active:
 		_active_save_name = ""
@@ -554,6 +563,10 @@ func _write_json(path: String, data: Dictionary) -> bool:
 	return true
 
 
+func _remove_file(path: String) -> Error:
+	return DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+
 # Бесшовная миграция старой схемы, где персонаж лежал в saves.
 func _migrate_legacy_characters() -> void:
 	DirAccess.make_dir_recursive_absolute(CHARACTER_DIR)
@@ -561,18 +574,31 @@ func _migrate_legacy_characters() -> void:
 	if legacy == null:
 		return
 	var prefix := _save_prefix()
+	var legacy_files: Array[String] = []
 	legacy.list_dir_begin()
 	var file_name := legacy.get_next()
 	while not file_name.is_empty():
 		var belongs_to_player := file_name == prefix + ".json" or file_name.begins_with(prefix + "__")
 		if file_name.ends_with(".json") and belongs_to_player:
-			var target := CHARACTER_DIR + file_name
-			if not FileAccess.file_exists(target):
-				var legacy_data := _peek_save(LEGACY_SAVE_DIR + file_name)
-				if not legacy_data.is_empty():
-					legacy_data["save_version"] = SAVE_VERSION
-					legacy_data["attributes"] = _normalize_attributes(legacy_data.get("attributes", {}))
-					legacy_data["attribute_points"] = max(0, int(legacy_data.get("attribute_points", 0)))
-					_write_json(target, legacy_data)
+			legacy_files.append(file_name)
 		file_name = legacy.get_next()
 	legacy.list_dir_end()
+
+	for legacy_file in legacy_files:
+		var legacy_path := LEGACY_SAVE_DIR + legacy_file
+		var target := CHARACTER_DIR + legacy_file
+		var migration_complete := FileAccess.file_exists(target)
+		if not migration_complete:
+			var legacy_data := _peek_save(legacy_path)
+			if not legacy_data.is_empty():
+				legacy_data["save_version"] = SAVE_VERSION
+				legacy_data["attributes"] = _normalize_attributes(legacy_data.get("attributes", {}))
+				legacy_data["attribute_points"] = max(0, int(legacy_data.get("attribute_points", 0)))
+				migration_complete = _write_json(target, legacy_data)
+
+		# Миграция должна быть одноразовым переносом. Повреждённый исходник
+		# оставляем на месте, чтобы данные можно было восстановить вручную.
+		if migration_complete:
+			var remove_result := _remove_file(legacy_path)
+			if remove_result != OK:
+				push_warning("SaveManager: не удалось убрать старое сохранение '%s' (ошибка %d)" % [legacy_path, remove_result])

@@ -8,6 +8,9 @@ signal close_requested
 @onready var master_value: Label = %MasterValue
 @onready var environment_slider: HSlider = %EnvironmentSlider
 @onready var environment_value: Label = %EnvironmentValue
+@onready var crosshair_option: OptionButton = %CrosshairOption
+@onready var thickness_slider: HSlider = %ThicknessSlider
+@onready var thickness_value: Label = %ThicknessValue
 
 
 func _ready() -> void:
@@ -16,6 +19,27 @@ func _ready() -> void:
 	master_slider.value = GameSettings.master_volume
 	environment_slider.value = GameSettings.environment_volume
 	_update_volume_labels()
+	crosshair_option.add_item("Точка", GameSettings.CrosshairShape.DOT)
+	crosshair_option.add_item("Перекрестие", GameSettings.CrosshairShape.CROSS)
+	crosshair_option.add_item("Круг", GameSettings.CrosshairShape.CIRCLE)
+	crosshair_option.select(crosshair_option.get_item_index(GameSettings.crosshair_shape))
+	thickness_slider.set_value_no_signal(GameSettings.crosshair_thickness)
+	_update_thickness_label()
+	crosshair_option.item_selected.connect(_on_crosshair_selected)
+	thickness_slider.value_changed.connect(_on_thickness_changed)
+
+
+func _on_crosshair_selected(index: int) -> void:
+	GameSettings.set_crosshair_shape(crosshair_option.get_item_id(index))
+
+
+func _on_thickness_changed(value: float) -> void:
+	GameSettings.set_crosshair_thickness(value)
+	_update_thickness_label()
+
+
+func _update_thickness_label() -> void:
+	thickness_value.text = "%d" % int(round(thickness_slider.value))
 
 
 func _fill_resolutions() -> void:
