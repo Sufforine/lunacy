@@ -4,6 +4,7 @@ class_name Player
 const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 const ANIM_IDLE := [&"idle", &"T"]
 const ANIM_RUN := [&"walk", &"Run"]
+const ANIM_SPRINT := [&"Run", &"run", &"walk"]
 const ANIM_CRAWL := [&"downed", &"Crawl"]
 const ANIM_DEAD := [&"dead", &"T"]
 const ANIM_SLASH := [&"attack", &"Slash"]
@@ -11,6 +12,19 @@ const ANIM_ABILITY := [&"ability", &"Fireballs"]
 const ANIM_JUMP := [&"jump", &"Jump"]
 
 @export var ease_speed: float = 5.0
+@export_group("Movement")
+@export_range(1.0, 3.0, 0.05) var sprint_multiplier: float = 1.6
+@export_range(1.0, 15.0, 0.1) var jump_velocity: float = 8.0
+@export_range(1.0, 8.0, 0.1) var gravity_multiplier: float = 3.0
+@export_range(1.0, 3.0, 0.1) var falling_multiplier: float = 1.5
+@export_range(10.0, 100.0, 1.0) var terminal_speed: float = 45.0
+@export_range(1.0, 80.0, 1.0) var acceleration: float = 30.0
+@export_range(0.0, 1.0, 0.05) var air_control: float = 0.4
+@export_group("Knockback")
+@export_range(1.0, 200.0, 1.0) var body_mass: float = 70.0
+@export_range(0.0, 50.0, 0.5) var ground_impulse_drag: float = 12.0
+@export_range(0.0, 10.0, 0.1) var air_impulse_drag: float = 1.0
+@export_group("")
 # Если выброшенные предметы летят НАЗАД от героя — поставь галочку:
 # значит перёд твоей модели смотрит вдоль +Z, а не -Z.
 @export var model_faces_positive_z: bool = false
@@ -33,9 +47,11 @@ var hud_bars: HUDBars = null
 
 
 # ── состояния анимации ───────────────────────────────────
-enum AnimationState { IDLE, WALK, DOWNED, DEAD }
+enum AnimationState { IDLE, WALK, DOWNED, DEAD, SPRINT }
 var animation_state: AnimationState = AnimationState.IDLE
 var _action_locked: bool = false
+var _movement_velocity := Vector3.ZERO
+var _external_velocity := Vector3.ZERO
 
 
 # ════════════════════════════════════════════════════════
@@ -131,14 +147,35 @@ func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority():
 		return
 
-	# В агонии или мёртв — не двигаемся
-	if stats.is_downed or stats.is_dead:
-		velocity = Vector3.ZERO
-		move_and_slide()
-		return
+	# Вертикальная физика продолжается даже при заблокированном управлении.
+	if not is_on_floor():
+		var fall_scale := falling_multiplier if velocity.y < 0.0 else 1.0
+		velocity += get_gravity() * gravity_multiplier * fall_scale * delta
+		velocity.y = maxf(velocity.y, -terminal_speed)
 
-	_handle_movement()
-	_handle_rotation(delta)
+	var controls_enabled := not stats.is_downed and not stats.is_dead \
+		and is_processing_input() and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	if inventory_ui != null and inventory_ui.is_main_panel_open():
+		controls_enabled = false
+
+	_handle_movement(delta, controls_enabled)
+	if controls_enabled:
+		if Input.is_action_just_pressed("jump") and is_on_floor():
+			velocity.y = jump_velocity
+			_play_action(ANIM_JUMP)
+		_handle_rotation(delta)
+	move_and_slide()
+	# Убираем составляющие толчка, направленные внутрь стен и склонов.
+	for index in get_slide_collision_count():
+		var normal := get_slide_collision(index).get_normal()
+		if _external_velocity.dot(normal) < 0.0:
+			_external_velocity = _external_velocity.slide(normal)
+		if _movement_velocity.dot(normal) < 0.0:
+			_movement_velocity = _movement_velocity.slide(normal)
+	_external_velocity.y = 0.0
+	_movement_velocity.y = 0.0
+	var drag := ground_impulse_drag if is_on_floor() else air_impulse_drag
+	_external_velocity = _external_velocity.move_toward(Vector3.ZERO, drag * delta)
 
 
 # ════════════════════════════════════════════════════════
@@ -151,18 +188,67 @@ func _process(_delta: float) -> void:
 # ════════════════════════════════════════════════════════
 # MOVEMENT
 # ════════════════════════════════════════════════════════
-func _handle_movement() -> void:
+func _handle_movement(delta: float, controls_enabled: bool) -> void:
 
-	var input_dir := InputManager.get_input_direction()
+	var input_dir := InputManager.get_input_direction() if controls_enabled else Vector3.ZERO
 	if camera_rig != null:
 		input_dir = camera_rig.get_camera_relative_direction(input_dir)
 	var speed: float = stats.get_stat("move_speed")
+	var sprinting := controls_enabled and Input.is_action_pressed("sprint") and not input_dir.is_zero_approx()
+	if sprinting:
+		speed *= sprint_multiplier
 
-	velocity.x = input_dir.x * speed
-	velocity.z = input_dir.z * speed
+	var movement_acceleration := acceleration * (1.0 if is_on_floor() else air_control)
+	_movement_velocity = _movement_velocity.move_toward(input_dir * speed, movement_acceleration * delta)
+	velocity.x = _movement_velocity.x + _external_velocity.x
+	velocity.z = _movement_velocity.z + _external_velocity.z
 
-	animation_state = AnimationState.WALK if input_dir.length() > 0 else AnimationState.IDLE
-	move_and_slide()
+	if not stats.is_downed and not stats.is_dead:
+		animation_state = AnimationState.IDLE
+		if Vector2(velocity.x, velocity.z).length() > 0.1:
+			animation_state = AnimationState.SPRINT if sprinting else AnimationState.WALK
+
+
+# Импульс в Н·с. В сетевой игре вызывается хостом на копии цели;
+# физику исполняет владелец, позиция передаётся обычным синхронизатором.
+func apply_impulse(impulse: Vector3) -> void:
+	if not impulse.is_finite():
+		return
+	if SteamLobby.is_session_active():
+		if not multiplayer.is_server():
+			return
+		if not is_multiplayer_authority():
+			_rpc_apply_impulse.rpc_id(get_multiplayer_authority(), impulse)
+			return
+	_add_impulse(impulse)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_apply_impulse(impulse: Vector3) -> void:
+	if multiplayer.get_remote_sender_id() != 1 or not is_multiplayer_authority():
+		return
+	if impulse.is_finite():
+		_add_impulse(impulse)
+
+
+func _add_impulse(impulse: Vector3) -> void:
+	var change := impulse / maxf(body_mass, 1.0)
+	_external_velocity += Vector3(change.x, 0.0, change.z)
+	velocity.y += change.y
+
+
+# Вызывается системой взрыва на каждой потенциальной цели.
+# Препятствия/видимость проверяются системой взрыва до этого вызова.
+func apply_explosion(origin: Vector3, radius: float, impulse_strength: float, upward_bias: float = 0.35) -> void:
+	if radius <= 0.0 or impulse_strength <= 0.0:
+		return
+	var offset := global_position + Vector3.UP * 1.0 - origin
+	var distance := offset.length()
+	if distance >= radius:
+		return
+	var direction := offset.normalized() if distance > 0.001 else Vector3.UP
+	direction = (direction + Vector3.UP * maxf(0.0, upward_bias)).normalized()
+	apply_impulse(direction * impulse_strength * (1.0 - distance / radius))
 
 
 # ════════════════════════════════════════════════════════
@@ -233,8 +319,6 @@ func _input(event: InputEvent) -> void:
 		_play_action(ANIM_SLASH)
 	elif event.is_action_pressed("ability"):
 		_play_action(ANIM_ABILITY)
-	elif event.is_action_pressed("jump"):
-		_play_action(ANIM_JUMP)
 
 
 # ════════════════════════════════════════════════════════
@@ -271,6 +355,8 @@ func _update_animation() -> void:
 			_play_loop(ANIM_IDLE)
 		AnimationState.WALK:
 			_play_loop(ANIM_RUN)
+		AnimationState.SPRINT:
+			_play_loop(ANIM_SPRINT)
 		AnimationState.DOWNED:
 			_play_loop(ANIM_CRAWL)
 		AnimationState.DEAD:

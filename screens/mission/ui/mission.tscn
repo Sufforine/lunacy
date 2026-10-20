@@ -74,6 +74,7 @@ script = ExtResource("1_mission")
 [node name="Environment" type="Node" parent="."]
 
 [node name="Ground" type="CSGBox3D" parent="Environment"]
+use_collision = true
 transform = Transform3D(159.46626, 0, 0, 0, 0.109848976, 0, 0, 0, 159.46626, 0, -0.03935182, 0)
 material = SubResource("StandardMaterial3D_ground")
 
@@ -82,14 +83,17 @@ transform = Transform3D(1, 0, 0, 0, 0.54976654, 0.8353183, 0, -0.8353183, 0.5497
 light_color = Color(0.91245383, 0.74995255, 0.24206635, 1)
 
 [node name="Column" type="CSGBox3D" parent="Environment"]
+use_collision = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.107869, 1.9654582, 10.945772)
 size = Vector3(2, 4, 2)
 
 [node name="Column2" type="CSGBox3D" parent="Environment"]
+use_collision = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1530323, 1.9654582, -13.636396)
 size = Vector3(2, 4, 2)
 
 [node name="Column3" type="CSGBox3D" parent="Environment"]
+use_collision = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.500141, 1.9654582, 5.3566685)
 size = Vector3(2, 4, 2)
 

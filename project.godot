@@ -117,6 +117,11 @@ jump={
 ]
 }
 
+sprint={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":4194325)]
+}
+
 [layer_names]
 
 3d_physics/layer_1="world"

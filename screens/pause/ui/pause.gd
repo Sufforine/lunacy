@@ -96,8 +96,9 @@ func _suspend_local_player() -> void:
 	_player_was_processing_input = _player.is_processing_input()
 	_player_was_processing_physics = _player.is_physics_processing()
 	_player.set_process_input(false)
-	_player.set_physics_process(false)
-	_player.velocity = Vector3.ZERO
+	# Блокируем ввод, но продолжаем падение и столкновения в сетевой игре.
+	_player.velocity.x = 0.0
+	_player.velocity.z = 0.0
 
 	if is_instance_valid(_player.inventory_ui):
 		_inventory_was_processing_input = _player.inventory_ui.is_processing_input()
