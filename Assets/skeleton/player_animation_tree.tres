@@ -1,4 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" load_steps=40 format=3]
+[gd_resource type="AnimationNodeStateMachine" load_steps=40 format=3 uid="uid://ddxn8hy4lctyv"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_nae2l"]
 animation = &"Spell_Simple_Shoot"
@@ -111,6 +111,7 @@ states/JumpStart/position = Vector2(300, 340)
 states/Land/node = SubResource("AnimationNodeAnimation_ungbq")
 states/Land/position = Vector2(780, 340)
 transitions = ["Start", "Grounded", SubResource("AnimationNodeStateMachineTransition_pgqm2"), "Grounded", "JumpStart", SubResource("AnimationNodeStateMachineTransition_knmmu"), "Grounded", "Air", SubResource("AnimationNodeStateMachineTransition_txkvb"), "JumpStart", "Air", SubResource("AnimationNodeStateMachineTransition_nm0oy"), "JumpStart", "Land", SubResource("AnimationNodeStateMachineTransition_lfrkd"), "Air", "Land", SubResource("AnimationNodeStateMachineTransition_6rkgr"), "Land", "Grounded", SubResource("AnimationNodeStateMachineTransition_3j71g"), "Grounded", "Attack", SubResource("AnimationNodeStateMachineTransition_3isjb"), "Land", "Attack", SubResource("AnimationNodeStateMachineTransition_ty8yu"), "Attack", "Grounded", SubResource("AnimationNodeStateMachineTransition_56s2f"), "Attack", "JumpStart", SubResource("AnimationNodeStateMachineTransition_pevcn"), "Attack", "Air", SubResource("AnimationNodeStateMachineTransition_y4qon"), "Grounded", "Ability", SubResource("AnimationNodeStateMachineTransition_02wet"), "Land", "Ability", SubResource("AnimationNodeStateMachineTransition_3bwe4"), "Ability", "Grounded", SubResource("AnimationNodeStateMachineTransition_c18lm"), "Ability", "JumpStart", SubResource("AnimationNodeStateMachineTransition_fhc5o"), "Ability", "Air", SubResource("AnimationNodeStateMachineTransition_uc5tf"), "Attack", "Ability", SubResource("AnimationNodeStateMachineTransition_cxjde"), "Ability", "Attack", SubResource("AnimationNodeStateMachineTransition_5lx26"), "Land", "JumpStart", SubResource("AnimationNodeStateMachineTransition_x6756"), "Land", "Air", SubResource("AnimationNodeStateMachineTransition_eff7f")]
+graph_offset = Vector2(0, 86.87259)
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dexk0"]
 animation = &"Death01"

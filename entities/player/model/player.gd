@@ -46,6 +46,8 @@ enum AnimationState { IDLE, WALK, DOWNED, DEAD, SPRINT, JUMP, FALL }
 var animation_state: AnimationState = AnimationState.IDLE
 var _action_locked: bool = false
 var _action_time_left: float = 0.0
+var _action_sequence: int = 0
+var _last_received_action_sequence: int = -1
 var animation_tree: AnimationTree
 var _animation_playback: AnimationNodeStateMachinePlayback
 var _alive_playback: AnimationNodeStateMachinePlayback
@@ -423,13 +425,52 @@ func _play_action(candidates: Array) -> void:
 		return
 	_start_action_animation(animation_name)
 	if SteamLobby.is_session_active():
-		_rpc_play_action_animation.rpc(animation_name)
+		_action_sequence += 1
+		_last_received_action_sequence = _action_sequence
+		_send_animation_action(animation_name, _action_sequence)
 
 
-@rpc("authority", "call_remote", "reliable")
-func _rpc_play_action_animation(animation_name: StringName) -> void:
-	if animation_player == null or not animation_player.has_animation(animation_name):
+func _send_animation_action(animation_name: StringName, sequence: int) -> void:
+	if multiplayer.is_server():
+		_rpc_apply_animation_action.rpc(animation_name, sequence)
+	else:
+		_rpc_request_animation_action.rpc_id(1, animation_name, sequence)
+
+
+# Клиент отправляет событие только хосту. Хост проверяет, что запрос пришёл
+# от authority именно этого Player, применяет его к своей копии и рассылает
+# остальным клиентам. Так действие видно всем, а не только хосту.
+@rpc("any_peer", "call_remote", "reliable", 1)
+func _rpc_request_animation_action(animation_name: StringName, sequence: int) -> void:
+	if not multiplayer.is_server():
 		return
+	if multiplayer.get_remote_sender_id() != get_multiplayer_authority():
+		return
+	if not _is_valid_network_action(animation_name, sequence):
+		return
+	_apply_network_animation_action(animation_name, sequence)
+	_rpc_apply_animation_action.rpc(animation_name, sequence)
+
+
+@rpc("any_peer", "call_remote", "reliable", 1)
+func _rpc_apply_animation_action(animation_name: StringName, sequence: int) -> void:
+	# Только хост имеет право ретранслировать подтверждённое действие.
+	if multiplayer.get_remote_sender_id() != 1:
+		return
+	if not _is_valid_network_action(animation_name, sequence):
+		return
+	_apply_network_animation_action(animation_name, sequence)
+
+
+func _is_valid_network_action(animation_name: StringName, sequence: int) -> bool:
+	return sequence > 0 and ACTION_STATES.has(animation_name) \
+		and animation_player != null and animation_player.has_animation(animation_name)
+
+
+func _apply_network_animation_action(animation_name: StringName, sequence: int) -> void:
+	if sequence <= _last_received_action_sequence:
+		return
+	_last_received_action_sequence = sequence
 	_start_action_animation(animation_name)
 
 
