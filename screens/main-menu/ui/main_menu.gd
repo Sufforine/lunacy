@@ -33,7 +33,7 @@ enum State { TITLE, MOVING, STAGE, CHOOSE_BODY, EDITING, MODE_SELECT, WORLD_SELE
 @export var start_in_character_editor: bool = false
 @export_file("*.tscn") var return_scene_after_character_select: String = ""
 
-@export var game_title: String = "НАЗВАНИЕ ИГРЫ"
+@export var game_title: String = "Lunacy"
 @export var title_camera_position: Vector3 = Vector3(0.0, 1.8, 7.0)
 @export var stage_camera_position: Vector3 = Vector3(-10.0, 1.6, 4.0)
 @export var stage_center: Vector3 = Vector3(-10.0, 0.0, 0.0)
