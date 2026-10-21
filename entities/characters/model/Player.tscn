@@ -1,15 +1,15 @@
 [gd_scene load_steps=14 format=3 uid="uid://186xvhxfq3q2"]
 
-[ext_resource type="Script" path="res://entities/player/model/player.gd" id="1_m0quj"]
-[ext_resource type="PackedScene" uid="uid://cf64mvvno0e6t" path="res://entities/player/assets/Player.glb" id="2_u0fdg"]
+[ext_resource type="Script" uid="uid://ifo3cnqiqti7" path="res://entities/player/model/player.gd" id="1_m0quj"]
 [ext_resource type="PackedScene" uid="uid://mmnrm4wv6kkk" path="res://shared/camera/camera.tscn" id="3_el8t1"]
 [ext_resource type="Script" uid="uid://d01j10rnkd40j" path="res://entities/inventory/model/data/EffectComponent.gd" id="4_8fjr3"]
 [ext_resource type="Script" uid="uid://djbdlfj35305n" path="res://entities/inventory/model/data/equipment_component.gd" id="5_sn5os"]
 [ext_resource type="Script" uid="uid://6u724dpa4ia2" path="res://entities/characters/model/stats_component.gd" id="6_x0035"]
-[ext_resource type="Script" uid="uid://bl1a2yvhckgo4" path="res://entities/characters/model/character_stats.gd" id="7_gey0r"]
+[ext_resource type="Script" path="res://entities/characters/model/character_stats.gd" id="7_gey0r"]
 [ext_resource type="Script" uid="uid://1bosx6ydwxhi" path="res://entities/inventory/model/data/inventory_component.gd" id="8_kvg34"]
 [ext_resource type="PackedScene" uid="uid://b212cv1etr5k3" path="res://entities/inventory/ui/inventory_ui.tscn" id="9_35bxx"]
 [ext_resource type="PackedScene" path="res://shared/ui/interaction_prompt.tscn" id="10_prompt"]
+[ext_resource type="PackedScene" path="res://Assets/skeleton/Mannequin.tscn" id="11_3hhge"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g75yn"]
 radius = 0.45
@@ -34,12 +34,12 @@ properties/2/replication_mode = 1
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 collision_layer = 2
 collision_mask = 5
-floor_snap_length = 0.25
 floor_constant_speed = true
+floor_snap_length = 0.25
 script = ExtResource("1_m0quj")
 
-[node name="Model" parent="." instance=ExtResource("2_u0fdg")]
-transform = Transform3D(-0.1, 0, -1.509958e-08, 0, 0.1, 0, 1.509958e-08, 0, -0.1, 0, 0, 0)
+[node name="Model" parent="." instance=ExtResource("11_3hhge")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)
 
 [node name="Collision" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
@@ -71,5 +71,3 @@ script = ExtResource("8_kvg34")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_thwtu")
-
-[editable path="Model"]

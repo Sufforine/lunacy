@@ -97,6 +97,13 @@ var _skin_swatches: Array[Color] = [
 	Color8(104, 66, 38),
 	Color8(84, 52, 30),
 	Color8(60, 38, 24),
+	Color8(125, 85, 170),
+	Color8(175, 130, 205),
+	Color8(70, 105, 145),
+	Color8(75, 135, 65),
+	Color8(125, 160, 85),
+	Color8(170, 65, 55),
+	Color8(115, 40, 45),
 ]
 
 
@@ -397,7 +404,7 @@ func _build_edit_ui() -> Control:
 	column.add_child(_make_label("Цвет кожи", 18))
 
 	var swatches := GridContainer.new()
-	swatches.columns = 4
+	swatches.columns = 6
 	column.add_child(swatches)
 
 	for swatch_color in _skin_swatches:

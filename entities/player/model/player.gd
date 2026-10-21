@@ -2,14 +2,9 @@ extends CharacterBody3D
 class_name Player
 
 const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
-const ANIM_IDLE := [&"idle", &"T"]
-const ANIM_RUN := [&"walk", &"Run"]
-const ANIM_SPRINT := [&"Run", &"run", &"walk"]
-const ANIM_CRAWL := [&"downed", &"Crawl"]
-const ANIM_DEAD := [&"dead", &"T"]
-const ANIM_SLASH := [&"attack", &"Slash"]
-const ANIM_ABILITY := [&"ability", &"Fireballs"]
-const ANIM_JUMP := [&"jump", &"Jump"]
+const ANIM_SLASH := [&"Sword_Attack"]
+const ANIM_ABILITY := [&"Spell_Simple_Shoot"]
+const ACTION_STATES := {&"Sword_Attack": &"Attack", &"Spell_Simple_Shoot": &"Ability"}
 
 @export var ease_speed: float = 5.0
 @export_group("Movement")
@@ -47,9 +42,13 @@ var hud_bars: HUDBars = null
 
 
 # ── состояния анимации ───────────────────────────────────
-enum AnimationState { IDLE, WALK, DOWNED, DEAD, SPRINT }
+enum AnimationState { IDLE, WALK, DOWNED, DEAD, SPRINT, JUMP, FALL }
 var animation_state: AnimationState = AnimationState.IDLE
 var _action_locked: bool = false
+var _action_time_left: float = 0.0
+var animation_tree: AnimationTree
+var _animation_playback: AnimationNodeStateMachinePlayback
+var _alive_playback: AnimationNodeStateMachinePlayback
 var _movement_velocity := Vector3.ZERO
 var _external_velocity := Vector3.ZERO
 
@@ -65,8 +64,6 @@ func _ready() -> void:
 	# персонажа (до того как что-то начнёт использовать model/animation_player)
 	_apply_character_model()
 	_resolve_animation_player()
-	if animation_player != null and not animation_player.animation_finished.is_connected(_on_action_animation_finished):
-		animation_player.animation_finished.connect(_on_action_animation_finished)
 
 	# Герой владельца берёт данные из локального профиля, чужой герой — из
 	# network_state, который NetSpawner кладёт в meta при спавне.
@@ -162,9 +159,12 @@ func _physics_process(delta: float) -> void:
 	if controls_enabled:
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			velocity.y = jump_velocity
-			_play_action(ANIM_JUMP)
 		_handle_rotation(delta)
 	move_and_slide()
+	# Это состояние синхронизируется существующим MultiplayerSynchronizer.
+	# Клиенты не проверяют is_on_floor(): физику копии выполняет её владелец.
+	if not is_on_floor() and not stats.is_downed and not stats.is_dead:
+		animation_state = AnimationState.JUMP if velocity.y > 0.0 else AnimationState.FALL
 	# Убираем составляющие толчка, направленные внутрь стен и склонов.
 	for index in get_slide_collision_count():
 		var normal := get_slide_collision(index).get_normal()
@@ -181,7 +181,10 @@ func _physics_process(delta: float) -> void:
 # ════════════════════════════════════════════════════════
 # PROCESS
 # ════════════════════════════════════════════════════════
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	if _action_locked:
+		_action_time_left = maxf(0.0, _action_time_left - delta)
+		_action_locked = _action_time_left > 0.0
 	_update_animation()
 
 
@@ -346,26 +349,61 @@ func _on_revived() -> void:
 # АНИМАЦИИ
 # ════════════════════════════════════════════════════════
 func _update_animation() -> void:
-
-	if animation_player == null or _action_locked:
+	if _animation_playback == null or _alive_playback == null:
 		return
-
+	if animation_state in [AnimationState.DOWNED, AnimationState.DEAD]:
+		_action_locked = false
+		var root_state := &"Dead" if animation_state == AnimationState.DEAD else &"Downed"
+		if _animation_playback.get_current_node() != root_state:
+			_animation_playback.travel(root_state)
+		return
+	if _animation_playback.get_current_node() != &"Alive":
+		_animation_playback.travel(&"Alive")
+		_alive_playback.start(&"Grounded")
+	var current := _alive_playback.get_current_node()
+	if animation_state in [AnimationState.JUMP, AnimationState.FALL]:
+		_action_locked = false
+		if animation_state == AnimationState.FALL:
+			_travel_animation(&"Air")
+		elif current not in [&"JumpStart", &"Air"]:
+			_travel_animation(&"JumpStart")
+		return
+	if current in [&"JumpStart", &"Air"]:
+		_travel_animation(&"Land")
+		return
+	if _action_locked:
+		return
+	# В покое даём приземлению закончиться. Движение сразу прерывает Land;
+	# атака и способность уже переводят дерево напрямую из _play_action().
+	if current == &"Land" and animation_state == AnimationState.IDLE \
+			and _alive_playback.get_current_play_position() < _alive_playback.get_current_length() - 0.12:
+		return
+	var movement_blend := 0.0
 	match animation_state:
-		AnimationState.IDLE:
-			_play_loop(ANIM_IDLE)
 		AnimationState.WALK:
-			_play_loop(ANIM_RUN)
+			movement_blend = 1.0
 		AnimationState.SPRINT:
-			_play_loop(ANIM_SPRINT)
-		AnimationState.DOWNED:
-			_play_loop(ANIM_CRAWL)
-		AnimationState.DEAD:
-			_play_loop(ANIM_DEAD)
+			movement_blend = 2.0
+	animation_tree.set("parameters/Alive/Grounded/blend_position", movement_blend)
+	_travel_animation(&"Grounded")
+
+
+func _travel_animation(state: StringName) -> void:
+	if _alive_playback.get_current_node() != state:
+		_alive_playback.travel(state)
 
 
 func _resolve_animation_player() -> void:
 	if animation_player == null and model != null:
 		animation_player = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	animation_tree = model.get_node_or_null("AnimationTree") as AnimationTree
+	if animation_tree != null:
+		animation_tree.active = true
+		_animation_playback = animation_tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
+		_alive_playback = animation_tree.get("parameters/Alive/playback") as AnimationNodeStateMachinePlayback
+		animation_tree.set("parameters/Alive/Grounded/blend_position", 0.0)
+		_alive_playback.start(&"Grounded")
+		_animation_playback.start(&"Alive")
 
 
 func _find_animation(candidates: Array) -> StringName:
@@ -377,14 +415,8 @@ func _find_animation(candidates: Array) -> StringName:
 	return &""
 
 
-func _play_loop(candidates: Array) -> void:
-	var animation_name := _find_animation(candidates)
-	if animation_name != &"" and animation_player.current_animation != animation_name:
-		animation_player.play(animation_name)
-
-
 func _play_action(candidates: Array) -> void:
-	if _action_locked:
+	if _action_locked or _alive_playback == null or animation_state in [AnimationState.JUMP, AnimationState.FALL, AnimationState.DOWNED, AnimationState.DEAD]:
 		return
 	var animation_name := _find_animation(candidates)
 	if animation_name == &"":
@@ -402,15 +434,13 @@ func _rpc_play_action_animation(animation_name: StringName) -> void:
 
 
 func _start_action_animation(animation_name: StringName) -> void:
-	_action_locked = true
-	animation_player.play(animation_name)
-
-
-func _on_action_animation_finished(_animation_name: StringName) -> void:
-	if not _action_locked:
+	if _alive_playback == null or not ACTION_STATES.has(animation_name):
 		return
-	_action_locked = false
-	_update_animation()
+	if animation_state in [AnimationState.DOWNED, AnimationState.DEAD, AnimationState.JUMP, AnimationState.FALL]:
+		return
+	_action_locked = true
+	_action_time_left = maxf(0.01, animation_player.get_animation(animation_name).length - 0.12)
+	_travel_animation(ACTION_STATES[animation_name])
 
 
 # ════════════════════════════════════════════════════════
@@ -463,7 +493,7 @@ func _apply_character_model() -> void:
 
 	var appearance: Dictionary = _resolve_appearance()
 	if appearance.is_empty():
-		return  # внешности нет — остаётся модель из сцены
+		appearance = {"body": CharacterModels.DEFAULT_BODY, "skin": CharacterModels.DEFAULT_SKIN, "hair": 0}
 
 	var body_id: String = str(appearance.get("body", CharacterModels.DEFAULT_BODY))
 	var new_model: Node3D = CharacterModels.create_model(body_id)
@@ -483,6 +513,7 @@ func _apply_character_model() -> void:
 
 	model = new_model
 	animation_player = new_model.find_child("AnimationPlayer", true, false) as AnimationPlayer
+	animation_tree = new_model.find_child("AnimationTree", true, false) as AnimationTree
 
 	CharacterModels.apply_appearance(new_model, appearance)
 
@@ -492,7 +523,7 @@ func _resolve_appearance() -> Dictionary:
 
 	if is_multiplayer_authority():
 		# Нет созданного персонажа (например отладочный запуск миссии) —
-		# оставляем модель сцены
+		# используем внешность по умолчанию.
 		if PlayerProfile.character_name.is_empty():
 			return {}
 		return PlayerProfile.appearance

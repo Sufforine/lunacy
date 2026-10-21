@@ -1,0 +1,26 @@
+[gd_resource type="AnimationLibrary" load_steps=11 format=3]
+
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Idle.res" id="1_gq1qt"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Walk.res" id="2_lft0d"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Sprint.res" id="3_1rec2"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Jump_Start.res" id="4_lae4v"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Jump.res" id="5_445rx"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Jump_Land.res" id="6_gpcdf"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Sword_Attack.res" id="7_hoa1l"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Spell_Simple_Shoot.res" id="8_ddda8"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Crouch_Idle.res" id="9_vaugr"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Death01.res" id="10_r4p33"]
+
+[resource]
+_data = {
+&"Crouch_Idle": ExtResource("9_vaugr"),
+&"Death01": ExtResource("10_r4p33"),
+&"Idle": ExtResource("1_gq1qt"),
+&"Jump": ExtResource("5_445rx"),
+&"Jump_Land": ExtResource("6_gpcdf"),
+&"Jump_Start": ExtResource("4_lae4v"),
+&"Spell_Simple_Shoot": ExtResource("8_ddda8"),
+&"Sprint": ExtResource("3_1rec2"),
+&"Sword_Attack": ExtResource("7_hoa1l"),
+&"Walk": ExtResource("2_lft0d")
+}
