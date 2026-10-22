@@ -508,32 +508,11 @@ func _serialize_quickslots() -> Array:
 
 # =========================================================
 # СТАРТОВЫЙ ИНВЕНТАРЬ
-# Вызывается из hub.gd перед спавном соло-игрока.
-# Если инвентарь пустой — выдаёт базовый набор предметов.
+# Совместимость со сценами, ранее запрашивавшими стартовые предметы.
 # =========================================================
 func ensure_starter_inventory_if_empty() -> void:
-
-	var has_items: bool = false
-	for id in PlayerProfile.inventory:
-		if id != "":
-			has_items = true
-			break
-
-	if has_items:
-		return
-
-	var starter_ids := ["health_potion", "mana_potion", "health_potion"]
-
-	var filled: Array = []
-	for id in starter_ids:
-		filled.append(id)
-
-	while filled.size() < 36:
-		filled.append("")
-
-	PlayerProfile.inventory = filled
-	save_profile()
-	print("SaveManager: выдан стартовый инвентарь")
+	# Старые сцены могут вызывать этот метод. Автоматическая выдача отключена.
+	pass
 
 
 func _empty_attributes() -> Dictionary:

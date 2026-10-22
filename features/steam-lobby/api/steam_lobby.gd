@@ -232,11 +232,11 @@ func _begin_network_scene_change(scene_path: String) -> void:
 	_scene_transition_waiting = _connected_peer_set()
 	_scene_transition_active = true
 	_scene_transition_commit_scheduled = false
-	if scene_path == MISSION_SCENE:
+	if scene_path == MISSION_SCENE or scene_path == HUB_SCENE:
 		_mission_loading_transition_id = _scene_transition_id
 		_mission_ready_waiting = _connected_peer_set()
 		_mission_completion_scheduled = false
-		_rpc_show_mission_loading.rpc(_scene_transition_id, _mission_loading_roster())
+		_rpc_show_mission_loading.rpc(_scene_transition_id, _mission_loading_roster(), "Загрузка хаба" if scene_path == HUB_SCENE else "Загрузка миссии")
 	_rpc_prepare_scene_change.rpc(_scene_transition_id, scene_path)
 
 
@@ -258,9 +258,10 @@ func _mission_loading_roster() -> Array:
 
 
 @rpc("authority", "call_local", "reliable")
-func _rpc_show_mission_loading(transition_id: int, players: Array) -> void:
+func _rpc_show_mission_loading(transition_id: int, players: Array, title: String) -> void:
 	_mission_loading_transition_id = transition_id
 	_show_loading_screen(players)
+	_loading_screen.title_label.text = title
 
 
 func _show_loading_screen(players: Array) -> void:
@@ -495,7 +496,7 @@ func _reset_scene_transition() -> void:
 
 
 func _is_allowed_gameplay_scene(scene_path: String) -> bool:
-	return scene_path == HUB_SCENE or scene_path == RUNOUTS_MENU_SCENE or scene_path == MISSION_SCENE
+	return scene_path == HUB_SCENE or scene_path == MISSION_SCENE
 
 
 func _connected_peer_set() -> Dictionary:
@@ -594,6 +595,9 @@ func _finish_mission_loading(transition_id: int) -> void:
 func _finalize_mission_spawn(transition_id: int) -> void:
 	if not is_instance_valid(_pending_mission) or _pending_mission_spawns.is_empty():
 		return
+	if _pending_mission.scene_file_path == HUB_SCENE:
+		_pending_mission.sync_world_progress_to_peers(SaveManager.load_world_progress())
+		_pending_mission.spawn_test_dog_for_session()
 
 	_mission_spawn_waiting = _connected_peer_set()
 	for peer_id in _session.player_states:
@@ -610,7 +614,7 @@ func _finalize_mission_spawn(transition_id: int) -> void:
 @rpc("authority", "call_local", "reliable")
 func _rpc_spawn_mission_player(state_data: Dictionary, spawn_position: Vector3) -> void:
 	var scene := get_tree().current_scene
-	if scene == null or scene.scene_file_path != MISSION_SCENE:
+	if scene == null or not scene.scene_file_path in [MISSION_SCENE, HUB_SCENE]:
 		push_error("SteamLobby: получен спавн до готовности миссии")
 		return
 	_spawner.spawn_player(scene, state_data, spawn_position)
@@ -656,23 +660,8 @@ func _hide_loading_after_spawn(transition_id: int) -> void:
 
 
 func spawn_hub_players(hub: Node3D, spawn_points: Array) -> void:
-	if not is_session_active():
-		return
-
-	if not multiplayer.is_server():
-		return
-
-	if spawn_points.is_empty():
-		push_error("SteamLobby: нет точек спавна в хабе")
-		return
-
-	_pending_hub = hub
-	_pending_spawns = spawn_points
-	_hub_spawn_waiting = _connected_peer_set()
-	_hub_spawn_round += 1
-	var spawn_round := _hub_spawn_round
-	_rpc_sync_profile_before_spawn.rpc()
-	_wait_for_hub_profiles(spawn_round)
+	# Хаб использует тот же барьер готовности сцены и героев, что и миссия.
+	spawn_mission_players(hub, spawn_points)
 
 
 func _wait_for_hub_profiles(spawn_round: int) -> void:
@@ -975,6 +964,67 @@ func _rpc_apply_progress(peer_id: int, progress: Dictionary) -> void:
 func _hero_for_peer(peer_id: int) -> Node:
 	var scene := get_tree().current_scene
 	return scene.get_node_or_null(str(peer_id)) if scene != null else null
+
+
+func chat_player_name(peer_id: int) -> String:
+	if not is_session_active():
+		return PlayerProfile.character_name
+	if _session.player_states.has(peer_id):
+		var state: PlayerState = _session.player_states[peer_id]
+		return state.character_name if not state.character_name.is_empty() else state.nickname
+	return "Игрок %d" % peer_id
+
+
+func execute_chat_command(peer_id: int, message: String) -> String:
+	# Команды доступны всем игрокам для тестирования, но меняют только
+	# их собственного героя. В сетевой игре выдачу выполняет хост.
+	if is_session_active() and not multiplayer.is_server():
+		return "Команду должен выполнить хост."
+	if is_gameplay_locked():
+		return "Дождитесь окончания загрузки."
+	var hero := _hero_for_peer(peer_id) as Player
+	if hero == null and not is_session_active():
+		var scene := get_tree().current_scene
+		if scene != null:
+			for candidate in scene.find_children("*", "CharacterBody3D", true, false):
+				if candidate is Player and candidate.is_multiplayer_authority():
+					hero = candidate as Player
+					break
+	if hero == null:
+		return "Команды выдачи доступны после появления героя в мире."
+	if hero.inventory.network_pending:
+		return "Дождитесь завершения операции с инвентарём."
+	var separator := message.find(" ")
+	var command := message.substr(0, separator) if separator >= 0 else message
+	var argument := message.substr(separator + 1).strip_edges() if separator >= 0 else ""
+	match command.to_lower():
+		"/give":
+			var selected: ItemData = null
+			argument = argument.trim_prefix('"').trim_suffix('"')
+			for item in ItemLibrary.all_items():
+				if item.id.to_lower() == argument.to_lower() or item.item_name.to_lower() == argument.to_lower():
+					selected = item
+					break
+			if selected == null:
+				return "Предмет не найден. /items — список; /give <id или название>."
+			if not hero.inventory.add_item(selected):
+				return "Инвентарь заполнен."
+			if is_session_active():
+				hero.inventory.network_revision += 1
+				_publish_inventory(peer_id)
+			else:
+				SaveManager.save_player_state(hero.inventory, hero.equipment)
+			return "Выдан предмет: %s" % selected.item_name
+		"/xp", "/exp":
+			if not argument.is_valid_int() or int(argument) < 1 or int(argument) > 100000:
+				return "Использование: /xp <число от 1 до 100000>."
+			hero.stats.add_experience(int(argument))
+			if is_session_active():
+				var progress := hero.stats.get_progress_data()
+				_session.update_progress(peer_id, progress)
+				_rpc_apply_progress.rpc(peer_id, progress)
+			return "Выдано опыта: %d" % int(argument)
+	return "Неизвестная команда. /help — список команд."
 
 
 func _inventory_for_peer(peer_id: int) -> InventoryComponent:

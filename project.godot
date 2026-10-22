@@ -22,6 +22,7 @@ SaveManager="*res://entities/player/model/save_manager.gd"
 ItemLibrary="*res://entities/inventory/model/data/item_library.gd"
 SteamLobby="*res://features/steam-lobby/api/steam_lobby.gd"
 GameSettings="*res://shared/settings/game_settings.gd"
+GameChat="*res://features/chat/game_chat.gd"
 
 [display]
 

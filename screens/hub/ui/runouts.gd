@@ -26,4 +26,11 @@ func set_interaction_focus(focused: bool) -> void:
 
 
 func interact(_player: Player) -> void:
-	SteamLobby.request_scene_change(RUNOUTS_MENU_SCENE)
+	if get_tree().get_first_node_in_group("mission_selection") != null:
+		return
+	var layer := CanvasLayer.new()
+	layer.layer = 60
+	get_tree().current_scene.add_child(layer)
+	var menu: Control = load(RUNOUTS_MENU_SCENE).instantiate()
+	layer.add_child(menu)
+	menu.connect("mission_selected", func(): get_tree().current_scene.get_node("Wagon").request_departure())

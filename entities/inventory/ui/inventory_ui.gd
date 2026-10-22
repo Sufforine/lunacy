@@ -137,6 +137,8 @@ func bind(inventory: InventoryComponent, equipment: EquipmentComponent, stats: S
 # INPUT
 # ════════════════════════════════════════════════════════
 func _input(event: InputEvent) -> void:
+	if GameChat.is_typing:
+		return
 	# В мультиплеере у каждого героя есть свой InventoryUI, но глобальный
 	# режим мыши один на всё окно. Управлять им может только локальный герой.
 	var owner_player := _find_owner_player()

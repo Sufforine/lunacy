@@ -1,9 +1,10 @@
-[gd_scene load_steps=17 format=3 uid="uid://cs0c4pqfplg4y"]
+[gd_scene load_steps=18 format=3 uid="uid://cs0c4pqfplg4y"]
 
 [ext_resource type="Script" uid="uid://bb6is2srtxwux" path="res://screens/hub/ui/hub.gd" id="1_ami6s"]
 [ext_resource type="Script" uid="uid://4wcfqadoo037" path="res://screens/hub/ui/merchant.gd" id="1_d1od2"]
 [ext_resource type="Script" uid="uid://bg726yf0y54c7" path="res://screens/hub/ui/runouts.gd" id="2_d1od2"]
 [ext_resource type="PackedScene" path="res://Assets/interactables/chest.tscn" id="4_chest"]
+[ext_resource type="Script" path="res://screens/hub/ui/wagon.gd" id="5_wagon"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qssp3"]
 albedo_color = Color(0.28985527, 0.41622728, 0.27746338, 1)
@@ -139,6 +140,22 @@ shape = SubResource("BoxShape3D_hcxm3")
 
 [node name="MainChest" parent="." instance=ExtResource("4_chest")]
 position = Vector3(-3.4, 0, 0)
+
+[node name="Wagon" type="Node3D" parent="."]
+position = Vector3(8, 0, 5)
+script = ExtResource("5_wagon")
+
+[node name="Cube" type="CSGBox3D" parent="Wagon"]
+position = Vector3(0, 0.8, 0)
+size = Vector3(2, 1.6, 2)
+use_collision = true
+
+[node name="Label3D" type="Label3D" parent="Wagon"]
+visible = false
+position = Vector3(0, 3.2, 0)
+billboard = 1
+font_size = 36
+text = ""
 
 [node name="SpawnPoints" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12.154316)

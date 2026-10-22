@@ -130,8 +130,6 @@ func _init_inventory() -> void:
 	if is_multiplayer_authority():
 		inventory_ui.bind(inventory, equipment, stats)
 		inventory.set_quickslot_data(PlayerProfile.quickslots)
-	inventory.add_item(ItemLibrary.get_item("experience_relic"))
-	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
 
 
 # ════════════════════════════════════════════════════════
@@ -149,6 +147,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y = maxf(velocity.y, -terminal_speed)
 
 	var controls_enabled := not stats.is_downed and not stats.is_dead \
+		and not GameChat.is_typing \
 		and is_processing_input() and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
 		and not SteamLobby.is_mission_loading()
 	if inventory_ui != null and inventory_ui.is_main_panel_open():
@@ -297,6 +296,8 @@ func _handle_rotation(delta: float) -> void:
 # INPUT
 # ════════════════════════════════════════════════════════
 func _input(event: InputEvent) -> void:
+	if GameChat.is_typing:
+		return
 
 	if not is_multiplayer_authority() or SteamLobby.is_gameplay_locked():
 		return

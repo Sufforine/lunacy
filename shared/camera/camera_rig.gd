@@ -94,6 +94,8 @@ func deactivate() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if GameChat.is_typing:
+		return
 	if not enabled:
 		return
 
