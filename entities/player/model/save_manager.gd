@@ -319,7 +319,7 @@ func delete_character(save_info: Dictionary) -> bool:
 # =========================================================
 # СОХРАНЕНИЕ
 # =========================================================
-func save_profile() -> void:
+func save_profile() -> bool:
 
 	DirAccess.make_dir_recursive_absolute(CHARACTER_DIR)
 
@@ -341,14 +341,7 @@ func save_profile() -> void:
 		"equipment":      _serialize_equipment(),
 	}
 
-	var file := FileAccess.open(get_save_path(), FileAccess.WRITE)
-	if file == null:
-		push_error("SaveManager: не удалось открыть файл для записи: %s" % get_save_path())
-		return
-
-	file.store_string(JSON.stringify(data, "\t"))
-	file.close()
-	print("SaveManager: сохранено → %s" % get_save_path())
+	return _write_json(get_save_path(), data)
 
 
 # =========================================================
@@ -480,14 +473,13 @@ func select_world(world: Variant) -> void:
 # =========================================================
 # СОХРАНИТЬ СОСТОЯНИЕ ИГРОКА ПОСЛЕ МИССИИ
 # =========================================================
-func save_player_state(inventory: InventoryComponent, equipment: EquipmentComponent) -> void:
+func save_player_state(inventory: InventoryComponent, equipment: EquipmentComponent) -> bool:
 
 	PlayerProfile.inventory  = inventory.get_data()
 	PlayerProfile.quickslots = inventory.get_quickslot_data()
 	PlayerProfile.equipment  = equipment.to_dict()
 
-	save_profile()
-	print("SaveManager: состояние игрока сохранено")
+	return save_profile()
 
 
 # =========================================================
@@ -557,13 +549,20 @@ func _normalize_attributes(raw: Variant) -> Dictionary:
 
 
 func _write_json(path: String, data: Dictionary) -> bool:
-	var file := FileAccess.open(path, FileAccess.WRITE)
+	var temporary := path + ".tmp"
+	var file := FileAccess.open(temporary, FileAccess.WRITE)
 	if file == null:
-		push_error("SaveManager: не удалось открыть файл для записи: %s" % path)
 		return false
 	file.store_string(JSON.stringify(data, "\t"))
+	file.flush()
+	var error := file.get_error()
 	file.close()
-	return true
+	if error != OK:
+		return false
+	if FileAccess.file_exists(path):
+		if DirAccess.copy_absolute(path, path + ".bak") != OK:
+			return false
+	return DirAccess.rename_absolute(temporary, path) == OK
 
 
 func _remove_file(path: String) -> Error:

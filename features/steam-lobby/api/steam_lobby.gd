@@ -42,6 +42,7 @@ var _loading_screen: NetworkLoadingScreen
 var _mission_loading_transition_id: int = 0
 var _mission_ready_waiting: Dictionary = {}
 var _mission_completion_scheduled: bool = false
+var _mission_spawn_waiting: Dictionary = {}
 
 # Смена сетевой сцены проходит через prepare/commit. Пока все клиенты не
 # отключили старые MultiplayerSynchronizer, сцена остаётся в дереве и может
@@ -163,6 +164,9 @@ func request_scene_change(scene_path: String) -> void:
 		push_warning("SteamLobby: запрещён переход на сцену '%s'" % scene_path)
 		return
 	if not is_session_active():
+		var hero := _hero_for_peer(1) as Player
+		if hero != null and not SaveManager.save_player_state(hero.inventory, hero.equipment):
+			return
 		get_tree().change_scene_to_file(scene_path)
 		return
 	if multiplayer.is_server():
@@ -179,7 +183,7 @@ func _rpc_request_scene_change(scene_path: String) -> void:
 
 
 func _begin_network_scene_change(scene_path: String) -> void:
-	if not multiplayer.is_server() or _scene_transition_active:
+	if not multiplayer.is_server() or is_gameplay_locked():
 		return
 	if not _is_allowed_gameplay_scene(scene_path):
 		return
@@ -232,6 +236,7 @@ func _show_loading_screen(players: Array) -> void:
 func _reset_mission_loading() -> void:
 	_mission_loading_transition_id = 0
 	_mission_ready_waiting.clear()
+	_mission_spawn_waiting.clear()
 	_mission_completion_scheduled = false
 	if is_instance_valid(_loading_screen):
 		_loading_screen.queue_free()
@@ -249,6 +254,13 @@ func _rpc_prepare_scene_change(transition_id: int, scene_path: String) -> void:
 	_disable_current_scene_synchronizers()
 
 	var local_peer_id := multiplayer.get_unique_id()
+	var hero := _hero_for_peer(local_peer_id) as Player
+	if hero != null:
+		while hero.inventory.network_pending:
+			await get_tree().process_frame
+		if not SaveManager.save_player_state(hero.inventory, hero.equipment):
+			push_error("Не удалось сохранить персонажа перед переходом")
+			return
 	if multiplayer.is_server():
 		_mark_scene_change_prepared(local_peer_id, transition_id)
 	else:
@@ -337,6 +349,10 @@ func _resolve_disconnected_spawn_wait(peer_id: int) -> void:
 		if _hub_spawn_waiting.is_empty():
 			_finalize_hub_spawn()
 	if _mission_loading_transition_id != 0 and multiplayer.is_server():
+		var was_spawning := _mission_spawn_waiting.has(peer_id)
+		_mission_spawn_waiting.erase(peer_id)
+		if was_spawning and _mission_spawn_waiting.is_empty():
+			_rpc_finish_mission_loading.rpc(_mission_loading_transition_id)
 		_mission_ready_waiting.erase(peer_id)
 		_rpc_remove_loading_player.rpc(_mission_loading_transition_id, peer_id)
 		_try_complete_mission_loading()
@@ -351,6 +367,7 @@ func spawn_mission_players(mission: Node3D, spawn_points: Array) -> void:
 		push_error("SteamLobby: нет точек спавна в миссии")
 		return
 
+	mission.process_mode = Node.PROCESS_MODE_DISABLED
 	SaveManager.ensure_starter_inventory_if_empty()
 	var peer_id := multiplayer.get_unique_id()
 	var state_data := _session.register_local_player(peer_id)
@@ -378,7 +395,6 @@ func _mark_mission_player_ready(peer_id: int, transition_id: int, state_data: Di
 	if peer_id != multiplayer.get_unique_id():
 		_session.register_remote_player(peer_id, state_data)
 	_mission_ready_waiting.erase(peer_id)
-	_rpc_set_loading_player_ready.rpc(transition_id, peer_id)
 	_try_complete_mission_loading()
 
 
@@ -408,6 +424,7 @@ func _finalize_mission_spawn(transition_id: int) -> void:
 	if not is_instance_valid(_pending_mission) or _pending_mission_spawns.is_empty():
 		return
 
+	_mission_spawn_waiting = _connected_peer_set()
 	for peer_id in _session.player_states:
 		var state_data := _session.player_state_data(peer_id)
 		var spawn_index := (maxi(1, int(peer_id)) - 1) % _pending_mission_spawns.size()
@@ -416,7 +433,7 @@ func _finalize_mission_spawn(transition_id: int) -> void:
 
 	_pending_mission = null
 	_pending_mission_spawns = []
-	_rpc_finish_mission_loading.rpc(transition_id)
+	_rpc_confirm_mission_spawn.rpc(transition_id, _session.player_states.keys())
 
 
 @rpc("authority", "call_local", "reliable")
@@ -459,6 +476,9 @@ func _hide_loading_after_spawn(transition_id: int) -> void:
 	_reset_mission_loading()
 	var scene := get_tree().current_scene
 	if scene != null:
+		scene.process_mode = Node.PROCESS_MODE_INHERIT
+		for node in scene.find_children("*", "MultiplayerSynchronizer", true, false):
+			node.public_visibility = true
 		var local_player := scene.get_node_or_null(str(multiplayer.get_unique_id())) as Player
 		if local_player != null:
 			local_player.call_deferred("_activate_local_camera")
@@ -730,62 +750,6 @@ func _server_spend_attribute(peer_id: int, attribute_name: String) -> void:
 	_rpc_apply_progress.rpc(peer_id, progress)
 
 
-func request_use_experience_relic(source: String, slot_index: int, item_id: String) -> void:
-	if not is_session_active():
-		return
-	if multiplayer.is_server():
-		_server_use_experience_relic(multiplayer.get_unique_id(), source, slot_index, item_id)
-	else:
-		_rpc_request_experience_relic.rpc_id(1, source, slot_index, item_id)
-
-
-@rpc("any_peer", "reliable")
-func _rpc_request_experience_relic(source: String, slot_index: int, item_id: String) -> void:
-	if multiplayer.is_server():
-		_server_use_experience_relic(multiplayer.get_remote_sender_id(), source, slot_index, item_id)
-
-
-func _server_use_experience_relic(peer_id: int, source: String, slot_index: int, item_id: String) -> void:
-	var inventory := _inventory_for_peer(peer_id)
-	var stats := _stats_for_peer(peer_id)
-	if inventory == null or stats == null:
-		return
-	var item := inventory.get_source_item(source, slot_index)
-	var authoritative_source := source
-	var authoritative_slot := slot_index
-	if item == null or item.id != item_id:
-		var location := inventory.find_item_location(item_id)
-		if not location.is_empty():
-			authoritative_source = str(location["source"])
-			authoritative_slot = int(location["slot_index"])
-			item = inventory.get_source_item(authoritative_source, authoritative_slot)
-	if item == null or item.id != item_id or item.experience_amount <= 0:
-		push_warning("SteamLobby: peer %d попытался использовать отсутствующую реликвию" % peer_id)
-		return
-	# Сразу убираем авторитетную копию: повторный RPC не сможет выдать ещё один уровень.
-	inventory.consume_network_item(authoritative_source, authoritative_slot, item_id)
-	stats.add_experience(item.experience_amount)
-	var progress := stats.get_progress_data()
-	_session.update_progress(peer_id, progress)
-	_rpc_commit_experience_relic.rpc(peer_id, source, slot_index, item_id, progress)
-
-
-@rpc("authority", "call_local", "reliable")
-func _rpc_commit_experience_relic(peer_id: int, source: String, slot_index: int, item_id: String, progress: Dictionary) -> void:
-	var inventory := _inventory_for_peer(peer_id)
-	if inventory != null:
-		inventory.consume_network_item(source, slot_index, item_id)
-	var stats := _stats_for_peer(peer_id)
-	if stats != null:
-		stats.apply_progress_data(progress)
-	var hero := _hero_for_peer(peer_id)
-	if hero != null and hero.is_multiplayer_authority() and inventory != null:
-		PlayerProfile.inventory = inventory.get_data()
-		PlayerProfile.quickslots = inventory.get_quickslot_data()
-		SaveManager.save_profile()
-	_session.update_progress(peer_id, progress)
-
-
 @rpc("authority", "call_local", "reliable")
 func _rpc_apply_progress(peer_id: int, progress: Dictionary) -> void:
 	var stats := _stats_for_peer(peer_id)
@@ -830,40 +794,11 @@ func request_drop(item_id: String, position: Vector3, direction: Vector3, throwe
 			_drops.spawn(scene, _drops.allocate_id(), item, position, direction, thrower)
 		return
 
-	if multiplayer.is_server():
-		_server_spawn_drop(item_id, position, direction, multiplayer.get_unique_id())
-	else:
-		_rpc_request_drop.rpc_id(1, item_id, position, direction)
-
-
-@rpc("any_peer", "reliable")
-func _rpc_request_drop(item_id: String, position: Vector3, direction: Vector3) -> void:
-	if not multiplayer.is_server():
-		return
-	_server_spawn_drop(item_id, position, direction, multiplayer.get_remote_sender_id())
-
-
-func _server_spawn_drop(item_id: String, position: Vector3, direction: Vector3, thrower_peer: int) -> void:
-	if not ItemLibrary.has_item(item_id):
-		push_warning("SteamLobby: неизвестный предмет '%s' в запросе на выброс" % item_id)
-		return
-	# У хоста UI и серверная копия совпадают, поэтому предмет уже удалён до
-	# запроса. Для удалённого игрока сервер хранит отдельную копию инвентаря:
-	# удаляем предмет и отклоняем поддельный либо повторный запрос.
-	if thrower_peer != multiplayer.get_unique_id():
-		var inventory := _inventory_for_peer(thrower_peer)
-		if inventory == null:
-			return
+	var inventory := _local_inventory()
+	if inventory != null:
 		var location := inventory.find_item_location(item_id)
-		if location.is_empty():
-			push_warning("SteamLobby: peer %d попытался выбросить отсутствующий '%s'" % [thrower_peer, item_id])
-			return
-		inventory.consume_network_item(
-			str(location["source"]),
-			int(location["slot_index"]),
-			item_id
-		)
-	_rpc_spawn_drop.rpc(_drops.allocate_id(), item_id, position, direction, thrower_peer)
+		if not location.is_empty():
+			inventory.network_request({"kind": "drop", "source": location.source, "index": location.slot_index})
 
 
 @rpc("authority", "call_local", "reliable")
@@ -903,6 +838,8 @@ func _rpc_request_pickup(drop_id: int) -> void:
 
 
 func _server_handle_pickup(picker_peer: int, drop_id: int) -> void:
+	if is_gameplay_locked():
+		return
 	# Предмет уже забрал кто-то другой (или он давно исчез)
 	if not _drops.has_drop(drop_id):
 		return
@@ -915,18 +852,13 @@ func _server_handle_pickup(picker_peer: int, drop_id: int) -> void:
 
 	_rpc_remove_drop.rpc(drop_id)
 	server_inventory.add_item(item)
-	if picker_peer != multiplayer.get_unique_id():
-		_rpc_grant_pickup.rpc_id(picker_peer, item_id)
+	server_inventory.network_revision += 1
+	_publish_inventory(picker_peer)
 
 
 @rpc("authority", "call_local", "reliable")
 func _rpc_remove_drop(drop_id: int) -> void:
 	_drops.remove(drop_id)
-
-
-@rpc("authority", "reliable")
-func _rpc_grant_pickup(item_id: String) -> void:
-	_apply_pickup_grant(_local_inventory(), item_id)
 
 
 func _apply_pickup_grant(inventory: InventoryComponent, item_id: String) -> void:
@@ -958,48 +890,6 @@ func _local_inventory() -> InventoryComponent:
 	return hero.get_node_or_null("InventoryComponent") as InventoryComponent
 
 
-# ════════════════════════════════════════════════════════
-# СНАРЯЖЕНИЕ — чтобы остальные видели что надето (и пассивки вроде щита)
-# Вызывается героем-владельцем при каждой смене снаряжения.
-# ════════════════════════════════════════════════════════
-func sync_equipment(equipment_data: Dictionary) -> void:
-	if not is_session_active():
-		return
-
-	if multiplayer.is_server():
-		_rpc_equipment_changed.rpc(multiplayer.get_unique_id(), equipment_data)
-	else:
-		_rpc_equipment_to_server.rpc_id(1, equipment_data)
-
-
-@rpc("any_peer", "reliable")
-func _rpc_equipment_to_server(equipment_data: Dictionary) -> void:
-	if not multiplayer.is_server():
-		return
-	var sender_id := multiplayer.get_remote_sender_id()
-	_apply_remote_equipment(sender_id, equipment_data)  # копия героя на хосте
-	_rpc_equipment_changed.rpc(sender_id, equipment_data)
-
-
-# call_remote: на самом сервере не выполняется (он применил снаряжение выше)
-@rpc("authority", "call_remote", "reliable")
-func _rpc_equipment_changed(peer_id: int, equipment_data: Dictionary) -> void:
-	_apply_remote_equipment(peer_id, equipment_data)
-
-
-func _apply_remote_equipment(peer_id: int, equipment_data: Dictionary) -> void:
-	var scene := get_tree().current_scene
-	if scene == null:
-		return
-	var hero := scene.get_node_or_null(str(peer_id))
-	# Своего героя не трогаем — его снаряжение уже актуально
-	if hero == null or hero.is_multiplayer_authority():
-		return
-	var eq := hero.get_node_or_null("EquipmentComponent") as EquipmentComponent
-	if eq != null:
-		eq.load_from_dict(equipment_data)
-
-
 func _clear_autoload_spawns() -> void:
 	for child in get_children():
 		if child.name.is_valid_int():
@@ -1014,3 +904,131 @@ func is_steam_ready() -> bool:
 
 func _steam_available() -> bool:
 	return Engine.has_singleton("Steam")
+
+
+func is_gameplay_locked() -> bool:
+	return _scene_transition_active or is_mission_loading()
+
+
+func request_inventory_operation(sequence: int, revision: int, command: Dictionary) -> void:
+	if multiplayer.is_server():
+		_server_inventory_operation(multiplayer.get_unique_id(), sequence, revision, command)
+	else:
+		_rpc_inventory_operation.rpc_id(1, sequence, revision, command)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_inventory_operation(sequence: int, revision: int, command: Dictionary) -> void:
+	if multiplayer.is_server():
+		_server_inventory_operation(multiplayer.get_remote_sender_id(), sequence, revision, command)
+
+
+func _server_inventory_operation(peer_id: int, sequence: int, revision: int, command: Dictionary) -> void:
+	var inv := _inventory_for_peer(peer_id)
+	if inv == null:
+		return
+	if sequence <= inv.last_operation or revision != inv.network_revision or is_gameplay_locked():
+		_publish_inventory(peer_id, sequence)
+		return
+	inv.last_operation = sequence
+	var source := str(command.get("source", "inventory"))
+	var index := int(command.get("index", -1))
+	var item := inv.network_item(source, index)
+	var hero := inv.get_parent() as Player
+	match str(command.get("kind", "")):
+		"move":
+			var target := str(command.get("target", ""))
+			var target_index := int(command.get("target_index", -1))
+			var other := inv.network_item(target, target_index)
+			if item != null and inv.accepts(target, target_index, item) and inv.accepts(source, index, other):
+				inv.put_network_item(source, index, other)
+				inv.put_network_item(target, target_index, item)
+		"use":
+			if item != null and source != "equipment":
+				if item.experience_amount > 0:
+					inv.consume_network_item(source, index, item.id)
+					hero.stats.add_experience(item.experience_amount)
+					_rpc_apply_progress.rpc(peer_id, hero.stats.get_progress_data())
+				elif item.heal_hp > 0 or item.heal_mana > 0:
+					# Only inventory ownership changes here; combat authority is unchanged.
+					if item.is_consumable:
+						inv.consume_network_item(source, index, item.id)
+					_rpc_inventory_use_effect.rpc(peer_id, item.id)
+		"drop":
+			if item != null and source != "equipment":
+				inv.consume_network_item(source, index, item.id)
+				var direction := hero.get_facing_direction()
+				_rpc_spawn_drop.rpc(_drops.allocate_id(), item.id, hero.global_position + direction * 0.6 + Vector3.UP, direction, peer_id)
+		"chest_put", "chest_take":
+			var chest := get_node_or_null(NodePath(str(command.get("chest", ""))))
+			var scene := get_tree().current_scene
+			if chest != null and scene != null and scene.is_ancestor_of(chest) and chest.has_method("_player_is_close") and chest.call("_player_is_close", hero):
+				if str(command.kind) == "chest_put" and item != null:
+					chest.call("_server_transfer_from_player", peer_id, index, item.id, [])
+				elif str(command.kind) == "chest_take" and chest.call("get_item", index) != null and chest.call("get_item", index).id == str(command.get("expected", "")):
+					chest.call("_server_transfer_to_player", peer_id, index, [])
+	inv.network_revision += 1
+	_publish_inventory(peer_id, sequence)
+
+
+func _publish_inventory(peer_id: int, sequence: int = 0) -> void:
+	var inv := _inventory_for_peer(peer_id)
+	if inv == null:
+		return
+	_rpc_inventory_snapshot.rpc(peer_id, sequence, inv.network_revision, inv.get_data(), inv.get_quickslot_data(), inv.get_parent().equipment.to_dict())
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_inventory_snapshot(peer_id: int, sequence: int, revision: int, items: Array, quick: Array, equipment_data: Dictionary) -> void:
+	var inv := _inventory_for_peer(peer_id)
+	if inv == null or revision < inv.network_revision:
+		return
+	inv.network_revision = revision
+	if not multiplayer.is_server():
+		inv.set_data(items)
+		inv.set_quickslot_data(quick)
+		inv.get_parent().equipment.load_from_dict(equipment_data)
+		inv.changed.emit()
+	if inv.get_parent().is_multiplayer_authority():
+		if sequence == inv.operation_sequence:
+			inv.network_pending = false
+		SaveManager.save_player_state(inv, inv.get_parent().equipment)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_inventory_use_effect(peer_id: int, item_id: String) -> void:
+	var hero := _hero_for_peer(peer_id)
+	var item := ItemLibrary.get_item(item_id)
+	if hero != null and item != null and hero.is_multiplayer_authority():
+		item.use(hero)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_confirm_mission_spawn(transition_id: int, peer_ids: Array) -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if transition_id != _mission_loading_transition_id:
+		return
+	for peer_id in peer_ids:
+		var hero := _hero_for_peer(int(peer_id)) as Player
+		if hero == null or not hero.is_node_ready() or hero.animation_tree == null or hero.camera_rig == null:
+			return
+	if multiplayer.is_server():
+		_mark_spawn_ready(multiplayer.get_unique_id(), transition_id)
+	else:
+		_rpc_spawn_ready.rpc_id(1, transition_id)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_spawn_ready(transition_id: int) -> void:
+	if multiplayer.is_server():
+		_mark_spawn_ready(multiplayer.get_remote_sender_id(), transition_id)
+
+
+func _mark_spawn_ready(peer_id: int, transition_id: int) -> void:
+	if transition_id != _mission_loading_transition_id or not _mission_spawn_waiting.has(peer_id):
+		return
+	_mission_spawn_waiting.erase(peer_id)
+	_rpc_set_loading_player_ready.rpc(transition_id, peer_id)
+	if _mission_spawn_waiting.is_empty():
+		_rpc_finish_mission_loading.rpc(transition_id)

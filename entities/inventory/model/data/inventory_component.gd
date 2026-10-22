@@ -5,6 +5,11 @@ class_name InventoryComponent
 
 signal changed
 
+var network_revision: int = 0
+var network_pending: bool = false
+var operation_sequence: int = 0
+var last_operation: int = 0
+
 const SLOT_COUNT := 36
 const QUICKSLOT_COUNT := 3
 
@@ -76,6 +81,9 @@ func move_item(from_index: int, to_index: int) -> void:
 # USE
 # =========================================================
 func use_item(slot_index: int, player: Node) -> void:
+	if SteamLobby.is_session_active():
+		network_request({"kind": "use", "source": "inventory", "index": slot_index})
+		return
 
 	if not _valid(slot_index):
 		return
@@ -144,6 +152,9 @@ func set_quickslot_data(data: Array) -> void:
 
 
 func use_quickslot(slot_index: int, player: Node) -> void:
+	if SteamLobby.is_session_active():
+		network_request({"kind": "use", "source": "quickslot", "index": slot_index})
+		return
 	if slot_index < 0 or slot_index >= QUICKSLOT_COUNT:
 		return
 	var item: ItemData = quickslots[slot_index]
@@ -190,7 +201,7 @@ func consume_network_item(source: String, slot_index: int, expected_item_id: Str
 
 func _request_experience_relic(item: ItemData, source: String, slot_index: int, player: Node) -> void:
 	if SteamLobby.is_session_active():
-		SteamLobby.request_use_experience_relic(source, slot_index, item.id)
+		network_request({"kind": "use", "source": source, "index": slot_index})
 		return
 	var stats := player.get_node_or_null("StatsComponent") as StatsComponent
 	if stats == null:
@@ -238,3 +249,49 @@ func _valid(index: int) -> bool:
 		push_warning("InventoryComponent: неверный индекс %d" % index)
 		return false
 	return true
+
+
+func network_request(command: Dictionary) -> void:
+	if network_pending or SteamLobby.is_gameplay_locked():
+		return
+	if str(command.get("kind", "")) == "use":
+		var item := network_item(str(command.get("source", "")), int(command.get("index", -1)))
+		if item == null:
+			return
+		var stats: StatsComponent = get_parent().stats
+		if item.experience_amount <= 0 and not (
+			(item.heal_hp > 0 and not stats.is_dead and stats.current_health < int(stats.get_stat("health")))
+			or (item.heal_mana > 0 and stats.current_mana < int(stats.get_stat("mana")))
+		):
+			return
+	operation_sequence += 1
+	network_pending = true
+	SteamLobby.request_inventory_operation(operation_sequence, network_revision, command)
+
+
+func network_item(source: String, index: int) -> ItemData:
+	if source == "equipment":
+		var keys := ["weapon", "helmet", "chestplate", "leggings", "cloak", "trinket_1", "trinket_2"]
+		return get_parent().equipment.get(keys[index]) if index >= 0 and index < keys.size() else null
+	return get_source_item(source, index)
+
+
+func accepts(source: String, index: int, item: ItemData) -> bool:
+	if source == "inventory":
+		return index >= 0 and index < SLOT_COUNT
+	if source == "quickslot":
+		return index >= 0 and index < QUICKSLOT_COUNT
+	if source == "equipment" and index >= 0 and index < 7:
+		var types := [ItemData.Slot.WEAPON, ItemData.Slot.HELMET, ItemData.Slot.CHESTPLATE, ItemData.Slot.LEGGINGS, ItemData.Slot.CLOAK, ItemData.Slot.TRINKET, ItemData.Slot.TRINKET]
+		return item == null or item.slot == types[index]
+	return false
+
+
+func put_network_item(source: String, index: int, item: ItemData) -> void:
+	if source == "equipment":
+		get_parent().equipment.equip_to_slot(item, index)
+	elif source == "quickslot":
+		quickslots[index] = item
+	else:
+		slots[index] = item
+	changed.emit()

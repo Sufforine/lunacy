@@ -87,38 +87,29 @@ func apply_world_progress(progress: Dictionary) -> void:
 
 
 func request_transfer_from_player(slot_index: int, inventory: InventoryComponent) -> void:
+	if SteamLobby.is_session_active():
+		inventory.network_request({"kind": "chest_put", "index": slot_index, "chest": str(get_path())})
+		return
 	if inventory == null:
 		return
 	var item := inventory.get_item(slot_index)
 	if item == null:
 		return
 	var inventory_data := inventory.get_data()
-	if not SteamLobby.is_session_active() or multiplayer.is_server():
-		_server_transfer_from_player(multiplayer.get_unique_id(), slot_index, item.id, inventory_data)
-	else:
-		_rpc_transfer_from_player.rpc_id(1, slot_index, item.id, inventory_data)
+	_server_transfer_from_player(multiplayer.get_unique_id(), slot_index, item.id, inventory_data)
 
 
 func request_transfer_to_player(slot_index: int, inventory: InventoryComponent) -> void:
+	if SteamLobby.is_session_active():
+		var item := get_item(slot_index)
+		if item == null:
+			return
+		inventory.network_request({"kind": "chest_take", "index": slot_index, "chest": str(get_path()), "expected": item.id})
+		return
 	if inventory == null or get_item(slot_index) == null:
 		return
 	var inventory_data := inventory.get_data()
-	if not SteamLobby.is_session_active() or multiplayer.is_server():
-		_server_transfer_to_player(multiplayer.get_unique_id(), slot_index, inventory_data)
-	else:
-		_rpc_transfer_to_player.rpc_id(1, slot_index, inventory_data)
-
-
-@rpc("any_peer", "call_remote", "reliable")
-func _rpc_transfer_from_player(slot_index: int, expected_item_id: String, inventory_data: Array) -> void:
-	if multiplayer.is_server():
-		_server_transfer_from_player(multiplayer.get_remote_sender_id(), slot_index, expected_item_id, inventory_data)
-
-
-@rpc("any_peer", "call_remote", "reliable")
-func _rpc_transfer_to_player(slot_index: int, inventory_data: Array) -> void:
-	if multiplayer.is_server():
-		_server_transfer_to_player(multiplayer.get_remote_sender_id(), slot_index, inventory_data)
+	_server_transfer_to_player(multiplayer.get_unique_id(), slot_index, inventory_data)
 
 
 func _server_transfer_from_player(peer_id: int, slot_index: int, expected_item_id: String, inventory_data: Array) -> void:
@@ -126,7 +117,7 @@ func _server_transfer_from_player(peer_id: int, slot_index: int, expected_item_i
 	var inventory := _inventory_for_player(player)
 	if inventory == null or not _player_is_close(player):
 		return
-	inventory.set_data(inventory_data)
+	# Inventory is owned by the host during a session.
 	var item := inventory.get_item(slot_index)
 	var free_slot := _first_free_slot()
 	if item == null or item.id != expected_item_id or free_slot < 0:
@@ -143,7 +134,7 @@ func _server_transfer_to_player(peer_id: int, slot_index: int, inventory_data: A
 	var inventory := _inventory_for_player(player)
 	if inventory == null or not _player_is_close(player):
 		return
-	inventory.set_data(inventory_data)
+	# Inventory is owned by the host during a session.
 	var item := get_item(slot_index)
 	if item == null or not inventory.add_item(item):
 		_send_inventory_state(peer_id, inventory)
@@ -155,24 +146,13 @@ func _server_transfer_to_player(peer_id: int, slot_index: int, inventory_data: A
 func _commit_transfer(peer_id: int, inventory: InventoryComponent) -> void:
 	_persist_contents()
 	contents_changed.emit()
-	_send_inventory_state(peer_id, inventory)
+	if not SteamLobby.is_session_active():
+		_send_inventory_state(peer_id, inventory)
 
 
-func _send_inventory_state(peer_id: int, inventory: InventoryComponent) -> void:
-	if SteamLobby.is_session_active() and peer_id != multiplayer.get_unique_id():
-		_rpc_apply_player_inventory.rpc_id(peer_id, inventory.get_data())
-	else:
+func _send_inventory_state(_peer_id: int, inventory: InventoryComponent) -> void:
+	if not SteamLobby.is_session_active():
 		_save_local_inventory(inventory)
-
-
-@rpc("authority", "call_remote", "reliable")
-func _rpc_apply_player_inventory(inventory_data: Array) -> void:
-	var player := _local_player()
-	var inventory := _inventory_for_player(player)
-	if inventory == null:
-		return
-	inventory.set_data(inventory_data)
-	_save_local_inventory(inventory)
 
 
 func _persist_contents() -> void:

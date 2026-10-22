@@ -100,8 +100,6 @@ func _ready() -> void:
 		# останется камера владельца, а мышь снова будет захвачена после меню.
 		call_deferred("_activate_local_camera")
 
-		# Любая смена снаряжения уходит остальным игрокам
-		equipment.changed.connect(_on_local_equipment_changed)
 	else:
 		# Интерфейс чужого героя на моём экране не нужен
 		# и не должен реагировать на глобальные I/Escape. Иначе каждый
@@ -129,11 +127,9 @@ func set_interaction_available(available: bool) -> void:
 
 
 func _init_inventory() -> void:
-	if not is_multiplayer_authority():
-		return
-
-	inventory_ui.bind(inventory, equipment, stats)
-	inventory.set_quickslot_data(PlayerProfile.quickslots)
+	if is_multiplayer_authority():
+		inventory_ui.bind(inventory, equipment, stats)
+		inventory.set_quickslot_data(PlayerProfile.quickslots)
 	inventory.add_item(ItemLibrary.get_item("experience_relic"))
 	inventory.add_item(ItemLibrary.get_item("ShieldArmor"))
 
@@ -143,7 +139,7 @@ func _init_inventory() -> void:
 # ════════════════════════════════════════════════════════
 func _physics_process(delta: float) -> void:
 
-	if not is_multiplayer_authority():
+	if not is_multiplayer_authority() or SteamLobby.is_gameplay_locked():
 		return
 
 	# Вертикальная физика продолжается даже при заблокированном управлении.
@@ -302,7 +298,7 @@ func _handle_rotation(delta: float) -> void:
 # ════════════════════════════════════════════════════════
 func _input(event: InputEvent) -> void:
 
-	if not is_multiplayer_authority():
+	if not is_multiplayer_authority() or SteamLobby.is_gameplay_locked():
 		return
 
 	# В агонии/смерти — только кнопки которые не требуют управления
@@ -501,7 +497,7 @@ func on_mission_complete() -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_PREDELETE and is_inside_tree():
+	if what == NOTIFICATION_EXIT_TREE and is_node_ready():
 		if is_multiplayer_authority():
 			SaveManager.save_player_state(inventory, equipment)
 
@@ -522,10 +518,6 @@ func get_facing_direction() -> Vector3:
 # ════════════════════════════════════════════════════════
 # СЕТЬ
 # ════════════════════════════════════════════════════════
-func _on_local_equipment_changed() -> void:
-	SteamLobby.sync_equipment(equipment.to_dict())
-
-
 # ════════════════════════════════════════════════════════
 # МОДЕЛЬ ПЕРСОНАЖА
 # Модель из сцены игрока заменяется на ту, что собрана в редакторе

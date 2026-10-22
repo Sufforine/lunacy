@@ -377,6 +377,11 @@ func _drop_on_inventory(to_idx: int) -> void:
 	var src  := _drag_source
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+	if SteamLobby.is_session_active():
+		var sources := {DragSource.INVENTORY: "inventory", DragSource.EQUIPMENT: "equipment", DragSource.QUICKSLOT: "quickslot"}
+		_inventory.network_request({"kind": "move", "source": sources.get(src, ""), "index": from, "target": "inventory", "target_index": to_idx})
+		return
+
 
 	match src:
 		DragSource.INVENTORY:
@@ -409,6 +414,11 @@ func _drop_on_equipment(to_idx: int) -> void:
 	var src  := _drag_source
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+	if SteamLobby.is_session_active():
+		var sources := {DragSource.INVENTORY: "inventory", DragSource.EQUIPMENT: "equipment", DragSource.QUICKSLOT: "quickslot"}
+		_inventory.network_request({"kind": "move", "source": sources.get(src, ""), "index": from, "target": "equipment", "target_index": to_idx})
+		return
+
 
 	if src == DragSource.INVENTORY:
 		var item := _inventory.get_item(from)
@@ -449,6 +459,11 @@ func _drop_on_quickslot(to_idx: int) -> void:
 	var src  := _drag_source
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+	if SteamLobby.is_session_active():
+		var sources := {DragSource.INVENTORY: "inventory", DragSource.EQUIPMENT: "equipment", DragSource.QUICKSLOT: "quickslot"}
+		_inventory.network_request({"kind": "move", "source": sources.get(src, ""), "index": from, "target": "quickslot", "target_index": to_idx})
+		return
+
 
 	match src:
 		DragSource.INVENTORY:
@@ -773,6 +788,10 @@ func _quick_equip(inv_idx: int) -> void:
 	if eq_idx < 0:
 		return
 
+	if SteamLobby.is_session_active():
+		_inventory.network_request({"kind": "move", "source": "inventory", "index": inv_idx, "target": "equipment", "target_index": eq_idx})
+		return
+
 	# Вытеснить текущий предмет обратно в инвентарь
 	var current := _eq_slot_item(eq_idx)
 	_inventory.slots[inv_idx] = current
@@ -823,6 +842,9 @@ func _quick_unequip(eq_idx: int) -> void:
 		push_warning("InventoryUI: нет свободных слотов в инвентаре")
 		return
 
+	if SteamLobby.is_session_active():
+		_inventory.network_request({"kind": "move", "source": "equipment", "index": eq_idx, "target": "inventory", "target_index": free_slot})
+		return
 	_inventory.slots[free_slot] = item
 	_equipment.equip_to_slot(null, eq_idx)
 	_inventory.changed.emit()
@@ -1069,6 +1091,9 @@ func _drop_hovered_item() -> void:
 
 	var inv_idx := _inv_slot_at_mouse()
 	if inv_idx >= 0 and not _inventory.is_empty(inv_idx):
+		if SteamLobby.is_session_active():
+			_inventory.network_request({"kind": "drop", "source": "inventory", "index": inv_idx})
+			return
 		var item: ItemData = _inventory.get_item(inv_idx)
 		_inventory.slots[inv_idx] = null
 		_inventory.changed.emit()
@@ -1077,6 +1102,9 @@ func _drop_hovered_item() -> void:
 
 	var qs_idx := _qs_slot_at_mouse()
 	if qs_idx >= 0 and _inventory.quickslots[qs_idx] != null:
+		if SteamLobby.is_session_active():
+			_inventory.network_request({"kind": "drop", "source": "quickslot", "index": qs_idx})
+			return
 		var q_item: ItemData = _inventory.quickslots[qs_idx]
 		_inventory.quickslots[qs_idx] = null
 		_inventory.changed.emit()
@@ -1098,6 +1126,10 @@ func _drop_dragged_item_in_world() -> void:
 	_restore_drag_icon()
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+
+	if SteamLobby.is_session_active():
+		_inventory.network_request({"kind": "drop", "source": "inventory" if src == DragSource.INVENTORY else "quickslot", "index": from})
+		return
 
 	var item: ItemData = null
 	match src:

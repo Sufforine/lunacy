@@ -29,6 +29,10 @@ func spawn_player(parent: Node, state_data: Dictionary, spawn_position: Vector3 
 	if not normalized_state.is_empty():
 		hero.set_meta("network_state", normalized_state)
 
+	if SteamLobby.is_mission_loading():
+		var sync := hero.get_node_or_null("MultiplayerSynchronizer") as MultiplayerSynchronizer
+		if sync != null:
+			sync.public_visibility = false
 	parent.add_child(hero)
 
 	if hero is Node3D:

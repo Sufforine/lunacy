@@ -30,6 +30,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if SteamLobby.is_gameplay_locked():
+		return
 	if SteamLobby.is_session_active() and not is_multiplayer_authority():
 		_update_animation()
 		return
