@@ -3,10 +3,12 @@ extends CanvasLayer
 
 const WAITING_COLOR := Color(0.42, 0.44, 0.48, 1.0)
 const READY_COLOR := Color(0.94, 0.97, 1.0, 1.0)
+const ERROR_COLOR := Color(1.0, 0.34, 0.34, 1.0)
 
 @onready var title_label: Label = %TitleLabel
 @onready var status_label: Label = %StatusLabel
 @onready var players_list: VBoxContainer = %PlayersList
+@onready var progress_bar: ProgressBar = %ProgressBar
 
 var _player_labels: Dictionary = {}
 
@@ -61,6 +63,17 @@ func remove_player(peer_id: int) -> void:
 
 func set_status(text: String) -> void:
 	status_label.text = text
+
+
+func set_progress(value: float) -> void:
+	progress_bar.value = clampf(value, 0.0, 1.0) * 100.0
+	status_label.text = "Загрузка сцены: %d%%" % int(round(progress_bar.value))
+
+
+func set_player_error(peer_id: int) -> void:
+	var label := _player_labels.get(peer_id) as Label
+	if label != null:
+		label.add_theme_color_override("font_color", ERROR_COLOR)
 
 
 func _update_status() -> void:

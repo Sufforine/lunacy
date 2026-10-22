@@ -52,6 +52,10 @@ var _scene_transition_path: String = ""
 var _scene_transition_waiting: Dictionary = {}
 var _scene_transition_active: bool = false
 var _scene_transition_commit_scheduled: bool = false
+var _scene_load_started_waiting: Dictionary = {}
+var _scene_load_retry_round: int = 0
+var _threaded_load_transition_id: int = 0
+var _threaded_load_path: String = ""
 
 
 func _ready() -> void:
@@ -288,20 +292,148 @@ func _finish_scene_change_prepare(transition_id: int) -> void:
 	await get_tree().create_timer(0.25, true).timeout
 	if not multiplayer.is_server() or transition_id != _scene_transition_id:
 		return
-	_rpc_load_gameplay_scene.rpc(transition_id, _scene_transition_path)
+	_dispatch_scene_load(transition_id, _scene_transition_path)
 
 
-@rpc("authority", "call_local", "reliable")
+func _dispatch_scene_load(transition_id: int, scene_path: String) -> void:
+	# Сначала отдельно отправляем команду каждому клиенту и ждём короткого
+	# подтверждения. Так хост не удаляет старую сцену в том же RPC-вызове,
+	# из-за чего пакет перехода мог не успеть уйти одному из пиров.
+	_scene_load_started_waiting.clear()
+	_scene_load_retry_round = 0
+	for peer_id in multiplayer.get_peers():
+		var remote_peer_id := int(peer_id)
+		_scene_load_started_waiting[remote_peer_id] = true
+		_rpc_load_gameplay_scene.rpc_id(remote_peer_id, transition_id, scene_path)
+	if _scene_load_started_waiting.is_empty():
+		_start_threaded_scene_load(transition_id, scene_path)
+	else:
+		_retry_unacknowledged_scene_loads(transition_id, scene_path)
+
+
+func _retry_unacknowledged_scene_loads(transition_id: int, scene_path: String) -> void:
+	await get_tree().create_timer(2.0, true).timeout
+	if not multiplayer.is_server() or transition_id != _scene_transition_id:
+		return
+	if _scene_load_started_waiting.is_empty():
+		return
+	_scene_load_retry_round += 1
+	var connected_peers := multiplayer.get_peers()
+	for peer_id_value in _scene_load_started_waiting.keys():
+		var peer_id := int(peer_id_value)
+		if connected_peers.has(peer_id):
+			_rpc_load_gameplay_scene.rpc_id(peer_id, transition_id, scene_path)
+		else:
+			_scene_load_started_waiting.erase(peer_id)
+	if _scene_load_started_waiting.is_empty():
+		_start_threaded_scene_load(transition_id, scene_path)
+		return
+	if is_instance_valid(_loading_screen):
+		_loading_screen.set_status("Ожидание ответа игроков…")
+	_retry_unacknowledged_scene_loads(transition_id, scene_path)
+
+
+@rpc("authority", "call_remote", "reliable")
 func _rpc_load_gameplay_scene(transition_id: int, scene_path: String) -> void:
 	if transition_id != _scene_transition_id:
 		return
 	if not _is_allowed_gameplay_scene(scene_path):
 		return
+	_rpc_scene_load_started.rpc_id(1, transition_id)
+	_start_threaded_scene_load(transition_id, scene_path)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_scene_load_started(transition_id: int) -> void:
+	if not multiplayer.is_server() or transition_id != _scene_transition_id:
+		return
+	var peer_id := multiplayer.get_remote_sender_id()
+	_scene_load_started_waiting.erase(peer_id)
+	if _scene_load_started_waiting.is_empty():
+		_start_threaded_scene_load(transition_id, _scene_transition_path)
+
+
+func _start_threaded_scene_load(transition_id: int, scene_path: String) -> void:
+	if transition_id != _scene_transition_id or not _is_allowed_gameplay_scene(scene_path):
+		return
+	if _threaded_load_transition_id == transition_id:
+		return
+	_threaded_load_transition_id = transition_id
+	_threaded_load_path = scene_path
+	if is_instance_valid(_loading_screen):
+		_loading_screen.set_progress(0.0)
+
+	var request_error := ResourceLoader.load_threaded_request(scene_path, "PackedScene", true)
+	if request_error != OK:
+		_threaded_load_transition_id = 0
+		_threaded_load_path = ""
+		_report_scene_load_failure(transition_id, "Не удалось начать загрузку сцены: %s" % error_string(request_error))
+		return
+	_poll_threaded_scene_load(transition_id, scene_path)
+
+
+func _poll_threaded_scene_load(transition_id: int, scene_path: String) -> void:
+	while transition_id == _threaded_load_transition_id and scene_path == _threaded_load_path:
+		var progress: Array = []
+		var status := ResourceLoader.load_threaded_get_status(scene_path, progress)
+		if status == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			if is_instance_valid(_loading_screen) and not progress.is_empty():
+				_loading_screen.set_progress(float(progress[0]))
+			await get_tree().process_frame
+			continue
+		if status == ResourceLoader.THREAD_LOAD_LOADED:
+			var packed_scene := ResourceLoader.load_threaded_get(scene_path) as PackedScene
+			if packed_scene == null:
+				_report_scene_load_failure(transition_id, "Загруженный ресурс не является сценой")
+			else:
+				_commit_loaded_scene(transition_id, scene_path, packed_scene)
+			return
+		_report_scene_load_failure(transition_id, "Ошибка фоновой загрузки сцены")
+		return
+
+
+func _commit_loaded_scene(transition_id: int, scene_path: String, packed_scene: PackedScene) -> void:
+	if transition_id != _scene_transition_id or scene_path != _scene_transition_path:
+		return
 	_reset_pending_scene_spawns()
 	_clear_autoload_spawns()
 	_drops.clear()
-	_reset_scene_transition()
-	get_tree().change_scene_to_file(scene_path)
+	if is_instance_valid(_loading_screen):
+		_loading_screen.set_progress(1.0)
+	var change_error := get_tree().change_scene_to_packed(packed_scene)
+	if change_error != OK:
+		_report_scene_load_failure(transition_id, "Не удалось открыть сцену: %s" % error_string(change_error))
+		return
+	await get_tree().scene_changed
+	if transition_id == _scene_transition_id:
+		_reset_scene_transition()
+
+
+func _report_scene_load_failure(transition_id: int, message: String) -> void:
+	_threaded_load_transition_id = 0
+	_threaded_load_path = ""
+	push_error("SteamLobby: %s" % message)
+	if is_instance_valid(_loading_screen):
+		_loading_screen.set_status("Ошибка загрузки")
+	if not multiplayer.is_server() and is_session_active():
+		_rpc_scene_load_failed.rpc_id(1, transition_id, message)
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_scene_load_failed(transition_id: int, message: String) -> void:
+	if not multiplayer.is_server() or transition_id != _scene_transition_id:
+		return
+	var peer_id := multiplayer.get_remote_sender_id()
+	push_error("SteamLobby: peer %d не загрузил сцену: %s" % [peer_id, message])
+	_rpc_mark_scene_load_failed.rpc(transition_id, peer_id)
+
+
+@rpc("authority", "call_local", "reliable")
+func _rpc_mark_scene_load_failed(transition_id: int, peer_id: int) -> void:
+	if transition_id != _mission_loading_transition_id or not is_instance_valid(_loading_screen):
+		return
+	_loading_screen.set_player_error(peer_id)
+	_loading_screen.set_status("Один из игроков не загрузил сцену")
 
 
 func _disable_current_scene_synchronizers() -> void:
@@ -319,8 +451,12 @@ func _disable_current_scene_synchronizers() -> void:
 func _reset_scene_transition() -> void:
 	_scene_transition_path = ""
 	_scene_transition_waiting.clear()
+	_scene_load_started_waiting.clear()
 	_scene_transition_active = false
 	_scene_transition_commit_scheduled = false
+	_scene_load_retry_round = 0
+	_threaded_load_transition_id = 0
+	_threaded_load_path = ""
 
 
 func _is_allowed_gameplay_scene(scene_path: String) -> bool:
@@ -667,6 +803,10 @@ func _on_peer_disconnected(id: int) -> void:
 		if _scene_transition_waiting.is_empty() and not _scene_transition_commit_scheduled:
 			_scene_transition_commit_scheduled = true
 			_finish_scene_change_prepare(_scene_transition_id)
+	if multiplayer.is_server() and _scene_load_started_waiting.has(id):
+		_scene_load_started_waiting.erase(id)
+		if _scene_load_started_waiting.is_empty() and _threaded_load_transition_id == 0:
+			_start_threaded_scene_load(_scene_transition_id, _scene_transition_path)
 	if multiplayer.is_server():
 		_rpc_despawn_hub_player.rpc(id)
 	else:
