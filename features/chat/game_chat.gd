@@ -6,9 +6,10 @@ var _panel: PanelContainer
 var _history: RichTextLabel
 var _entry: LineEdit
 var _messages: Array[String] = []
-var _hide_at := 0
 var _previous_mouse_mode: int = Input.MOUSE_MODE_VISIBLE
 var _last_sent: Dictionary = {}
+var _typing_style := StyleBoxFlat.new()
+var _transparent_style := StyleBoxEmpty.new()
 
 
 func _ready() -> void:
@@ -22,25 +23,31 @@ func _ready() -> void:
 	_panel.offset_bottom = -25
 	add_child(_panel)
 	var column := VBoxContainer.new()
+	column.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.add_child(column)
 	_history = RichTextLabel.new()
 	_history.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_history.bbcode_enabled = false
 	_history.scroll_following = true
+	_history.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	column.add_child(_history)
 	_entry = LineEdit.new()
 	_entry.placeholder_text = "Сообщение или /help"
 	_entry.max_length = 256
 	column.add_child(_entry)
 	_entry.hide()
-	_panel.hide()
+	_typing_style.bg_color = Color(0.04, 0.05, 0.07, 0.88)
+	_typing_style.corner_radius_top_left = 8
+	_typing_style.corner_radius_top_right = 8
+	_typing_style.corner_radius_bottom_left = 8
+	_typing_style.corner_radius_bottom_right = 8
+	_typing_style.content_margin_left = 10
+	_typing_style.content_margin_top = 10
+	_typing_style.content_margin_right = 10
+	_typing_style.content_margin_bottom = 10
+	_set_typing_visual(false)
 	get_tree().scene_changed.connect(_on_scene_changed)
 	multiplayer.peer_disconnected.connect(func(id: int): _last_sent.erase(id))
-
-
-func _process(_delta: float) -> void:
-	if not is_typing and Time.get_ticks_msec() > _hide_at:
-		_panel.hide()
 
 
 func _input(event: InputEvent) -> void:
@@ -64,7 +71,7 @@ func _input(event: InputEvent) -> void:
 		is_typing = true
 		_previous_mouse_mode = Input.mouse_mode
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-		_panel.show()
+		_set_typing_visual(true)
 		_entry.show()
 		_entry.clear()
 		_entry.grab_focus()
@@ -75,8 +82,8 @@ func _close() -> void:
 	is_typing = false
 	_entry.release_focus()
 	_entry.hide()
+	_set_typing_visual(false)
 	Input.mouse_mode = _previous_mouse_mode
-	_hide_at = Time.get_ticks_msec() + 8000
 
 
 func _on_scene_changed() -> void:
@@ -84,9 +91,15 @@ func _on_scene_changed() -> void:
 	is_typing = false
 	_entry.release_focus()
 	_entry.hide()
-	_panel.hide()
-	_hide_at = 0
+	_set_typing_visual(false)
 	_last_sent.clear()
+
+
+func _set_typing_visual(typing: bool) -> void:
+	# Закрытый чат показывает только текст и полностью пропускает мышь к UI
+	# под ним. Фон и перехват кликов включаются лишь на время ввода.
+	_panel.add_theme_stylebox_override("panel", _typing_style if typing else _transparent_style)
+	_panel.mouse_filter = Control.MOUSE_FILTER_STOP if typing else Control.MOUSE_FILTER_IGNORE
 
 
 func _submit(message: String) -> void:
@@ -141,5 +154,3 @@ func _receive_message(author: String, message: String) -> void:
 	if _messages.size() > 100:
 		_messages.pop_front()
 	_history.text = "\n".join(_messages)
-	_panel.show()
-	_hide_at = Time.get_ticks_msec() + 8000
