@@ -1,10 +1,11 @@
 class_name NetSpawner
 extends RefCounted
 
+const PLAYER_SCENE_PATH := "res://entities/characters/model/Player.tscn"
+const PLAYER_SCENE: PackedScene = preload(PLAYER_SCENE_PATH)
 
 func spawn_player(parent: Node, state_data: Dictionary, spawn_position: Vector3 = Vector3.ZERO) -> Node:
 	var peer_id: int = state_data.get("peer_id", 0)
-	var hero_path: String = state_data.get("hero_scene", "")
 
 	if peer_id <= 0:
 		push_error("NetSpawner: некорректный peer_id %d" % peer_id)
@@ -14,25 +15,23 @@ func spawn_player(parent: Node, state_data: Dictionary, spawn_position: Vector3 
 	if existing:
 		return existing
 
-	if hero_path.is_empty():
-		push_error("NetSpawner: hero_scene пустой для peer %d" % peer_id)
-		return null
+	var requested_path := str(state_data.get("hero_scene", ""))
+	if not requested_path.is_empty() and requested_path != PLAYER_SCENE_PATH:
+		push_warning("NetSpawner: устаревшая сцена '%s' для peer %d заменена на Player" % [requested_path, peer_id])
 
-	var hero_scene := load(hero_path)
-	if hero_scene == null:
-		push_error("NetSpawner: не удалось загрузить '%s'" % hero_path)
-		return null
+	var normalized_state := state_data.duplicate(true)
+	normalized_state["hero_scene"] = PLAYER_SCENE_PATH
 
-	var hero: Node = hero_scene.instantiate()
+	var hero: Node = PLAYER_SCENE.instantiate()
 	hero.name = str(peer_id)
 	hero.set_multiplayer_authority(peer_id)
 
-	if not state_data.is_empty():
-		hero.set_meta("network_state", state_data)
+	if not normalized_state.is_empty():
+		hero.set_meta("network_state", normalized_state)
 
 	parent.add_child(hero)
 
-	if hero is Node3D and spawn_position != Vector3.ZERO:
+	if hero is Node3D:
 		(hero as Node3D).global_position = spawn_position
 
 	print("NetSpawner: заспавнен герой для peer ", peer_id, " @ ", spawn_position)

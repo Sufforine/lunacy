@@ -153,7 +153,8 @@ func _physics_process(delta: float) -> void:
 		velocity.y = maxf(velocity.y, -terminal_speed)
 
 	var controls_enabled := not stats.is_downed and not stats.is_dead \
-		and is_processing_input() and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+		and is_processing_input() and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
+		and not SteamLobby.is_mission_loading()
 	if inventory_ui != null and inventory_ui.is_main_panel_open():
 		controls_enabled = false
 

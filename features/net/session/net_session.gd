@@ -15,17 +15,25 @@ func register_local_player(peer_id: int) -> Dictionary:
 func register_remote_player(peer_id: int, state_data: Dictionary) -> Dictionary:
 	var normalized := state_data.duplicate(true)
 	normalized["peer_id"] = peer_id
+	# Не доверяем присланному пути сцены: старые сохранения клиента могли
+	# содержать Dullahan или другую несовместимую Player-сцену.
+	normalized["hero_scene"] = (
+		PlayerStateCodec.PLAYER_SCENE_PATH
+		if not str(normalized.get("character_name", "")).is_empty()
+		else ""
+	)
 	player_states[peer_id] = PlayerStateCodec.to_state(normalized)
-	return normalized
+	return PlayerStateCodec.to_dict(player_states[peer_id])
 
 
 func remove_player(peer_id: int) -> void:
 	player_states.erase(peer_id)
 
 
-func update_hero(peer_id: int, hero_scene: String) -> void:
+func update_hero(peer_id: int, _hero_scene: String) -> void:
 	if player_states.has(peer_id):
-		player_states[peer_id].hero_scene = hero_scene
+		var state: PlayerState = player_states[peer_id]
+		state.hero_scene = PlayerStateCodec.PLAYER_SCENE_PATH if not state.character_name.is_empty() else ""
 
 
 func update_progress(peer_id: int, progress: Dictionary) -> void:

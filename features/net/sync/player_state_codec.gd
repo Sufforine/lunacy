@@ -1,6 +1,7 @@
 class_name PlayerStateCodec
 extends RefCounted
 
+const PLAYER_SCENE_PATH := "res://entities/characters/model/Player.tscn"
 
 static func from_profile(peer_id: int) -> Dictionary:
 	var state := PlayerState.new()
@@ -16,7 +17,7 @@ static func to_dict(state: PlayerState) -> Dictionary:
 		"nickname": state.nickname,
 		"character_name": state.character_name,
 		"appearance": state.appearance.duplicate(true),
-		"hero_scene": state.hero_scene,
+		"hero_scene": PLAYER_SCENE_PATH if not state.character_name.is_empty() else "",
 		"level": state.level,
 		"experience": state.experience,
 		"attributes": state.attributes.duplicate(true),
@@ -33,7 +34,9 @@ static func apply_dict(data: Dictionary, state: PlayerState) -> void:
 	state.nickname = data.get("nickname", "Игрок")
 	state.character_name = data.get("character_name", "")
 	state.appearance = data.get("appearance", {})
-	state.hero_scene = data.get("hero_scene", "")
+	# Сцена Player является частью сетевого протокола, а не данными клиента.
+	# Это гарантирует одинаковые пути узлов и MultiplayerSynchronizer у всех.
+	state.hero_scene = PLAYER_SCENE_PATH if not state.character_name.is_empty() else ""
 	state.level = data.get("level", 1)
 	state.experience = data.get("experience", 0)
 	state.attributes = data.get("attributes", {}).duplicate(true)

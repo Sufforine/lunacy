@@ -8,14 +8,15 @@ const CHARACTER_DIR := "user://characters/"
 const WORLD_DIR := "user://worlds/"
 const LEGACY_SAVE_DIR := "user://saves/"
 const SAVE_VERSION := 2
+const PLAYER_SCENE_PATH := "res://entities/characters/model/Player.tscn"
 
 # Сцена, которую хаб/миссия инстанцируют для ЛЮБОГО созданного персонажа.
 # В ней уже должны быть player.gd и все компоненты (Stats, Equipment,
 # Inventory, Effects, CameraRig, CanvasLayer/InventoryUI и т.д.) —
 # собирается один раз в редакторе, а не кодом при создании персонажа.
-# Путь задаётся в инспекторе корневого узла главного меню (поле Hero Scene) —
-# main_menu.gd передаёт его сюда при запуске. Править код не нужно.
-var default_hero_scene: String = ""
+# Путь больше не является выбором персонажа и не должен приходить из старого
+# сохранения или от сетевого клиента. Внешность хранится отдельно в appearance.
+var default_hero_scene: String = PLAYER_SCENE_PATH
 
 const DEFAULT_APPEARANCE := {"body": "male", "skin": "e0ac69", "hair": 0}
 
@@ -81,7 +82,11 @@ func has_active_character() -> bool:
 
 # Можно ли реально заспавнить текущего персонажа: сцена задана и существует
 func has_valid_hero_scene() -> bool:
-	return not PlayerProfile.hero_scene.is_empty() and ResourceLoader.exists(PlayerProfile.hero_scene)
+	return (
+		not PlayerProfile.character_name.is_empty()
+		and PlayerProfile.hero_scene == PLAYER_SCENE_PATH
+		and ResourceLoader.exists(PLAYER_SCENE_PATH)
+	)
 
 
 # =========================================================
@@ -219,7 +224,7 @@ func create_character(character_name: String, appearance: Dictionary = {}) -> bo
 	PlayerProfile.character_name = clean_name
 	PlayerProfile.appearance     = final_appearance.duplicate(true)
 	PlayerProfile.created_at     = Time.get_unix_time_from_system()
-	PlayerProfile.hero_scene     = default_hero_scene
+	PlayerProfile.hero_scene     = PLAYER_SCENE_PATH
 	PlayerProfile.level          = 1
 	PlayerProfile.experience     = 0
 	PlayerProfile.attributes     = _empty_attributes()
@@ -227,9 +232,6 @@ func create_character(character_name: String, appearance: Dictionary = {}) -> bo
 	PlayerProfile.inventory      = []
 	PlayerProfile.quickslots     = ["", "", ""]
 	PlayerProfile.equipment      = EMPTY_EQUIPMENT.duplicate()
-
-	if default_hero_scene.is_empty():
-		push_warning("SaveManager: сцена героя не задана — персонаж не сможет заспавниться. Перетащи сцену игрока в поле Hero Scene у корневого узла главного меню.")
 
 	save_profile()
 	print("SaveManager: создан персонаж '%s' (%s)" % [clean_name, slug])
@@ -321,6 +323,9 @@ func save_profile() -> void:
 
 	DirAccess.make_dir_recursive_absolute(CHARACTER_DIR)
 
+	if not PlayerProfile.character_name.is_empty():
+		PlayerProfile.hero_scene = PLAYER_SCENE_PATH
+
 	var data := {
 		"save_version":   SAVE_VERSION,
 		"character_name": PlayerProfile.character_name,
@@ -384,12 +389,10 @@ func load_profile() -> void:
 
 	PlayerProfile.character_name = data.get("character_name", "")
 	PlayerProfile.created_at     = float(data.get("created_at", 0.0))
-	# Все персонажи пока используют общую сцену. Сохранения, созданные до того
-	# как сцена героя была задана (или с устаревшим путём), чиним на лету.
-	var saved_hero_scene: String = str(data.get("hero_scene", ""))
-	if saved_hero_scene.is_empty() or not ResourceLoader.exists(saved_hero_scene):
-		saved_hero_scene = default_hero_scene
-	PlayerProfile.hero_scene     = saved_hero_scene
+	# После перехода на конструктор все персонажи используют одну Player-сцену.
+	# Старый путь намеренно не читаем: он мог указывать на Dullahan или другую
+	# сцену с несовместимой структурой сетевых узлов.
+	PlayerProfile.hero_scene     = PLAYER_SCENE_PATH if not PlayerProfile.character_name.is_empty() else ""
 	PlayerProfile.level          = data.get("level",      1)
 	PlayerProfile.experience     = data.get("experience", 0)
 	PlayerProfile.attributes     = _normalize_attributes(data.get("attributes", {}))
