@@ -97,11 +97,22 @@ func _on_lobby_ready(lobby_id: int) -> void:
 	ready_button.visible = is_host
 	if is_host:
 		ready_button.text = "Старт"
-		ready_button.pressed.connect(_on_start_pressed)
+		if not ready_button.pressed.is_connected(_on_start_pressed):
+			ready_button.pressed.connect(_on_start_pressed)
 
 
 func _on_lobby_failed(reason: String) -> void:
 	push_warning("lobby_menu: %s" % reason)
+	var dialog := AcceptDialog.new()
+	dialog.title = "Мультиплеер"
+	dialog.dialog_text = reason
+	add_child(dialog)
+	dialog.confirmed.connect(dialog.queue_free)
+	dialog.canceled.connect(dialog.queue_free)
+	dialog.popup_centered()
+	if not steam_lobby.is_session_active():
+		main_menu_panel.visible = true
+		lobby_panel.visible = false
 	host_button.disabled = false
 	join_button.disabled = false
 

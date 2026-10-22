@@ -2,12 +2,22 @@ class_name NetSteamTransport
 extends RefCounted
 
 var peer: MultiplayerPeer
+var last_error: Error = OK
+
+
+func _configure_steam_peer(steam_peer: SteamMultiplayerPeer) -> void:
+	# Настройка присутствует не во всех сборках GodotSteam.
+	if steam_peer.has_method("set_server_relay"):
+		steam_peer.call("set_server_relay", true)
 
 
 func create_steam_host(multiplayer_api: MultiplayerAPI) -> SteamMultiplayerPeer:
 	var steam_peer := SteamMultiplayerPeer.new()
-	steam_peer.server_relay = true
-	steam_peer.create_host()
+	_configure_steam_peer(steam_peer)
+	last_error = steam_peer.create_host()
+	if last_error != OK:
+		steam_peer.close()
+		return null
 	peer = steam_peer
 	multiplayer_api.multiplayer_peer = steam_peer
 	return steam_peer
@@ -15,8 +25,11 @@ func create_steam_host(multiplayer_api: MultiplayerAPI) -> SteamMultiplayerPeer:
 
 func create_steam_client(multiplayer_api: MultiplayerAPI, lobby_owner_id: int) -> SteamMultiplayerPeer:
 	var steam_peer := SteamMultiplayerPeer.new()
-	steam_peer.server_relay = true
-	steam_peer.create_client(lobby_owner_id)
+	_configure_steam_peer(steam_peer)
+	last_error = steam_peer.create_client(lobby_owner_id)
+	if last_error != OK:
+		steam_peer.close()
+		return null
 	peer = steam_peer
 	multiplayer_api.multiplayer_peer = steam_peer
 	return steam_peer

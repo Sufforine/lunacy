@@ -20,6 +20,9 @@ const MISSION_SCENE := "res://screens/mission/ui/mission.tscn"
 const HUB_PROFILE_SYNC_TIMEOUT_SECONDS := 6.0
 
 var _steam_ready: bool = false
+var _creating_lobby: bool = false
+var _requested_lobby_id: int = 0
+var _connection_deadline: int = 0
 
 var lobby_id: int = 0
 var peer: MultiplayerPeer
@@ -88,8 +91,11 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _steam_available():
+	if _steam_ready:
 		Steam.run_callbacks()
+	if _connection_deadline != 0 and Time.get_ticks_msec() >= _connection_deadline:
+		disconnect_lobby()
+		lobby_failed.emit("Время ожидания подключения истекло. Проверьте, что хост доступен и версии игры совпадают.")
 
 
 func is_session_active() -> bool:
@@ -101,6 +107,8 @@ func is_mission_loading() -> bool:
 
 
 func host_lobby() -> void:
+	if _connection_deadline != 0:
+		return
 	if not is_steam_ready():
 		lobby_failed.emit("Steam не инициализирован")
 		return
@@ -108,11 +116,18 @@ func host_lobby() -> void:
 	if lobby_id != 0:
 		disconnect_lobby()
 
-	Steam.createLobby(LOBBY_TYPE_PUBLIC, 4)
+	_creating_lobby = true
 	is_host = true
+	_connection_deadline = Time.get_ticks_msec() + 30000
+	Steam.createLobby(LOBBY_TYPE_PUBLIC, 4)
 
 
 func join_lobby(id: int) -> void:
+	if _connection_deadline != 0:
+		return
+	if id <= 0:
+		lobby_failed.emit("Некорректный код лобби")
+		return
 	if not is_steam_ready():
 		lobby_failed.emit("Steam не инициализирован")
 		return
@@ -121,6 +136,8 @@ func join_lobby(id: int) -> void:
 		disconnect_lobby()
 
 	is_joining = true
+	_requested_lobby_id = id
+	_connection_deadline = Time.get_ticks_msec() + 30000
 	Steam.joinLobby(id)
 
 
@@ -132,11 +149,20 @@ func disconnect_lobby() -> void:
 	_drops.clear()
 	if _steam_ready and lobby_id != 0:
 		Steam.leaveLobby(lobby_id)
-	_transport.close_connection(multiplayer)
 	if multiplayer.peer_connected.is_connected(_on_peer_connected):
 		multiplayer.peer_connected.disconnect(_on_peer_connected)
 	if multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
 		multiplayer.peer_disconnected.disconnect(_on_peer_disconnected)
+	if multiplayer.connected_to_server.is_connected(_on_connected_to_server):
+		multiplayer.connected_to_server.disconnect(_on_connected_to_server)
+	if multiplayer.connection_failed.is_connected(_on_connection_failed):
+		multiplayer.connection_failed.disconnect(_on_connection_failed)
+	if multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+		multiplayer.server_disconnected.disconnect(_on_server_disconnected)
+	_transport.close_connection(multiplayer)
+	_creating_lobby = false
+	_requested_lobby_id = 0
+	_connection_deadline = 0
 	_session.player_states.clear()
 	lobby_id = 0
 	peer = null
@@ -151,6 +177,11 @@ func start_game() -> void:
 	if PlayerProfile.hero_scene.is_empty():
 		push_warning("SteamLobby: хост не выбрал героя")
 		return
+
+	for connected_id in multiplayer.get_peers():
+		if not _session.player_states.has(int(connected_id)):
+			lobby_failed.emit("Дождитесь получения данных всех игроков")
+			return
 
 	for peer_id in _session.player_states:
 		var state: PlayerState = _session.player_states[peer_id]
@@ -192,6 +223,10 @@ func _begin_network_scene_change(scene_path: String) -> void:
 	if not _is_allowed_gameplay_scene(scene_path):
 		return
 
+	# Поздний вход требует отдельной синхронизации мира и пока не поддерживается.
+	peer.refuse_new_connections = true
+	if _steam_ready and lobby_id != 0:
+		Steam.setLobbyJoinable(lobby_id, false)
 	_scene_transition_id += 1
 	_scene_transition_path = scene_path
 	_scene_transition_waiting = _connected_peer_set()
@@ -734,6 +769,12 @@ func _rpc_despawn_hub_player(peer_id: int) -> void:
 
 
 func _on_lobby_created(result: int, id: int) -> void:
+	if not _creating_lobby:
+		if result == RESULT_OK and id != lobby_id and _steam_ready:
+			Steam.leaveLobby(id)
+		return
+	_creating_lobby = false
+	_connection_deadline = 0
 	if not _steam_available():
 		return
 
@@ -745,6 +786,11 @@ func _on_lobby_created(result: int, id: int) -> void:
 
 	lobby_id = id
 	peer = _transport.create_steam_host(multiplayer)
+	if peer == null:
+		var reason := "Не удалось создать Steam-сервер: %s" % error_string(_transport.last_error)
+		disconnect_lobby()
+		lobby_failed.emit(reason)
+		return
 	if not multiplayer.peer_connected.is_connected(_on_peer_connected):
 		multiplayer.peer_connected.connect(_on_peer_connected)
 	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
@@ -757,22 +803,39 @@ func _on_lobby_created(result: int, id: int) -> void:
 
 
 func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) -> void:
-	if not is_joining:
+	if not is_joining or id != _requested_lobby_id:
+		if response == RESULT_OK and id != lobby_id and _steam_ready:
+			Steam.leaveLobby(id)
 		return
 
 	if not _steam_available():
 		return
 	if response != RESULT_OK:
-		is_joining = false
+		disconnect_lobby()
 		lobby_failed.emit("Не удалось войти в Steam-лобби: %d" % response)
 		return
 
 	lobby_id = id
-	peer = _transport.create_steam_client(multiplayer, Steam.getLobbyOwner(lobby_id))
+	var owner_id: int = Steam.getLobbyOwner(lobby_id)
+	if owner_id == 0 or owner_id == Steam.getSteamID():
+		disconnect_lobby()
+		lobby_failed.emit("Хост лобби недоступен")
+		return
+	if not multiplayer.server_disconnected.is_connected(_on_server_disconnected):
+		multiplayer.server_disconnected.connect(_on_server_disconnected)
+	# Подписываемся до установки peer в MultiplayerAPI.
+	if not multiplayer.connected_to_server.is_connected(_on_connected_to_server):
+		multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
+	if not multiplayer.connection_failed.is_connected(_on_connection_failed):
+		multiplayer.connection_failed.connect(_on_connection_failed, CONNECT_ONE_SHOT)
+	peer = _transport.create_steam_client(multiplayer, owner_id)
+	if peer == null:
+		var reason := "Не удалось создать Steam-клиент: %s" % error_string(_transport.last_error)
+		disconnect_lobby()
+		lobby_failed.emit(reason)
+		return
 	is_joining = false
 
-	multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
-	multiplayer.connection_failed.connect(_on_connection_failed, CONNECT_ONE_SHOT)
 	if not multiplayer.peer_disconnected.is_connected(_on_peer_disconnected):
 		multiplayer.peer_disconnected.connect(_on_peer_disconnected)
 	print("SteamLobby: в лобби, ожидание P2P-подключения к хосту...")
@@ -781,13 +844,18 @@ func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) 
 func _on_connected_to_server() -> void:
 	var state_data := _session.register_local_player(multiplayer.get_unique_id())
 	_rpc_send_state.rpc_id(1, state_data)
-	lobby_ready.emit(lobby_id)
+	# Меню открывается после подтверждения профиля списком игроков от хоста.
 	print("SteamLobby: P2P подключён, peer_id=", multiplayer.get_unique_id())
 
 
 func _on_connection_failed() -> void:
-	lobby_failed.emit("Не удалось подключиться к хосту")
 	disconnect_lobby()
+	lobby_failed.emit("Не удалось подключиться к хосту")
+
+
+func _on_server_disconnected() -> void:
+	disconnect_lobby()
+	lobby_failed.emit("Соединение с хостом потеряно")
 
 
 func _on_peer_connected(id: int) -> void:
@@ -836,6 +904,12 @@ func _broadcast_player_list() -> void:
 
 @rpc("authority", "call_local", "reliable")
 func _rpc_player_list(list: Array) -> void:
+	if not multiplayer.is_server() and _connection_deadline != 0:
+		for player_data in list:
+			if int(player_data.get("peer_id", 0)) == multiplayer.get_unique_id():
+				_connection_deadline = 0
+				lobby_ready.emit(lobby_id)
+				break
 	players_updated.emit(list)
 
 
