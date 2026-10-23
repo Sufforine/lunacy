@@ -1,4 +1,3 @@
-class_name WorldChest
 extends StaticBody3D
 
 signal contents_changed

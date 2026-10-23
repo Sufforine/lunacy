@@ -23,6 +23,7 @@ var _steam_ready: bool = false
 var _creating_lobby: bool = false
 var _requested_lobby_id: int = 0
 var _connection_deadline: int = 0
+var _connection_stage: String = ""
 
 var lobby_id: int = 0
 var peer: MultiplayerPeer
@@ -94,8 +95,10 @@ func _process(_delta: float) -> void:
 	if _steam_ready:
 		Steam.run_callbacks()
 	if _connection_deadline != 0 and Time.get_ticks_msec() >= _connection_deadline:
+		var failed_stage := _connection_stage
+		push_warning("SteamLobby: тайм-аут на этапе: %s" % failed_stage)
 		disconnect_lobby()
-		lobby_failed.emit("Время ожидания подключения истекло. Проверьте, что хост доступен и версии игры совпадают.")
+		lobby_failed.emit("Время ожидания истекло. Этап: %s.\nПричину уточните в журнале Godot у обоих игроков." % failed_stage)
 
 
 func is_session_active() -> bool:
@@ -117,6 +120,7 @@ func host_lobby() -> void:
 		disconnect_lobby()
 
 	_creating_lobby = true
+	_connection_stage = "создание Steam-лобби"
 	is_host = true
 	_connection_deadline = Time.get_ticks_msec() + 30000
 	Steam.createLobby(LOBBY_TYPE_PUBLIC, 4)
@@ -136,6 +140,7 @@ func join_lobby(id: int) -> void:
 		disconnect_lobby()
 
 	is_joining = true
+	_connection_stage = "вход в Steam-лобби"
 	_requested_lobby_id = id
 	_connection_deadline = Time.get_ticks_msec() + 30000
 	Steam.joinLobby(id)
@@ -164,6 +169,7 @@ func disconnect_lobby() -> void:
 	_requested_lobby_id = 0
 	_connection_deadline = 0
 	_session.player_states.clear()
+	_connection_stage = ""
 	lobby_id = 0
 	peer = null
 	is_host = false
@@ -839,6 +845,8 @@ func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) 
 		multiplayer.connected_to_server.connect(_on_connected_to_server, CONNECT_ONE_SHOT)
 	if not multiplayer.connection_failed.is_connected(_on_connection_failed):
 		multiplayer.connection_failed.connect(_on_connection_failed, CONNECT_ONE_SHOT)
+	_connection_stage = "P2P-соединение с хостом"
+	print("SteamLobby: соединение с владельцем лобби ", owner_id, "; Godot ", Engine.get_version_info().get("string", ""))
 	peer = _transport.create_steam_client(multiplayer, owner_id)
 	if peer == null:
 		var reason := "Не удалось создать Steam-клиент: %s" % error_string(_transport.last_error)
@@ -853,6 +861,7 @@ func _on_lobby_joined(id: int, _permissions: int, _locked: bool, response: int) 
 
 
 func _on_connected_to_server() -> void:
+	_connection_stage = "подтверждение данных героя хостом"
 	var state_data := _session.register_local_player(multiplayer.get_unique_id())
 	_rpc_send_state.rpc_id(1, state_data)
 	# Меню открывается после подтверждения профиля списком игроков от хоста.
