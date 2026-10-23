@@ -53,12 +53,14 @@ var _animation_playback: AnimationNodeStateMachinePlayback
 var _alive_playback: AnimationNodeStateMachinePlayback
 var _movement_velocity := Vector3.ZERO
 var _external_velocity := Vector3.ZERO
+var owns_local_profile := false
 
 
 # ════════════════════════════════════════════════════════
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+	owns_local_profile = is_multiplayer_authority()
 
 	add_to_group("player")
 
@@ -499,7 +501,8 @@ func on_mission_complete() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_EXIT_TREE and is_node_ready():
-		if is_multiplayer_authority():
+		# Транспорт уже может быть закрыт: authority больше нельзя запрашивать.
+		if owns_local_profile:
 			SaveManager.save_player_state(inventory, equipment)
 
 

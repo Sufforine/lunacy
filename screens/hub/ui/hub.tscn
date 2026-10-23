@@ -1,173 +1,210 @@
-[gd_scene load_steps=18 format=3 uid="uid://cs0c4pqfplg4y"]
+[gd_scene load_steps=13 format=3 uid="uid://cs0c4pqfplg4y"]
 
-[ext_resource type="Script" uid="uid://bb6is2srtxwux" path="res://screens/hub/ui/hub.gd" id="1_ami6s"]
-[ext_resource type="Script" uid="uid://4wcfqadoo037" path="res://screens/hub/ui/merchant.gd" id="1_d1od2"]
-[ext_resource type="Script" uid="uid://bg726yf0y54c7" path="res://screens/hub/ui/runouts.gd" id="2_d1od2"]
-[ext_resource type="PackedScene" path="res://Assets/interactables/chest.tscn" id="4_chest"]
-[ext_resource type="Script" path="res://screens/hub/ui/wagon.gd" id="5_wagon"]
+[ext_resource type="Script" path="res://screens/hub/ui/hub.gd" id="1_45dd6"]
+[ext_resource type="PackedScene" path="res://screens/hub/ui/hub_architecture.tscn" id="2_oal32"]
+[ext_resource type="Script" path="res://screens/hub/ui/runouts.gd" id="3_3umn4"]
+[ext_resource type="Script" path="res://screens/hub/ui/wagon.gd" id="4_gi8rm"]
+[ext_resource type="Script" path="res://screens/hub/ui/exit_door.gd" id="5_k7ck2"]
+[ext_resource type="PackedScene" path="res://Assets/interactables/chest.tscn" id="6_3f7a2"]
+[ext_resource type="Script" path="res://Assets/interactables/chest.gd" id="7_w8eu4"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qssp3"]
-albedo_color = Color(0.28985527, 0.41622728, 0.27746338, 1)
+[sub_resource type="Environment" id="Environment_m30j0"]
+background_mode = 1
+background_color = Color(0.07450981, 0.09411765, 0.14117648, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.654902, 0.7254902, 0.83137256, 1)
+ambient_light_energy = 0.5
+tonemap_mode = 2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_boundary_wall"]
-albedo_color = Color(0.235, 0.255, 0.29, 1)
-roughness = 0.88
-
-[sub_resource type="BoxMesh" id="BoxMesh_boundary_wall"]
-material = SubResource("StandardMaterial3D_boundary_wall")
-size = Vector3(62.5, 6, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_boundary_wall"]
-size = Vector3(62.5, 6, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_camera_boundary_z"]
-size = Vector3(64, 30, 1)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_camera_boundary_x"]
-size = Vector3(1, 30, 53)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_qssp3"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hcxm3"]
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_qssp3"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d1od2"]
-transparency = 1
-blend_mode = 1
-albedo_color = Color(1, 0.84824264, 0.63674074, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_62wog"]
+resource_name = "fire"
+albedo_color = Color(1, 0.4745098, 0.15686275, 1)
+roughness = 0.85
 emission_enabled = true
-emission = Color(1, 0.8438284, 0.62569994, 1)
-emission_energy_multiplier = 1.47
+emission = Color(1, 0.4117647, 0.1254902, 1)
+emission_energy_multiplier = 3.0
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_hcxm3"]
-size = Vector3(1.298584, 1.2382813, 1.2089844)
+[sub_resource type="BoxMesh" id="BoxMesh_qjnbv"]
+material = SubResource("StandardMaterial3D_62wog")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w6xti"]
-albedo_color = Color(0.15717193, 0.23727924, 0.3775836, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjijg"]
+resource_name = "page"
+albedo_color = Color(0.9019608, 0.8509804, 0.6784314, 1)
+roughness = 0.85
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_174ik"]
+material = SubResource("StandardMaterial3D_gjijg")
+top_radius = 0.85
+bottom_radius = 0.85
+height = 0.03
 
 [node name="Hub" type="Node3D"]
-script = ExtResource("1_ami6s")
+script = ExtResource("1_45dd6")
 
-[node name="Ground" type="Node3D" parent="."]
+[node name="Architecture" type="Node3D" parent="." instance=ExtResource("2_oal32")]
 
-[node name="CSGBox3D" type="CSGBox3D" parent="Ground"]
-transform = Transform3D(47.314545, 0, 0, 0, 3.8891134, 0, 0, 0, 51.660942, 0.61094046, -0.19225323, 0)
-use_collision = true
-size = Vector3(1.3204346, 0.030822754, 1)
-material = SubResource("StandardMaterial3D_qssp3")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_m30j0")
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Ground"]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-light_color = Color(0.76558864, 0.72944033, 0.548492, 1)
+[node name="Lighting" type="Node3D" parent="."]
+
+[node name="FireLight" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3, 0)
+light_color = Color(1, 0.6039216, 0.27058825, 1)
+light_energy = 4.0
 shadow_enabled = true
+omni_range = 13.0
 
-[node name="NorthBoundaryWall" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61094, 3, 25.83)
+[node name="WallLight_0_0" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 4, -19)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="Mesh" type="MeshInstance3D" parent="NorthBoundaryWall"]
-mesh = SubResource("BoxMesh_boundary_wall")
+[node name="WallLight_0_2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 4, -19)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="Collision" type="CollisionShape3D" parent="NorthBoundaryWall"]
-shape = SubResource("BoxShape3D_boundary_wall")
+[node name="WallLight_11_0" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 4, -8)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="CameraBounds" type="StaticBody3D" parent="."]
-collision_layer = 512
-collision_mask = 0
+[node name="WallLight_11_2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 4, -8)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="North" type="CollisionShape3D" parent="CameraBounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61094, 10, 25.83)
-shape = SubResource("BoxShape3D_camera_boundary_z")
+[node name="WallLight_27_0" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 4, 8)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="South" type="CollisionShape3D" parent="CameraBounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61094, 10, -25.83)
-shape = SubResource("BoxShape3D_camera_boundary_z")
+[node name="WallLight_27_2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 4, 8)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="West" type="CollisionShape3D" parent="CameraBounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.63, 10, 0)
-shape = SubResource("BoxShape3D_camera_boundary_x")
+[node name="WallLight_38_0" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.5, 4, 19)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="East" type="CollisionShape3D" parent="CameraBounds"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.85, 10, 0)
-shape = SubResource("BoxShape3D_camera_boundary_x")
+[node name="WallLight_38_2" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.5, 4, 19)
+light_color = Color(1, 0.8235294, 0.60784316, 1)
+light_energy = 2.3
+omni_range = 10.0
 
-[node name="Merchant" type="StaticBody3D" parent="."]
-script = ExtResource("1_d1od2")
+[node name="DungeonBlue" type="OmniLight3D" parent="Lighting"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4, 19)
+light_color = Color(0.4117647, 0.60784316, 1, 1)
+light_energy = 2.0
+omni_range = 8.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
-shape = SubResource("BoxShape3D_qssp3")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="Merchant"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
-material = SubResource("StandardMaterial3D_hcxm3")
-
-[node name="GlowRing" type="MeshInstance3D" parent="Merchant"]
-transform = Transform3D(2.5485697, 0, 0, 0, 0.010874152, 0, 0, 0, 2.537507, 0, 0, 0)
-mesh = SubResource("CylinderMesh_qssp3")
-surface_material_override/0 = SubResource("StandardMaterial3D_d1od2")
-
-[node name="Area3D" type="Area3D" parent="Merchant"]
-input_capture_on_drag = true
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Merchant/Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
-shape = SubResource("BoxShape3D_hcxm3")
+[node name="FireSparks" type="CPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+amount = 70
+lifetime = 1.5
+preprocess = 1.5
+mesh = SubResource("BoxMesh_qjnbv")
+emission_shape = 1
+emission_sphere_radius = 0.55
+direction = Vector3(0, 1, 0)
+spread = 25.0
+gravity = Vector3(0, 0.5, 0)
+initial_velocity_min = 1.1
+initial_velocity_max = 2.5
+scale_amount_min = 0.04
+scale_amount_max = 0.12
 
 [node name="runouts" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3989148, 0, 0)
-script = ExtResource("2_d1od2")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="runouts"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
-shape = SubResource("BoxShape3D_qssp3")
-
-[node name="CSGBox3D" type="CSGBox3D" parent="runouts"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
-material = SubResource("StandardMaterial3D_w6xti")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, 18.5)
+script = ExtResource("3_3umn4")
 
 [node name="GlowRing" type="MeshInstance3D" parent="runouts"]
-transform = Transform3D(2.5485697, 0, 0, 0, 0.010874152, 0, 0, 0, 2.537507, 0, 0, 0)
-mesh = SubResource("CylinderMesh_qssp3")
-surface_material_override/0 = SubResource("StandardMaterial3D_d1od2")
-
-[node name="Area3D" type="Area3D" parent="runouts"]
-input_capture_on_drag = true
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="runouts/Area3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.68007874, 0)
-shape = SubResource("BoxShape3D_hcxm3")
-
-[node name="MainChest" parent="." instance=ExtResource("4_chest")]
-position = Vector3(-3.4, 0, 0)
+mesh = SubResource("CylinderMesh_174ik")
 
 [node name="Wagon" type="Node3D" parent="."]
-position = Vector3(8, 0, 5)
-script = ExtResource("5_wagon")
-
-[node name="Cube" type="CSGBox3D" parent="Wagon"]
-position = Vector3(0, 0.8, 0)
-size = Vector3(2, 1.6, 2)
-use_collision = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17.5)
+script = ExtResource("4_gi8rm")
 
 [node name="Label3D" type="Label3D" parent="Wagon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
 visible = false
-position = Vector3(0, 3.2, 0)
+pixel_size = 0.008
 billboard = 1
-font_size = 36
-text = ""
+font_size = 40
+
+[node name="ExitDoor" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -20.3)
+script = ExtResource("5_k7ck2")
+
+[node name="MainChest" type="StaticBody3D" parent="." instance=ExtResource("6_3f7a2")]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -12.5, 0, 0)
+script = ExtResource("7_w8eu4")
 
 [node name="SpawnPoints" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 12.154316)
 
 [node name="Spawn_1" type="Marker3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.1434517, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.15, -16)
 
 [node name="Spawn_2" type="Marker3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3714304, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0.15, -16)
 
 [node name="Spawn_3" type="Marker3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -2.16897)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0.15, -16)
 
 [node name="Spawn_4" type="Marker3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.195324)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0.15, -16)
+
+[node name="Signs" type="Node3D" parent="."]
+
+[node name="Exit" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.4, -21)
+pixel_size = 0.008
+billboard = 1
+text = "Выход в меню"
+font_size = 40
+
+[node name="Dungeon" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.4, 21)
+pixel_size = 0.008
+billboard = 1
+text = "Вход в подземелье"
+font_size = 40
+
+[node name="Artisan_0" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4, -12)
+pixel_size = 0.008
+billboard = 1
+text = "Кузнец"
+font_size = 40
+
+[node name="Artisan_1" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 4, -12)
+pixel_size = 0.008
+billboard = 1
+text = "Алхимик"
+font_size = 40
+
+[node name="Artisan_2" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4, 12)
+pixel_size = 0.008
+billboard = 1
+text = "Скупщик"
+font_size = 40
+
+[node name="Artisan_3" type="Label3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 4, 12)
+pixel_size = 0.008
+billboard = 1
+text = "Инженер"
+font_size = 40

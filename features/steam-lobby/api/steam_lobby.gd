@@ -194,6 +194,28 @@ func start_game() -> void:
 	_begin_network_scene_change(HUB_SCENE)
 
 
+func leave_to_main_menu() -> void:
+	if is_session_active() and multiplayer.is_server():
+		_rpc_host_left.rpc()
+	# Отложенный выход не удаляет текущую сцену внутри её обработчика GUI.
+	_finish_leave_to_menu.call_deferred()
+
+
+@rpc("authority", "call_remote", "reliable")
+func _rpc_host_left() -> void:
+	_finish_leave_to_menu.call_deferred()
+
+
+func _finish_leave_to_menu() -> void:
+	for node in get_tree().get_nodes_in_group("player"):
+		if node is Player and node.owns_local_profile:
+			SaveManager.save_player_state(node.inventory, node.equipment)
+	disconnect_lobby()
+	get_tree().paused = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	get_tree().change_scene_to_file("res://screens/main-menu/ui/main_menu.tscn")
+
+
 func request_scene_change(scene_path: String) -> void:
 	if not _is_allowed_gameplay_scene(scene_path):
 		push_warning("SteamLobby: запрещён переход на сцену '%s'" % scene_path)
@@ -843,7 +865,9 @@ func _on_connection_failed() -> void:
 
 
 func _on_server_disconnected() -> void:
-	disconnect_lobby()
+	# В том числе когда хост вышел через ворота: надёжный RPC о выходе
+	# может не успеть дойти до закрытия транспорта.
+	_finish_leave_to_menu.call_deferred()
 	lobby_failed.emit("Соединение с хостом потеряно")
 
 

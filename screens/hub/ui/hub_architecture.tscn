@@ -1,0 +1,2506 @@
+[gd_scene load_steps=14 format=3]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h0kus"]
+resource_name = "floor"
+albedo_color = Color(0.27058825, 0.27058825, 0.3019608, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mikr4"]
+resource_name = "stone"
+albedo_color = Color(0.33333334, 0.34117648, 0.38431373, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_o0t6b"]
+resource_name = "trim"
+albedo_color = Color(0.46666667, 0.45882353, 0.5019608, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_csekc"]
+resource_name = "wood"
+albedo_color = Color(0.32941177, 0.20784314, 0.14901961, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_41lj0"]
+resource_name = "smith"
+albedo_color = Color(0.6627451, 0.29411766, 0.1882353, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_62wog"]
+resource_name = "fire"
+albedo_color = Color(1, 0.4745098, 0.15686275, 1)
+roughness = 0.85
+emission_enabled = true
+emission = Color(1, 0.4117647, 0.1254902, 1)
+emission_energy_multiplier = 3.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_11bi5"]
+resource_name = "metal"
+albedo_color = Color(0.16078432, 0.20392157, 0.2509804, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1xdnq"]
+resource_name = "alchemy"
+albedo_color = Color(0.2627451, 0.50980395, 0.3882353, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gjijg"]
+resource_name = "page"
+albedo_color = Color(0.9019608, 0.8509804, 0.6784314, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y8nn4"]
+resource_name = "merchant"
+albedo_color = Color(0.5294118, 0.32156864, 0.4627451, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xsysy"]
+resource_name = "engineer"
+albedo_color = Color(0.7411765, 0.5647059, 0.28235295, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b37gs"]
+resource_name = "exit"
+albedo_color = Color(0.52156866, 0.38039216, 0.26666668, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6nhti"]
+resource_name = "dungeon"
+albedo_color = Color(0.20784314, 0.29411766, 0.4509804, 1)
+roughness = 0.85
+
+[node name="HubArchitecture" type="Node3D"]
+
+[node name="Hall_28x44m" type="Node3D" parent="."]
+
+[node name="Floor" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.3, 0)
+use_collision = true
+size = Vector3(28, 0.6, 44)
+material = SubResource("StandardMaterial3D_h0kus")
+
+[node name="FloorSeamX_0" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_2" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_4" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_6" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_8" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_10" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_12" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_14" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_16" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_18" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_20" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_22" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamX_24" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.006, 0)
+size = Vector3(0.035, 0.01, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_0" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -20)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_2" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -18)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_4" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -16)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_6" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -14)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_8" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -12)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_10" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -10)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_12" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -8)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_14" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -6)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_16" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -4)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_18" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, -2)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_20" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 0)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_22" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 2)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_24" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 4)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_26" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 6)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_28" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 8)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_30" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 10)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_32" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 12)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_34" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 14)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_36" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 16)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_38" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 18)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="FloorSeamZ_40" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.006, 20)
+size = Vector3(28, 0.01, 0.035)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="SideWall_0" type="Node3D" parent="Hall_28x44m"]
+
+[node name="WallCollision" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.4, 5, 0)
+use_collision = true
+size = Vector3(0.8, 10, 44.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_0_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_0_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_0_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 0.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_1_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_1_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 1.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 2.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_3_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_3_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_3_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 3.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_4_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_4_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_4_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 4.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_5_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_5_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_5_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 5.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_6_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_6_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 6.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 7.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_8_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_8_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_8_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 8.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_9_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_9_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_9_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.98, 9.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="EndWall_0_0" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.75, 5, -22)
+use_collision = true
+size = Vector3(10.5, 10, 0.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="EndWall_0_44" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.75, 5, 22)
+use_collision = true
+size = Vector3(10.5, 10, 0.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Lintel_0" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, -22)
+use_collision = true
+size = Vector3(7, 4, 0.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="SideWall_2" type="Node3D" parent="Hall_28x44m"]
+
+[node name="WallCollision" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.4, 5, 0)
+use_collision = true
+size = Vector3(0.8, 10, 44.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_0_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_0_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_0_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_0_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 0.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_1_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_1_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_1_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 1.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_2_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_2_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 2.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_3_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_3_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_3_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_3_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 3.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_4_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_4_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_4_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_4_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 4.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_5_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_5_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_5_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_5_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 5.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_6_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_6_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_6_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 6.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_7_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_7_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 7.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_8_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_8_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_8_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_8_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 8.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_0" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_1" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_9_2" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_3" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_4" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_5" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_6" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, -3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_9_7" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 0)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_8" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 3)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_9" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 6)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_10" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 9)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_11" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 12)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Brick_9_12" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 15)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_13" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 18)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Brick_9_14" type="CSGBox3D" parent="Hall_28x44m/SideWall_2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.98, 9.5, 21)
+size = Vector3(0.12, 0.95, 2.94)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="EndWall_2_0" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.75, 5, -22)
+use_collision = true
+size = Vector3(10.5, 10, 0.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="EndWall_2_44" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.75, 5, 22)
+use_collision = true
+size = Vector3(10.5, 10, 0.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Lintel_2" type="CSGBox3D" parent="Hall_28x44m"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8, 22)
+use_collision = true
+size = Vector3(7, 4, 0.8)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Ceiling_HideForTopView" type="Node3D" parent="."]
+
+[node name="Ceiling" type="CSGBox3D" parent="Ceiling_HideForTopView"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.4, 0)
+use_collision = true
+size = Vector3(28, 0.6, 44)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="CrossBeam_0" type="CSGBox3D" parent="Ceiling_HideForTopView"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.8, -16)
+use_collision = true
+size = Vector3(28, 0.6, 0.6)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="CrossBeam_16" type="CSGBox3D" parent="Ceiling_HideForTopView"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.8, 0)
+use_collision = true
+size = Vector3(28, 0.6, 0.6)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="CrossBeam_32" type="CSGBox3D" parent="Ceiling_HideForTopView"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.8, 16)
+use_collision = true
+size = Vector3(28, 0.6, 0.6)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Column_0_0" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, -6)
+
+[node name="Base" type="CSGBox3D" parent="Column_0_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+use_collision = true
+size = Vector3(2.1, 0.5, 2.1)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Shaft" type="CSGBox3D" parent="Column_0_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(1.3, 9, 1.3)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Capital" type="CSGBox3D" parent="Column_0_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 0)
+use_collision = true
+size = Vector3(2, 0.6, 2)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Column_0_12" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 6)
+
+[node name="Base" type="CSGBox3D" parent="Column_0_12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+use_collision = true
+size = Vector3(2.1, 0.5, 2.1)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Shaft" type="CSGBox3D" parent="Column_0_12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(1.3, 9, 1.3)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Capital" type="CSGBox3D" parent="Column_0_12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 0)
+use_collision = true
+size = Vector3(2, 0.6, 2)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Column_10_0" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, -6)
+
+[node name="Base" type="CSGBox3D" parent="Column_10_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+use_collision = true
+size = Vector3(2.1, 0.5, 2.1)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Shaft" type="CSGBox3D" parent="Column_10_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(1.3, 9, 1.3)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Capital" type="CSGBox3D" parent="Column_10_0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 0)
+use_collision = true
+size = Vector3(2, 0.6, 2)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Column_10_12" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 6)
+
+[node name="Base" type="CSGBox3D" parent="Column_10_12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
+use_collision = true
+size = Vector3(2.1, 0.5, 2.1)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Shaft" type="CSGBox3D" parent="Column_10_12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 0)
+use_collision = true
+size = Vector3(1.3, 9, 1.3)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Capital" type="CSGBox3D" parent="Column_10_12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.5, 0)
+use_collision = true
+size = Vector3(2, 0.6, 2)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Blacksmith" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -12)
+
+[node name="Platform" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(5, 0.2, 6)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Counter" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 2)
+use_collision = true
+size = Vector3(4, 1.2, 0.8)
+material = SubResource("StandardMaterial3D_41lj0")
+
+[node name="Canopy" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+use_collision = true
+size = Vector3(5.4, 0.25, 6.3)
+material = SubResource("StandardMaterial3D_41lj0")
+
+[node name="Post_-2_2_-2_6" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_-2_2_2_6" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_-2_6" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_2_6" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Forge" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -1)
+use_collision = true
+size = Vector3(2, 1.6, 1.5)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Coals" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.73, -1)
+size = Vector3(1.4, 0.1, 1)
+material = SubResource("StandardMaterial3D_62wog")
+
+[node name="Chimney" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -2)
+use_collision = true
+size = Vector3(1.5, 4, 1)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="Anvil" type="CSGBox3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, 1.5, 1.9)
+use_collision = true
+size = Vector3(1, 0.4, 0.5)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="WorkLight" type="OmniLight3D" parent="Blacksmith"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+light_color = Color(1, 0.73333335, 0.4392157, 1)
+light_energy = 2.0
+omni_range = 7.0
+
+[node name="Alchemist" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -12)
+
+[node name="Platform" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(5, 0.2, 6)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Counter" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 2)
+use_collision = true
+size = Vector3(4, 1.2, 0.8)
+material = SubResource("StandardMaterial3D_1xdnq")
+
+[node name="Canopy" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+use_collision = true
+size = Vector3(5.4, 0.25, 6.3)
+material = SubResource("StandardMaterial3D_1xdnq")
+
+[node name="Post_-2_2_-2_6" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_-2_2_2_6" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_-2_6" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_2_6" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Goods_0" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.55, 2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="Goods_1" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 1.55, 2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="Goods_2" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 1.55, 2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="Goods_3" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.55, 2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="Goods_4" type="CSGBox3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 1.55, 2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="WorkLight" type="OmniLight3D" parent="Alchemist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+light_color = Color(1, 0.73333335, 0.4392157, 1)
+light_energy = 2.0
+omni_range = 7.0
+
+[node name="Merchant" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 12)
+
+[node name="Platform" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(5, 0.2, 6)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Counter" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -2)
+use_collision = true
+size = Vector3(4, 1.2, 0.8)
+material = SubResource("StandardMaterial3D_y8nn4")
+
+[node name="Canopy" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+use_collision = true
+size = Vector3(5.4, 0.25, 6.3)
+material = SubResource("StandardMaterial3D_y8nn4")
+
+[node name="Post_-2_2_-2_6" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_-2_2_2_6" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_-2_6" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_2_6" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Goods_0" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_1" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_2" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_3" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_4" type="CSGBox3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="WorkLight" type="OmniLight3D" parent="Merchant"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+light_color = Color(1, 0.73333335, 0.4392157, 1)
+light_energy = 2.0
+omni_range = 7.0
+
+[node name="Engineer" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 12)
+
+[node name="Platform" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+use_collision = true
+size = Vector3(5, 0.2, 6)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Counter" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, -2)
+use_collision = true
+size = Vector3(4, 1.2, 0.8)
+material = SubResource("StandardMaterial3D_xsysy")
+
+[node name="Canopy" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.4, 0)
+use_collision = true
+size = Vector3(5.4, 0.25, 6.3)
+material = SubResource("StandardMaterial3D_xsysy")
+
+[node name="Post_-2_2_-2_6" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_-2_2_2_6" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_-2_6" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, -2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Post_2_2_2_6" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.2, 1.8, 2.6)
+use_collision = true
+size = Vector3(0.18, 3.2, 0.18)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Goods_0" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_1" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_2" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.1, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_3" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.6, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Goods_4" type="CSGBox3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 1.55, -2)
+size = Vector3(0.35, 0.5, 0.35)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="WorkLight" type="OmniLight3D" parent="Engineer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.7, 0)
+light_color = Color(1, 0.73333335, 0.4392157, 1)
+light_energy = 2.0
+omni_range = 7.0
+
+[node name="ExitGate" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -21.6)
+
+[node name="Frame_0" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 3, 0)
+use_collision = true
+size = Vector3(0.7, 6, 1.5)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="DoorLeaf_0" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 2.7, 0)
+use_collision = true
+size = Vector3(2.85, 5.4, 0.4)
+material = SubResource("StandardMaterial3D_b37gs")
+
+[node name="Brace_0_1" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1, 0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_0_2_7" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 2.7, 0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_0_4_5" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 4.5, 0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Frame_2" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 3, 0)
+use_collision = true
+size = Vector3(0.7, 6, 1.5)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="DoorLeaf_2" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 2.7, 0)
+use_collision = true
+size = Vector3(2.85, 5.4, 0.4)
+material = SubResource("StandardMaterial3D_b37gs")
+
+[node name="Brace_2_1" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1, 0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_2_2_7" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 2.7, 0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_2_4_5" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 4.5, 0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="TopFrame" type="CSGBox3D" parent="ExitGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.8, 0)
+use_collision = true
+size = Vector3(7.3, 0.6, 1.5)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="DungeonGate" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 21.6)
+
+[node name="Frame_0" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.3, 3, 0)
+use_collision = true
+size = Vector3(0.7, 6, 1.5)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="DoorLeaf_0" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 2.7, 0)
+use_collision = true
+size = Vector3(2.85, 5.4, 0.4)
+material = SubResource("StandardMaterial3D_6nhti")
+
+[node name="Brace_0_1" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 1, -0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_0_2_7" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 2.7, -0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_0_4_5" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.45, 4.5, -0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Frame_2" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3, 3, 0)
+use_collision = true
+size = Vector3(0.7, 6, 1.5)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="DoorLeaf_2" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 2.7, 0)
+use_collision = true
+size = Vector3(2.85, 5.4, 0.4)
+material = SubResource("StandardMaterial3D_6nhti")
+
+[node name="Brace_2_1" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 1, -0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_2_2_7" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 2.7, -0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Brace_2_4_5" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.45, 4.5, -0.25)
+size = Vector3(2.8, 0.16, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="TopFrame" type="CSGBox3D" parent="DungeonGate"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.8, 0)
+use_collision = true
+size = Vector3(7.3, 0.6, 1.5)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="MissionBook" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 0, 18.5)
+
+[node name="Plinth" type="CSGBox3D" parent="MissionBook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+use_collision = true
+size = Vector3(1.3, 0.3, 1.3)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Pedestal" type="CSGBox3D" parent="MissionBook"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+use_collision = true
+size = Vector3(0.65, 1.3, 0.65)
+material = SubResource("StandardMaterial3D_mikr4")
+
+[node name="BookCover" type="CSGBox3D" parent="MissionBook"]
+transform = Transform3D(1, 0, 0, 0, 0.9396926, -0.34202012, 0, 0.34202012, 0.9396926, 0, 1.5, 0)
+size = Vector3(1.15, 0.12, 0.8)
+material = SubResource("StandardMaterial3D_6nhti")
+
+[node name="Page_0" type="CSGBox3D" parent="MissionBook"]
+transform = Transform3D(0.99026805, 0.1391731, 0, -0.13077994, 0.9305476, -0.34202012, -0.0476, 0.3386916, 0.9396926, -0.27, 1.59, 0)
+size = Vector3(0.52, 0.05, 0.72)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="Page_2" type="CSGBox3D" parent="MissionBook"]
+transform = Transform3D(0.99026805, -0.1391731, 0, 0.13077994, 0.9305476, -0.34202012, 0.0476, 0.3386916, 0.9396926, 0.27, 1.59, 0)
+size = Vector3(0.52, 0.05, 0.72)
+material = SubResource("StandardMaterial3D_gjijg")
+
+[node name="Campfire" type="Node3D" parent="."]
+
+[node name="Stone_0" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.3, 0.25, 0)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_1" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(0.8660254, 0, -0.5, 0, 1, 0, 0.5, 0, 0.8660254, 1.125833, 0.25, 0.65)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_2" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(0.49999997, 0, -0.86602545, 0, 1, 0, 0.86602545, 0, 0.49999997, 0.65, 0.25, 1.125833)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_3" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 7.960204e-17, 0.25, 1.3)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_4" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(-0.50000006, 0, -0.8660254, 0, 1, 0, 0.8660254, 0, -0.50000006, -0.65, 0.25, 1.125833)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_5" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(-0.8660254, 0, -0.50000006, 0, 1, 0, 0.50000006, 0, -0.8660254, -1.125833, 0.25, 0.65)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_6" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(-1, 0, 8.742278e-08, 0, 1, 0, -8.742278e-08, 0, -1, -1.3, 0.25, 1.5920408e-16)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_7" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(-0.8660254, 0, 0.49999997, 0, 1, 0, -0.49999997, 0, -0.8660254, -1.125833, 0.25, -0.65)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_8" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(-0.4999999, 0, 0.86602545, 0, 1, 0, -0.86602545, 0, -0.4999999, -0.65, 0.25, -1.125833)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_9" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1.1924881e-08, 0, 1, 0, 1, 0, -1, 0, 1.1924881e-08, -2.3880612e-16, 0.25, -1.3)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_10" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(0.4999999, 0, 0.86602545, 0, 1, 0, -0.86602545, 0, 0.4999999, 0.65, 0.25, -1.125833)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Stone_11" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(0.8660253, 0, 0.5000002, 0, 1, 0, -0.5000002, 0, 0.8660253, 1.125833, 0.25, -0.65)
+use_collision = true
+size = Vector3(0.55, 0.5, 0.55)
+material = SubResource("StandardMaterial3D_o0t6b")
+
+[node name="Log_0" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(0.921061, 0, -0.38941833, 0, 1, 0, 0.38941833, 0, 0.921061, 0, 0.25, -0.35)
+use_collision = true
+size = Vector3(1.6, 0.25, 0.3)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="PotStand_0" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 1, 0)
+use_collision = true
+size = Vector3(0.12, 2, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Log_2" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(0.921061, 0, 0.38941833, 0, 1, 0, -0.38941833, 0, 0.921061, 0, 0.25, 0.35)
+use_collision = true
+size = Vector3(1.6, 0.25, 0.3)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="PotStand_2" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8, 1, 0)
+use_collision = true
+size = Vector3(0.12, 2, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Support" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
+use_collision = true
+size = Vector3(1.8, 0.12, 0.12)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Chain" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7, 0)
+size = Vector3(0.05, 0.6, 0.05)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Cauldron" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
+use_collision = true
+size = Vector3(0.9, 0.6, 0.9)
+material = SubResource("StandardMaterial3D_11bi5")
+
+[node name="Soup" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.41, 0)
+size = Vector3(0.73, 0.03, 0.73)
+material = SubResource("StandardMaterial3D_1xdnq")
+
+[node name="Embers" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.28, 0)
+size = Vector3(1.2, 0.12, 1.2)
+material = SubResource("StandardMaterial3D_62wog")
+
+[node name="Bench_0" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, -3)
+use_collision = true
+size = Vector3(2.8, 0.4, 0.6)
+material = SubResource("StandardMaterial3D_csekc")
+
+[node name="Bench_6" type="CSGBox3D" parent="Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 3)
+use_collision = true
+size = Vector3(2.8, 0.4, 0.6)
+material = SubResource("StandardMaterial3D_csekc")
