@@ -23,6 +23,25 @@ class_name WeaponData
 @export_group("Weapon Info")
 @export var attack_range: float = 1.5
 
+@export_group("Held Models")
+@export var right_hand_scene: PackedScene
+@export var left_hand_scene: PackedScene
+@export var right_hand_position := Vector3(0, 0.08, 0)
+@export var right_hand_rotation := Vector3(90, 0, 0)
+@export var right_hand_scale := Vector3.ONE
+@export var left_hand_position := Vector3(0, 0.04, -0.08)
+@export var left_hand_rotation := Vector3.ZERO
+@export var left_hand_scale := Vector3.ONE
+
+@export_group("Combat")
+@export var attack_animation: StringName = &"Sword_Attack"
+@export var block_animation: StringName = &"Sword_Idle"
+@export_range(0.1, 5.0) var attack_cooldown: float = 0.8
+@export_range(0.0, 2.0) var attack_hit_delay: float = 0.3
+@export_range(0.0, 0.95) var block_reduction: float = 0.7
+# Только первые три способности доступны на Q/E/R.
+@export var skills: Array[WeaponSkill] = []
+
 
 func _init() -> void:
 	slot = ItemData.Slot.WEAPON

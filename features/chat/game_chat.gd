@@ -46,11 +46,22 @@ func _ready() -> void:
 	_typing_style.content_margin_right = 10
 	_typing_style.content_margin_bottom = 10
 	_set_typing_visual(false)
+	_apply_chat_scale()
+	GameSettings.chat_scale_changed.connect(_apply_chat_scale)
 	get_tree().scene_changed.connect(_on_scene_changed)
 	multiplayer.peer_disconnected.connect(func(id: int): _last_sent.erase(id))
 
 
 func _input(event: InputEvent) -> void:
+	# Пока чат открыт, колесо всегда принадлежит истории сообщений,
+	# даже если курсор находится за пределами самого RichTextLabel.
+	if is_typing and event is InputEventMouseButton:
+		var mouse_event := event as InputEventMouseButton
+		if mouse_event.pressed and _is_mouse_wheel(mouse_event):
+			_scroll_history(mouse_event)
+			get_viewport().set_input_as_handled()
+			return
+
 	if not event is InputEventKey or not event.pressed or event.echo:
 		return
 	if is_typing:
@@ -78,6 +89,20 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
+func _is_mouse_wheel(event: InputEventMouseButton) -> bool:
+	return event.button_index == MOUSE_BUTTON_WHEEL_UP \
+		or event.button_index == MOUSE_BUTTON_WHEEL_DOWN
+
+
+func _scroll_history(event: InputEventMouseButton) -> void:
+	var scroll_bar := _history.get_v_scroll_bar()
+	var amount := maxf(scroll_bar.page * 0.18, 36.0) * maxf(event.factor, 1.0)
+	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+		scroll_bar.value -= amount
+	else:
+		scroll_bar.value += amount
+
+
 func _close() -> void:
 	is_typing = false
 	_entry.release_focus()
@@ -100,6 +125,29 @@ func _set_typing_visual(typing: bool) -> void:
 	# под ним. Фон и перехват кликов включаются лишь на время ввода.
 	_panel.add_theme_stylebox_override("panel", _typing_style if typing else _transparent_style)
 	_panel.mouse_filter = Control.MOUSE_FILTER_STOP if typing else Control.MOUSE_FILTER_IGNORE
+	# RichTextLabel создаёт собственную полосу прокрутки. В закрытом чате
+	# она полностью отключена, поэтому на экране остаётся только текст.
+	_history.scroll_active = typing
+	var scroll_bar := _history.get_v_scroll_bar()
+	scroll_bar.mouse_filter = Control.MOUSE_FILTER_STOP if typing else Control.MOUSE_FILTER_IGNORE
+	if typing:
+		_scroll_history_to_bottom.call_deferred()
+
+
+func _apply_chat_scale() -> void:
+	var factor := 1.0 + GameSettings.chat_scale_percent / 100.0
+	_panel.scale = Vector2(factor, factor)
+	_update_scale_pivot.call_deferred()
+
+
+func _update_scale_pivot() -> void:
+	# Нижний левый угол остаётся на месте при изменении масштаба.
+	_panel.pivot_offset = Vector2(0.0, _panel.size.y)
+
+
+func _scroll_history_to_bottom() -> void:
+	var scroll_bar := _history.get_v_scroll_bar()
+	scroll_bar.value = scroll_bar.max_value
 
 
 func _submit(message: String) -> void:
@@ -154,3 +202,4 @@ func _receive_message(author: String, message: String) -> void:
 	if _messages.size() > 100:
 		_messages.pop_front()
 	_history.text = "\n".join(_messages)
+	_scroll_history_to_bottom.call_deferred()

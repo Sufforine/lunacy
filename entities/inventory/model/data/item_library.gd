@@ -24,6 +24,7 @@ func _init() -> void:
 		preload("res://entities/inventory/model/items/trinkets/DamageCharm.tres"),
 		preload("res://entities/inventory/model/items/trinkets/SpeedCharm.tres"),
 		preload("res://entities/inventory/model/items/weapon/Axe.tres"),
+		preload("res://entities/inventory/model/items/weapon/SwordShield.tres"),
 		preload("res://entities/inventory/model/items/armor/DullahanCoat.tres"),
 		preload("res://entities/inventory/model/items/armor/ShieldArmor.tres"),
 	])

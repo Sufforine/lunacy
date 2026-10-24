@@ -94,7 +94,7 @@ func deactivate() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if GameChat.is_typing:
+	if _interface_captures_mouse():
 		return
 	if not enabled:
 		return
@@ -116,6 +116,16 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif mouse_event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 		_target_distance = minf(maximum_distance, _target_distance + zoom_step)
 		get_viewport().set_input_as_handled()
+
+
+func _interface_captures_mouse() -> bool:
+	if GameChat.is_typing:
+		return true
+	return player != null \
+		and is_instance_valid(player) \
+		and player.inventory_ui != null \
+		and is_instance_valid(player.inventory_ui) \
+		and player.inventory_ui.is_main_panel_open()
 
 
 func _physics_process(delta: float) -> void:

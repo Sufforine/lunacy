@@ -1,8 +1,11 @@
 extends Node
 
 signal crosshair_changed
+signal chat_scale_changed
+signal inventory_theme_changed
 
 enum CrosshairShape { DOT, CROSS, CIRCLE }
+enum InventoryTheme { DAY, NIGHT }
 
 const SETTINGS_PATH := "user://settings.cfg"
 const ENVIRONMENT_BUS := &"Environment"
@@ -14,6 +17,8 @@ var master_volume: float = 100.0
 var environment_volume: float = 100.0
 var crosshair_shape: int = CrosshairShape.DOT
 var crosshair_thickness: float = 3.0
+var chat_scale_percent: float = 0.0
+var inventory_theme: int = InventoryTheme.DAY
 
 
 func set_crosshair_shape(value: int) -> void:
@@ -25,6 +30,21 @@ func set_crosshair_shape(value: int) -> void:
 func set_crosshair_thickness(value: float) -> void:
 	crosshair_thickness = clampf(value, 1.0, 8.0)
 	crosshair_changed.emit()
+	_save_settings()
+
+
+func set_chat_scale_percent(value: float) -> void:
+	chat_scale_percent = clampf(value, -50.0, 50.0)
+	chat_scale_changed.emit()
+	_save_settings()
+
+
+func set_inventory_theme(value: int) -> void:
+	var selected := clampi(value, InventoryTheme.DAY, InventoryTheme.NIGHT)
+	if inventory_theme == selected:
+		return
+	inventory_theme = selected
+	inventory_theme_changed.emit()
 	_save_settings()
 
 
@@ -160,6 +180,8 @@ func _load_settings() -> void:
 	environment_volume = clampf(float(config.get_value("audio", "environment", environment_volume)), 0.0, 100.0)
 	crosshair_shape = clampi(int(config.get_value("crosshair", "shape", crosshair_shape)), CrosshairShape.DOT, CrosshairShape.CIRCLE)
 	crosshair_thickness = clampf(float(config.get_value("crosshair", "thickness", crosshair_thickness)), 1.0, 8.0)
+	chat_scale_percent = clampf(float(config.get_value("chat", "scale_percent", chat_scale_percent)), -50.0, 50.0)
+	inventory_theme = clampi(int(config.get_value("inventory", "theme", inventory_theme)), InventoryTheme.DAY, InventoryTheme.NIGHT)
 
 
 func _save_settings() -> void:
@@ -170,6 +192,8 @@ func _save_settings() -> void:
 	config.set_value("audio", "environment", environment_volume)
 	config.set_value("crosshair", "shape", crosshair_shape)
 	config.set_value("crosshair", "thickness", crosshair_thickness)
+	config.set_value("chat", "scale_percent", chat_scale_percent)
+	config.set_value("inventory", "theme", inventory_theme)
 	var error := config.save(SETTINGS_PATH)
 	if error != OK:
 		push_warning("GameSettings: не удалось сохранить настройки (%s)" % error_string(error))

@@ -1,13 +1,18 @@
-[gd_resource type="Resource" script_class="ItemData" load_steps=3 format=3 uid="uid://qjpn86egrf6x"]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3 uid="uid://qjpn86egrf6x"]
 
 [ext_resource type="Texture2D" uid="uid://cxq1670oiwlt6" path="res://Assets/Icons/WoW Icon Pack/Weapons/Halberd_06.png" id="1_0kmnu"]
-[ext_resource type="Script" uid="uid://c77evqxqq52db" path="res://entities/inventory/model/data/item_data.gd" id="1_u6cb8"]
+[ext_resource type="Script" path="res://entities/inventory/model/data/Weapondata.gd" id="1_u6cb8"]
+[ext_resource type="PackedScene" path="res://Assets/weapons/axe_A.gltf" id="3_model"]
 
 [resource]
 script = ExtResource("1_u6cb8")
 id = "axe"
 item_name = "axe"
 icon = ExtResource("1_0kmnu")
-slot = 1
-bonus_physical_damage = 99
-metadata/_custom_type_script = "uid://c77evqxqq52db"
+physical_base_damage = 40.0
+strength_ratio = 0.7
+right_hand_scene = ExtResource("3_model")
+right_hand_position = Vector3(0, 0.16, 0)
+right_hand_rotation = Vector3(0, 0, 0)
+right_hand_scale = Vector3(0.75, 0.75, 0.75)
+block_reduction = 0.3

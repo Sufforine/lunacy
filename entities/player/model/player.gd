@@ -4,7 +4,7 @@ class_name Player
 const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 const ANIM_SLASH := [&"Sword_Attack"]
 const ANIM_ABILITY := [&"Spell_Simple_Shoot"]
-const ACTION_STATES := {&"Sword_Attack": &"Attack", &"Spell_Simple_Shoot": &"Ability"}
+const ACTION_STATES := {&"Sword_Attack": &"Attack", &"Spell_Simple_Shoot": &"Ability", &"Push": &"ShieldBash"}
 
 @export var ease_speed: float = 5.0
 @export_group("Movement")
@@ -39,6 +39,7 @@ const ACTION_STATES := {&"Sword_Attack": &"Attack", &"Spell_Simple_Shoot": &"Abi
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
 @onready var interaction_prompt: InteractionPrompt = $CanvasLayer/InteractionPrompt
 var hud_bars: HUDBars = null
+var weapon_combat: Node
 
 
 # ── состояния анимации ───────────────────────────────────
@@ -80,6 +81,10 @@ func _ready() -> void:
 		equipment.load_from_dict(net_state.get("equipment", {}))
 		inventory.set_data(net_state.get("inventory", []))
 		inventory.set_quickslot_data(net_state.get("quickslots", []))
+
+	weapon_combat = load("res://entities/player/model/weapon_combat.gd").new()
+	weapon_combat.name = "WeaponCombat"
+	add_child(weapon_combat)
 
 	stats.current_health = int(stats.get_stat("health"))
 	stats.current_mana   = int(stats.get_stat("mana"))
@@ -198,6 +203,9 @@ func _handle_movement(delta: float, controls_enabled: bool) -> void:
 		input_dir = camera_rig.get_camera_relative_direction(input_dir)
 	var speed: float = stats.get_stat("move_speed")
 	var sprinting := controls_enabled and Input.is_action_pressed("sprint") and not input_dir.is_zero_approx()
+	if weapon_combat != null and weapon_combat.blocking:
+		sprinting = false
+		speed *= 0.5
 	if sprinting:
 		speed *= sprint_multiplier
 
@@ -318,12 +326,7 @@ func _input(event: InputEvent) -> void:
 			KEY_2: inventory.use_quickslot(1, self)
 			KEY_3: inventory.use_quickslot(2, self)
 
-	if stats.is_downed or not event.is_pressed() or event.is_echo():
-		return
-	if event.is_action_pressed("attack"):
-		_play_action(ANIM_SLASH)
-	elif event.is_action_pressed("ability"):
-		_play_action(ANIM_ABILITY)
+	# Боевой ввод обрабатывается WeaponCombat после UI в _unhandled_input.
 
 
 # ════════════════════════════════════════════════════════
@@ -375,6 +378,9 @@ func _update_animation() -> void:
 		return
 	if _action_locked:
 		return
+	if weapon_combat != null and weapon_combat.blocking:
+		_travel_animation(&"Block")
+		return
 	# В покое даём приземлению закончиться. Движение сразу прерывает Land;
 	# атака и способность уже переводят дерево напрямую из _play_action().
 	if current == &"Land" and animation_state == AnimationState.IDLE \
@@ -400,12 +406,41 @@ func _resolve_animation_player() -> void:
 		animation_player = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
 	animation_tree = model.get_node_or_null("AnimationTree") as AnimationTree
 	if animation_tree != null:
+		_prepare_weapon_animation_tree()
 		animation_tree.active = true
 		_animation_playback = animation_tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
 		_alive_playback = animation_tree.get("parameters/Alive/playback") as AnimationNodeStateMachinePlayback
 		animation_tree.set("parameters/Alive/Grounded/blend_position", 0.0)
 		_alive_playback.start(&"Grounded")
 		_animation_playback.start(&"Alive")
+
+
+func _prepare_weapon_animation_tree() -> void:
+	# Каждый герой получает собственные узлы дерева и библиотеку.
+	animation_tree.tree_root = animation_tree.tree_root.duplicate(true)
+	var library := animation_player.get_animation_library(&"").duplicate() as AnimationLibrary
+	animation_player.remove_animation_library(&"")
+	animation_player.add_animation_library(&"", library)
+	var root := animation_tree.tree_root as AnimationNodeStateMachine
+	var alive := root.get_node(&"Alive") as AnimationNodeStateMachine
+	for entry in [[&"ShieldBash", &"Push"], [&"Block", &"Sword_Idle"]]:
+		var animation := load("res://Assets/skeleton/animations/%s.res" % entry[1]).duplicate() as Animation
+		animation.loop_mode = Animation.LOOP_LINEAR if entry[0] == &"Block" else Animation.LOOP_NONE
+		library.add_animation(entry[1], animation)
+		var node := AnimationNodeAnimation.new()
+		node.animation = entry[1]
+		alive.add_node(entry[0], node)
+		for other in [&"Grounded", &"Attack", &"Ability", &"Land", &"Air", &"JumpStart"]:
+			var enter := AnimationNodeStateMachineTransition.new()
+			enter.xfade_time = 0.1
+			alive.add_transition(other, entry[0], enter)
+			var leave := AnimationNodeStateMachineTransition.new()
+			leave.xfade_time = 0.1
+			alive.add_transition(entry[0], other, leave)
+	for pair in [[&"Block", &"ShieldBash"], [&"ShieldBash", &"Block"]]:
+		var transition := AnimationNodeStateMachineTransition.new()
+		transition.xfade_time = 0.1
+		alive.add_transition(pair[0], pair[1], transition)
 
 
 func _find_animation(candidates: Array) -> StringName:

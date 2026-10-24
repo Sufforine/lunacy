@@ -49,20 +49,20 @@ grow_vertical = 2
 mouse_filter = 1
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(600, 540)
+custom_minimum_size = Vector2(600, 680)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 layout_mode = 2
 theme_override_constants/margin_left = 46
-theme_override_constants/margin_top = 24
+theme_override_constants/margin_top = 18
 theme_override_constants/margin_right = 46
-theme_override_constants/margin_bottom = 24
+theme_override_constants/margin_bottom = 18
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 6
 
 [node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -214,6 +214,59 @@ custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "3"
+
+[node name="ChatTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
+theme_override_font_sizes/font_size = 20
+text = "Чат"
+
+[node name="ChatScaleRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ChatScaleRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Масштаб"
+
+[node name="ChatScaleSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ChatScaleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 30)
+layout_mode = 2
+min_value = -50.0
+max_value = 50.0
+step = 5.0
+
+[node name="ChatScaleValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ChatScaleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(54, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0%"
+
+[node name="InventoryTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
+theme_override_font_sizes/font_size = 20
+text = "Внешний вид инвентаря"
+
+[node name="InventoryThemeRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/InventoryThemeRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Цветовая схема"
+
+[node name="InventoryThemeOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/InventoryThemeRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 42)
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
 
 [node name="Back" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 46)

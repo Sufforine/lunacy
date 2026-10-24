@@ -86,6 +86,8 @@ func _ready() -> void:
 # PROCESS — таймер агонии
 # ════════════════════════════════════════════════════════
 func _process(delta: float) -> void:
+	if SteamLobby.is_session_active() and not get_parent().is_multiplayer_authority():
+		return
 
 	if not is_downed or is_dead:
 		return
@@ -242,6 +244,9 @@ func take_damage(amount: int, is_magical: bool = false) -> void:
 
 	if is_dead:
 		return
+	var combat := get_parent().get_node_or_null("WeaponCombat")
+	if combat != null:
+		amount = combat.mitigate_damage(amount, is_magical)
 
 	var resistance: float = get_stat(
 		"magic_resistance" if is_magical else "armor"

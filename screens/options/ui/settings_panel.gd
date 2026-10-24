@@ -11,6 +11,9 @@ signal close_requested
 @onready var crosshair_option: OptionButton = %CrosshairOption
 @onready var thickness_slider: HSlider = %ThicknessSlider
 @onready var thickness_value: Label = %ThicknessValue
+@onready var chat_scale_slider: HSlider = %ChatScaleSlider
+@onready var chat_scale_value: Label = %ChatScaleValue
+@onready var inventory_theme_option: OptionButton = %InventoryThemeOption
 
 
 func _ready() -> void:
@@ -27,6 +30,17 @@ func _ready() -> void:
 	_update_thickness_label()
 	crosshair_option.item_selected.connect(_on_crosshair_selected)
 	thickness_slider.value_changed.connect(_on_thickness_changed)
+	chat_scale_slider.set_value_no_signal(GameSettings.chat_scale_percent)
+	chat_scale_slider.value_changed.connect(_on_chat_scale_changed)
+	_update_chat_scale_label()
+	inventory_theme_option.add_item("День", GameSettings.InventoryTheme.DAY)
+	inventory_theme_option.add_item("Ночь", GameSettings.InventoryTheme.NIGHT)
+	inventory_theme_option.select(inventory_theme_option.get_item_index(GameSettings.inventory_theme))
+	inventory_theme_option.item_selected.connect(_on_inventory_theme_selected)
+
+
+func _on_inventory_theme_selected(index: int) -> void:
+	GameSettings.set_inventory_theme(inventory_theme_option.get_item_id(index))
 
 
 func _on_crosshair_selected(index: int) -> void:
@@ -40,6 +54,16 @@ func _on_thickness_changed(value: float) -> void:
 
 func _update_thickness_label() -> void:
 	thickness_value.text = "%d" % int(round(thickness_slider.value))
+
+
+func _on_chat_scale_changed(value: float) -> void:
+	GameSettings.set_chat_scale_percent(value)
+	_update_chat_scale_label()
+
+
+func _update_chat_scale_label() -> void:
+	var value := int(round(chat_scale_slider.value))
+	chat_scale_value.text = "+%d%%" % value if value > 0 else "%d%%" % value
 
 
 func _fill_resolutions() -> void:

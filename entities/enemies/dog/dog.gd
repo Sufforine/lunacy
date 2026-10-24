@@ -21,6 +21,7 @@ var _state: State = State.IDLE
 var _state_timer: float = 0.0
 var _move_direction := Vector3.ZERO
 var _spawn_origin := Vector3.ZERO
+var _knockback := Vector3.ZERO
 
 
 func _ready() -> void:
@@ -48,6 +49,12 @@ func _physics_process(delta: float) -> void:
 			velocity.z = 0.0
 			if _state_timer <= 0.0:
 				_enter_walk()
+	if stats.is_downed or stats.is_dead:
+		velocity.x = 0.0
+		velocity.z = 0.0
+	velocity.x += _knockback.x
+	velocity.z += _knockback.z
+	_knockback = _knockback.move_toward(Vector3.ZERO, 12.0 * delta)
 
 	if not is_on_floor():
 		velocity.y -= _get_gravity() * delta
@@ -63,6 +70,12 @@ func _enter_idle() -> void:
 	_state_timer = randf_range(idle_duration_min, idle_duration_max)
 	velocity.x = 0.0
 	velocity.z = 0.0
+
+
+func apply_impulse(impulse: Vector3) -> void:
+	if SteamLobby.is_session_active() and not multiplayer.is_server():
+		return
+	_knockback += impulse / 70.0
 
 
 func _enter_walk() -> void:
@@ -105,6 +118,8 @@ func _update_animation() -> void:
 		return
 
 	var candidates: Array = ANIM_RUN if _state == State.WALK else ANIM_IDLE
+	if stats.is_downed or stats.is_dead:
+		candidates = [&"death", &"Death01", &"idle", &"T"]
 	for animation_name in candidates:
 		if animation_player.has_animation(animation_name):
 			if animation_player.current_animation != animation_name:
