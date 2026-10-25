@@ -1315,6 +1315,10 @@ func _rpc_inventory_use_effect(peer_id: int, item_id: String) -> void:
 	var item := ItemLibrary.get_item(item_id)
 	if hero != null and item != null and hero.is_multiplayer_authority():
 		item.use(hero)
+	elif hero != null and item != null and item.heal_mana > 0:
+		# Ability costs are validated on the host; keep its mana copy in sync
+		# with this already-authorized potion use (without applying HP twice).
+		hero.stats.restore_mana(item.heal_mana)
 
 
 @rpc("authority", "call_local", "reliable")

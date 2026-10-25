@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=6 format=3 uid="uid://ds42jmucnwtcr"]
+
+[ext_resource type="Script" uid="uid://bbrkjwne585g0" path="res://entities/abilities/model/ability_definition.gd" id="1"]
+[ext_resource type="Animation" uid="uid://cd8vi23e1qen0" path="res://Assets/skeleton/animations/Sword_Attack.res" id="2"]
+[ext_resource type="Texture2D" uid="uid://dxfgg7brr86br" path="res://Assets/Icons/WoW Icon Pack/Abilities/WeaponMastery.png" id="3"]
+[ext_resource type="Script" uid="uid://3vveym6qyjsd" path="res://entities/abilities/model/melee_ability_behavior.gd" id="4"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("4")
+damage_multiplier = 1.8
+range_multiplier = 1.15
+arc_degrees = 70.0
+knockback = 140.0
+
+[resource]
+script = ExtResource("1")
+id = &"heavy_strike"
+title = "Сильный удар"
+icon = ExtResource("3")
+animation = ExtResource("2")
+cooldown = 4.0
+effect_delay = 0.4
+behavior = SubResource("Effect")

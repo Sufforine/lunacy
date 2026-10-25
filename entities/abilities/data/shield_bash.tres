@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=6 format=3 uid="uid://beo23dx4lthbj"]
+
+[ext_resource type="Script" uid="uid://bbrkjwne585g0" path="res://entities/abilities/model/ability_definition.gd" id="1"]
+[ext_resource type="Animation" uid="uid://bf3poh2ibw4u1" path="res://Assets/skeleton/animations/Push.res" id="2"]
+[ext_resource type="Texture2D" uid="uid://bv8f140aijekn" path="res://Assets/Icons/WoW Icon Pack/Abilities/ShieldBash.png" id="3"]
+[ext_resource type="Script" uid="uid://3vveym6qyjsd" path="res://entities/abilities/model/melee_ability_behavior.gd" id="4"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("4")
+damage_multiplier = 0.65
+range_multiplier = 0.85
+arc_degrees = 90.0
+knockback = 420.0
+
+[resource]
+script = ExtResource("1")
+id = &"shield_bash"
+title = "Удар щитом"
+icon = ExtResource("3")
+animation = ExtResource("2")
+cooldown = 6.0
+effect_delay = 0.25
+behavior = SubResource("Effect")

@@ -1,8 +1,13 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=2 format=3 uid="uid://dhvdjsbov72xo"]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=4 format=3 uid="uid://dhvdjsbov72xo"]
 
 [ext_resource type="Script" uid="uid://djnvsbqfrri3n" path="res://entities/inventory/model/data/Weapondata.gd" id="1_cj63k"]
 
+[ext_resource type="Resource" path="res://entities/abilities/data/melee_attack.tres" id="primary"]
+[ext_resource type="Resource" path="res://entities/abilities/data/weapon_guard.tres" id="secondary"]
+
 [resource]
+primary_action = ExtResource("primary")
+secondary_action = ExtResource("secondary")
 script = ExtResource("1_cj63k")
 slot = 1
 metadata/_custom_type_script = "uid://djnvsbqfrri3n"

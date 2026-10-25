@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://entities/abilities/model/ability_definition.gd" id="1"]
+[ext_resource type="Animation" path="res://Assets/skeleton/animations/Sword_Idle.res" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = &"weapon_guard"
+title = "Блок оружием"
+animation = ExtResource("2")
+held = true
+cooldown = 0.0
+effect_delay = 0.0
+physical_damage_reduction = 0.3

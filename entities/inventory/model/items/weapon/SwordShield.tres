@@ -1,64 +1,34 @@
-[gd_resource type="Resource" script_class="WeaponData" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="WeaponData" load_steps=11 format=3 uid="uid://btv62kyxlli3b"]
 
-[ext_resource type="Script" path="res://entities/inventory/model/data/Weapondata.gd" id="1"]
-[ext_resource type="PackedScene" path="res://Assets/weapons/sword_A.gltf" id="2"]
-[ext_resource type="PackedScene" path="res://Assets/weapons/shield_A.gltf" id="3"]
-[ext_resource type="Script" path="res://entities/inventory/model/data/weapon_skill.gd" id="4"]
-[ext_resource type="Texture2D" path="res://Assets/Icons/WoW Icon Pack/Abilities/WeaponMastery.png" id="5"]
-[ext_resource type="Texture2D" path="res://Assets/Icons/WoW Icon Pack/Abilities/ShieldBash.png" id="6"]
-[ext_resource type="Texture2D" path="res://Assets/Icons/WoW Icon Pack/Abilities/Cleave.png" id="7"]
-
-[sub_resource type="Resource" id="Heavy"]
-script = ExtResource("4")
-title = "Сильный удар"
-icon = ExtResource("5")
-animation = &"Sword_Attack"
-cooldown = 4.0
-hit_delay = 0.4
-damage_multiplier = 1.8
-range_multiplier = 1.15
-arc_degrees = 70.0
-knockback = 140.0
-
-[sub_resource type="Resource" id="Bash"]
-script = ExtResource("4")
-title = "Удар щитом"
-icon = ExtResource("6")
-animation = &"Push"
-cooldown = 6.0
-hit_delay = 0.25
-damage_multiplier = 0.65
-range_multiplier = 0.85
-arc_degrees = 90.0
-knockback = 420.0
-
-[sub_resource type="Resource" id="Sweep"]
-script = ExtResource("4")
-title = "Широкий взмах"
-icon = ExtResource("7")
-animation = &"Sword_Attack"
-cooldown = 8.0
-hit_delay = 0.35
-damage_multiplier = 1.25
-range_multiplier = 1.35
-arc_degrees = 240.0
-knockback = 180.0
+[ext_resource type="Script" uid="uid://djnvsbqfrri3n" path="res://entities/inventory/model/data/Weapondata.gd" id="1"]
+[ext_resource type="PackedScene" uid="uid://2vdr7jyw0s6y" path="res://Assets/weapons/sword_A.gltf" id="2"]
+[ext_resource type="PackedScene" uid="uid://bq6g13faxsljp" path="res://Assets/weapons/shield_A.gltf" id="3"]
+[ext_resource type="Script" uid="uid://bbrkjwne585g0" path="res://entities/abilities/model/ability_definition.gd" id="4"]
+[ext_resource type="Texture2D" uid="uid://dxfgg7brr86br" path="res://Assets/Icons/WoW Icon Pack/Abilities/WeaponMastery.png" id="5"]
+[ext_resource type="Resource" uid="uid://beo23dx4lthbj" path="res://entities/abilities/data/shield_bash.tres" id="bash"]
+[ext_resource type="Resource" uid="uid://ds42jmucnwtcr" path="res://entities/abilities/data/heavy_strike.tres" id="heavy"]
+[ext_resource type="Resource" uid="uid://d00wml0rdoqch" path="res://entities/abilities/data/melee_attack.tres" id="primary"]
+[ext_resource type="Resource" path="res://entities/abilities/data/shield_guard.tres" id="secondary"]
+[ext_resource type="Resource" uid="uid://dmbo8nsxhsput" path="res://entities/abilities/data/wide_swing.tres" id="sweep"]
 
 [resource]
 script = ExtResource("1")
-id = "sword"
-item_name = "Меч и щит"
-icon = ExtResource("5")
-description = "Комплект: меч в правой руке, щит в левой. ЛКМ — удар, ПКМ — блок. Q/E/R — способности оружия."
 physical_base_damage = 25.0
 strength_ratio = 0.8
 attack_range = 2.1
 right_hand_scene = ExtResource("2")
 left_hand_scene = ExtResource("3")
 right_hand_position = Vector3(0, 0.16, 0)
-right_hand_rotation = Vector3(0, 0, 0)
+right_hand_rotation = Vector3(0, 0, -90)
 right_hand_scale = Vector3(0.65, 0.65, 0.65)
 left_hand_position = Vector3(0, 0.08, 0.11)
-left_hand_rotation = Vector3(0, 90, 0)
+left_hand_rotation = Vector3(-115, 90, 0)
 left_hand_scale = Vector3(0.75, 0.75, 0.75)
-skills = Array[ExtResource("4")]([SubResource("Heavy"), SubResource("Bash"), SubResource("Sweep")])
+primary_action = ExtResource("primary")
+secondary_action = ExtResource("secondary")
+skills = Array[ExtResource("4")]([ExtResource("heavy"), ExtResource("bash"), ExtResource("sweep")])
+id = "sword"
+item_name = "Меч и щит"
+icon = ExtResource("5")
+description = "Комплект: меч в правой руке, щит в левой. ЛКМ — удар, ПКМ — блок. Q/E/R — способности оружия."
+slot = 1

@@ -33,14 +33,24 @@ class_name WeaponData
 @export var left_hand_rotation := Vector3.ZERO
 @export var left_hand_scale := Vector3.ONE
 
-@export_group("Combat")
-@export var attack_animation: StringName = &"Sword_Attack"
-@export var block_animation: StringName = &"Sword_Idle"
-@export_range(0.1, 5.0) var attack_cooldown: float = 0.8
-@export_range(0.0, 2.0) var attack_hit_delay: float = 0.3
-@export_range(0.0, 0.95) var block_reduction: float = 0.7
-# Только первые три способности доступны на Q/E/R.
-@export var skills: Array[WeaponSkill] = []
+@export_group("Abilities")
+@export var primary_action: AbilityDefinition
+@export var secondary_action: AbilityDefinition
+# Only the first three slots are bound to Q/E/R.
+@export var skills: Array[AbilityDefinition] = []
+@export_group("Animation Profile")
+## Optional weapon-specific idle pose; locomotion keeps the common tree.
+@export var idle_animation: Animation
+
+
+func get_ability(index: int) -> AbilityDefinition:
+	if index == -1:
+		return primary_action
+	if index == -2:
+		return secondary_action
+	if index >= 0 and index < mini(3, skills.size()):
+		return skills[index]
+	return null
 
 
 func _init() -> void:

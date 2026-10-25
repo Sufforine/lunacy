@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="AbilityDefinition" load_steps=5 format=3 uid="uid://d00wml0rdoqch"]
+
+[ext_resource type="Script" uid="uid://bbrkjwne585g0" path="res://entities/abilities/model/ability_definition.gd" id="1"]
+[ext_resource type="Animation" uid="uid://cd8vi23e1qen0" path="res://Assets/skeleton/animations/Sword_Attack.res" id="2"]
+[ext_resource type="Script" uid="uid://3vveym6qyjsd" path="res://entities/abilities/model/melee_ability_behavior.gd" id="4"]
+
+[sub_resource type="Resource" id="Effect"]
+script = ExtResource("4")
+
+[resource]
+script = ExtResource("1")
+id = &"melee_attack"
+title = "Удар"
+animation = ExtResource("2")
+behavior = SubResource("Effect")

@@ -2,9 +2,6 @@ extends CharacterBody3D
 class_name Player
 
 const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
-const ANIM_SLASH := [&"Sword_Attack"]
-const ANIM_ABILITY := [&"Spell_Simple_Shoot"]
-const ACTION_STATES := {&"Sword_Attack": &"Attack", &"Spell_Simple_Shoot": &"Ability", &"Push": &"ShieldBash"}
 
 @export var ease_speed: float = 5.0
 @export_group("Movement")
@@ -40,18 +37,13 @@ const ACTION_STATES := {&"Sword_Attack": &"Attack", &"Spell_Simple_Shoot": &"Abi
 @onready var interaction_prompt: InteractionPrompt = $CanvasLayer/InteractionPrompt
 var hud_bars: HUDBars = null
 var weapon_combat: Node
+var character_animation: Node
 
 
 # ── состояния анимации ───────────────────────────────────
 enum AnimationState { IDLE, WALK, DOWNED, DEAD, SPRINT, JUMP, FALL }
 var animation_state: AnimationState = AnimationState.IDLE
-var _action_locked: bool = false
-var _action_time_left: float = 0.0
-var _action_sequence: int = 0
-var _last_received_action_sequence: int = -1
 var animation_tree: AnimationTree
-var _animation_playback: AnimationNodeStateMachinePlayback
-var _alive_playback: AnimationNodeStateMachinePlayback
 var _movement_velocity := Vector3.ZERO
 var _external_velocity := Vector3.ZERO
 var owns_local_profile := false
@@ -68,7 +60,9 @@ func _ready() -> void:
 	# Первым делом: заменить модель из сцены на модель, созданную в редакторе
 	# персонажа (до того как что-то начнёт использовать model/animation_player)
 	_apply_character_model()
-	_resolve_animation_player()
+	character_animation = load("res://entities/player/model/character_animation_controller.gd").new()
+	character_animation.name = "CharacterAnimationController"
+	add_child(character_animation)
 
 	# Герой владельца берёт данные из локального профиля, чужой герой — из
 	# network_state, который NetSpawner кладёт в meta при спавне.
@@ -85,6 +79,9 @@ func _ready() -> void:
 	weapon_combat = load("res://entities/player/model/weapon_combat.gd").new()
 	weapon_combat.name = "WeaponCombat"
 	add_child(weapon_combat)
+	var presenter: Node = load("res://entities/player/model/weapon_presenter.gd").new()
+	presenter.name = "WeaponPresenter"
+	add_child(presenter)
 
 	stats.current_health = int(stats.get_stat("health"))
 	stats.current_mana   = int(stats.get_stat("mana"))
@@ -184,16 +181,6 @@ func _physics_process(delta: float) -> void:
 
 
 # ════════════════════════════════════════════════════════
-# PROCESS
-# ════════════════════════════════════════════════════════
-func _process(delta: float) -> void:
-	if _action_locked:
-		_action_time_left = maxf(0.0, _action_time_left - delta)
-		_action_locked = _action_time_left > 0.0
-	_update_animation()
-
-
-# ════════════════════════════════════════════════════════
 # MOVEMENT
 # ════════════════════════════════════════════════════════
 func _handle_movement(delta: float, controls_enabled: bool) -> void:
@@ -205,7 +192,7 @@ func _handle_movement(delta: float, controls_enabled: bool) -> void:
 	var sprinting := controls_enabled and Input.is_action_pressed("sprint") and not input_dir.is_zero_approx()
 	if weapon_combat != null and weapon_combat.blocking:
 		sprinting = false
-		speed *= 0.5
+		speed *= weapon_combat.movement_multiplier()
 	if sprinting:
 		speed *= sprint_multiplier
 
@@ -348,175 +335,6 @@ func _on_revived() -> void:
 	animation_state = AnimationState.IDLE
 	# TODO: проиграть анимацию подъёма
 	print("Player %s: поднят" % name)
-
-
-# ════════════════════════════════════════════════════════
-# АНИМАЦИИ
-# ════════════════════════════════════════════════════════
-func _update_animation() -> void:
-	if _animation_playback == null or _alive_playback == null:
-		return
-	if animation_state in [AnimationState.DOWNED, AnimationState.DEAD]:
-		_action_locked = false
-		var root_state := &"Dead" if animation_state == AnimationState.DEAD else &"Downed"
-		if _animation_playback.get_current_node() != root_state:
-			_animation_playback.travel(root_state)
-		return
-	if _animation_playback.get_current_node() != &"Alive":
-		_animation_playback.travel(&"Alive")
-		_alive_playback.start(&"Grounded")
-	var current := _alive_playback.get_current_node()
-	if animation_state in [AnimationState.JUMP, AnimationState.FALL]:
-		_action_locked = false
-		if animation_state == AnimationState.FALL:
-			_travel_animation(&"Air")
-		elif current not in [&"JumpStart", &"Air"]:
-			_travel_animation(&"JumpStart")
-		return
-	if current in [&"JumpStart", &"Air"]:
-		_travel_animation(&"Land")
-		return
-	if _action_locked:
-		return
-	if weapon_combat != null and weapon_combat.blocking:
-		_travel_animation(&"Block")
-		return
-	# В покое даём приземлению закончиться. Движение сразу прерывает Land;
-	# атака и способность уже переводят дерево напрямую из _play_action().
-	if current == &"Land" and animation_state == AnimationState.IDLE \
-			and _alive_playback.get_current_play_position() < _alive_playback.get_current_length() - 0.12:
-		return
-	var movement_blend := 0.0
-	match animation_state:
-		AnimationState.WALK:
-			movement_blend = 1.0
-		AnimationState.SPRINT:
-			movement_blend = 2.0
-	animation_tree.set("parameters/Alive/Grounded/blend_position", movement_blend)
-	_travel_animation(&"Grounded")
-
-
-func _travel_animation(state: StringName) -> void:
-	if _alive_playback.get_current_node() != state:
-		_alive_playback.travel(state)
-
-
-func _resolve_animation_player() -> void:
-	if animation_player == null and model != null:
-		animation_player = model.find_child("AnimationPlayer", true, false) as AnimationPlayer
-	animation_tree = model.get_node_or_null("AnimationTree") as AnimationTree
-	if animation_tree != null:
-		_prepare_weapon_animation_tree()
-		animation_tree.active = true
-		_animation_playback = animation_tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
-		_alive_playback = animation_tree.get("parameters/Alive/playback") as AnimationNodeStateMachinePlayback
-		animation_tree.set("parameters/Alive/Grounded/blend_position", 0.0)
-		_alive_playback.start(&"Grounded")
-		_animation_playback.start(&"Alive")
-
-
-func _prepare_weapon_animation_tree() -> void:
-	# Каждый герой получает собственные узлы дерева и библиотеку.
-	animation_tree.tree_root = animation_tree.tree_root.duplicate(true)
-	var library := animation_player.get_animation_library(&"").duplicate() as AnimationLibrary
-	animation_player.remove_animation_library(&"")
-	animation_player.add_animation_library(&"", library)
-	var root := animation_tree.tree_root as AnimationNodeStateMachine
-	var alive := root.get_node(&"Alive") as AnimationNodeStateMachine
-	for entry in [[&"ShieldBash", &"Push"], [&"Block", &"Sword_Idle"]]:
-		var animation := load("res://Assets/skeleton/animations/%s.res" % entry[1]).duplicate() as Animation
-		animation.loop_mode = Animation.LOOP_LINEAR if entry[0] == &"Block" else Animation.LOOP_NONE
-		library.add_animation(entry[1], animation)
-		var node := AnimationNodeAnimation.new()
-		node.animation = entry[1]
-		alive.add_node(entry[0], node)
-		for other in [&"Grounded", &"Attack", &"Ability", &"Land", &"Air", &"JumpStart"]:
-			var enter := AnimationNodeStateMachineTransition.new()
-			enter.xfade_time = 0.1
-			alive.add_transition(other, entry[0], enter)
-			var leave := AnimationNodeStateMachineTransition.new()
-			leave.xfade_time = 0.1
-			alive.add_transition(entry[0], other, leave)
-	for pair in [[&"Block", &"ShieldBash"], [&"ShieldBash", &"Block"]]:
-		var transition := AnimationNodeStateMachineTransition.new()
-		transition.xfade_time = 0.1
-		alive.add_transition(pair[0], pair[1], transition)
-
-
-func _find_animation(candidates: Array) -> StringName:
-	if animation_player == null:
-		return &""
-	for animation_name in candidates:
-		if animation_player.has_animation(animation_name):
-			return animation_name
-	return &""
-
-
-func _play_action(candidates: Array) -> void:
-	if _action_locked or _alive_playback == null or animation_state in [AnimationState.JUMP, AnimationState.FALL, AnimationState.DOWNED, AnimationState.DEAD]:
-		return
-	var animation_name := _find_animation(candidates)
-	if animation_name == &"":
-		return
-	_start_action_animation(animation_name)
-	if SteamLobby.is_session_active():
-		_action_sequence += 1
-		_last_received_action_sequence = _action_sequence
-		_send_animation_action(animation_name, _action_sequence)
-
-
-func _send_animation_action(animation_name: StringName, sequence: int) -> void:
-	if multiplayer.is_server():
-		_rpc_apply_animation_action.rpc(animation_name, sequence)
-	else:
-		_rpc_request_animation_action.rpc_id(1, animation_name, sequence)
-
-
-# Клиент отправляет событие только хосту. Хост проверяет, что запрос пришёл
-# от authority именно этого Player, применяет его к своей копии и рассылает
-# остальным клиентам. Так действие видно всем, а не только хосту.
-@rpc("any_peer", "call_remote", "reliable", 1)
-func _rpc_request_animation_action(animation_name: StringName, sequence: int) -> void:
-	if not multiplayer.is_server():
-		return
-	if multiplayer.get_remote_sender_id() != get_multiplayer_authority():
-		return
-	if not _is_valid_network_action(animation_name, sequence):
-		return
-	_apply_network_animation_action(animation_name, sequence)
-	_rpc_apply_animation_action.rpc(animation_name, sequence)
-
-
-@rpc("any_peer", "call_remote", "reliable", 1)
-func _rpc_apply_animation_action(animation_name: StringName, sequence: int) -> void:
-	# Только хост имеет право ретранслировать подтверждённое действие.
-	if multiplayer.get_remote_sender_id() != 1:
-		return
-	if not _is_valid_network_action(animation_name, sequence):
-		return
-	_apply_network_animation_action(animation_name, sequence)
-
-
-func _is_valid_network_action(animation_name: StringName, sequence: int) -> bool:
-	return sequence > 0 and ACTION_STATES.has(animation_name) \
-		and animation_player != null and animation_player.has_animation(animation_name)
-
-
-func _apply_network_animation_action(animation_name: StringName, sequence: int) -> void:
-	if sequence <= _last_received_action_sequence:
-		return
-	_last_received_action_sequence = sequence
-	_start_action_animation(animation_name)
-
-
-func _start_action_animation(animation_name: StringName) -> void:
-	if _alive_playback == null or not ACTION_STATES.has(animation_name):
-		return
-	if animation_state in [AnimationState.DOWNED, AnimationState.DEAD, AnimationState.JUMP, AnimationState.FALL]:
-		return
-	_action_locked = true
-	_action_time_left = maxf(0.01, animation_player.get_animation(animation_name).length - 0.12)
-	_travel_animation(ACTION_STATES[animation_name])
 
 
 # ════════════════════════════════════════════════════════
