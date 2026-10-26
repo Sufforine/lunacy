@@ -12,6 +12,11 @@ const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 @export_range(10.0, 100.0, 1.0) var terminal_speed: float = 45.0
 @export_range(1.0, 80.0, 1.0) var acceleration: float = 30.0
 @export_range(0.0, 1.0, 0.05) var air_control: float = 0.4
+@export_group("Locomotion animation")
+## Reference ground speed for the unscaled Walk/Sprint clips (metres per second).
+@export_range(0.1, 20.0, 0.1) var animation_walk_speed: float = 5.0
+@export_range(0.1, 30.0, 0.1) var animation_sprint_speed: float = 8.0
+@export_range(1.0, 30.0, 0.5) var animation_blend_response: float = 12.0
 @export_group("Knockback")
 @export_range(1.0, 200.0, 1.0) var body_mass: float = 70.0
 @export_range(0.0, 50.0, 0.5) var ground_impulse_drag: float = 12.0
@@ -43,6 +48,9 @@ var character_animation: Node
 # ── состояния анимации ───────────────────────────────────
 enum AnimationState { IDLE, WALK, DOWNED, DEAD, SPRINT, JUMP, FALL }
 var animation_state: AnimationState = AnimationState.IDLE
+## Owner-computed, replicated animation input; excludes knockback and blocked motion.
+var locomotion_speed: float = 0.0
+var _sprinting := false
 var animation_tree: AnimationTree
 var _movement_velocity := Vector3.ZERO
 var _external_velocity := Vector3.ZERO
@@ -162,7 +170,10 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("jump") and is_on_floor():
 			velocity.y = jump_velocity
 		_handle_rotation(delta)
+	var previous_position := global_position
+	var applied_external := _external_velocity
 	move_and_slide()
+	_update_locomotion_state(previous_position, applied_external, delta)
 	# Это состояние синхронизируется существующим MultiplayerSynchronizer.
 	# Клиенты не проверяют is_on_floor(): физику копии выполняет её владелец.
 	if not is_on_floor() and not stats.is_downed and not stats.is_dead:
@@ -189,22 +200,37 @@ func _handle_movement(delta: float, controls_enabled: bool) -> void:
 	if camera_rig != null:
 		input_dir = camera_rig.get_camera_relative_direction(input_dir)
 	var speed: float = stats.get_stat("move_speed")
-	var sprinting := controls_enabled and Input.is_action_pressed("sprint") and not input_dir.is_zero_approx()
-	if weapon_combat != null and weapon_combat.blocking:
-		sprinting = false
-		speed *= weapon_combat.movement_multiplier()
-	if sprinting:
+	_sprinting = controls_enabled and Input.is_action_pressed("sprint") and not input_dir.is_zero_approx()
+	var movement_scale := 1.0
+	if weapon_combat != null:
+		_sprinting = _sprinting and weapon_combat.allows_sprint()
+		movement_scale = weapon_combat.movement_multiplier()
+		speed *= movement_scale
+	if _sprinting:
 		speed *= sprint_multiplier
 
 	var movement_acceleration := acceleration * (1.0 if is_on_floor() else air_control)
 	_movement_velocity = _movement_velocity.move_toward(input_dir * speed, movement_acceleration * delta)
+	if movement_scale < 1.0:
+		_movement_velocity = _movement_velocity.limit_length(speed)
 	velocity.x = _movement_velocity.x + _external_velocity.x
 	velocity.z = _movement_velocity.z + _external_velocity.z
 
+
+func _update_locomotion_state(previous_position: Vector3, applied_external: Vector3, delta: float) -> void:
+	locomotion_speed = 0.0
+	var controlled := Vector3(_movement_velocity.x, 0.0, _movement_velocity.z)
+	if is_on_floor() and controlled.length() > 0.01 and not stats.is_dead and not stats.is_downed:
+		var actual := (global_position - previous_position) / maxf(delta, 0.0001)
+		actual.y = 0.0
+		var direction := controlled.normalized()
+		# Walking into a wall gives zero speed; being pushed while idle does too.
+		var contributed_speed := maxf(0.0, actual.dot(direction) - applied_external.dot(direction))
+		locomotion_speed = minf(controlled.length(), minf(actual.length(), contributed_speed))
 	if not stats.is_downed and not stats.is_dead:
 		animation_state = AnimationState.IDLE
-		if Vector2(velocity.x, velocity.z).length() > 0.1:
-			animation_state = AnimationState.SPRINT if sprinting else AnimationState.WALK
+		if locomotion_speed > 0.08:
+			animation_state = AnimationState.SPRINT if _sprinting else AnimationState.WALK
 
 
 # Импульс в Н·с. В сетевой игре вызывается хостом на копии цели;

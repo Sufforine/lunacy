@@ -234,7 +234,15 @@ func _apply_hold(value: bool) -> void:
 
 
 func movement_multiplier() -> float:
-	return _active_ability.movement_multiplier if blocking and _active_ability != null else 1.0
+	return _active_ability.movement_multiplier if _has_movement_restriction() else 1.0
+
+
+func allows_sprint() -> bool:
+	return _active_ability.allow_sprint if _has_movement_restriction() else true
+
+
+func _has_movement_restriction() -> bool:
+	return _active_ability != null and (blocking or _now() < _busy_until) and _can_fight(_active_ability)
 
 
 func mitigate_damage(amount: int, magical: bool) -> int:

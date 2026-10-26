@@ -1,6 +1,8 @@
 extends Resource
 class_name AbilityDefinition
 
+enum AnimationLayer { FULL_BODY, UPPER_BODY }
+
 ## Shared, immutable configuration. Runtime state belongs to AbilityController.
 @export var id: StringName
 @export var title: String = ""
@@ -14,11 +16,17 @@ class_name AbilityDefinition
 @export_range(0, 10000) var mana_cost: int = 0
 @export var requires_grounded: bool = true
 @export var behavior: AbilityBehavior
+@export_group("Animation and movement")
+## Upper body preserves locomotion below Spine; full body replaces the pose.
+@export var animation_layer: AnimationLayer = AnimationLayer.FULL_BODY
+## Applies during both ordinary and held actions. Zero stops controlled movement,
+## but gravity and external impulses continue to move the physical body.
+@export_range(0.0, 1.0) var movement_multiplier: float = 1.0
+@export var allow_sprint: bool = false
 @export_group("Held action")
 ## Hold the secondary input to maintain a guard. No repeated activation cost.
 @export var held: bool = false
 @export_range(0.0, 0.95) var physical_damage_reduction: float = 0.0
-@export_range(0.0, 1.0) var movement_multiplier: float = 0.5
 
 
 func is_valid() -> bool:

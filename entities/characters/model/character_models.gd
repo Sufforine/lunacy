@@ -80,9 +80,13 @@ static func play_idle(model: Node3D) -> void:
 	if tree != null:
 		tree.active = true
 		var playback := tree.get("parameters/playback") as AnimationNodeStateMachinePlayback
-		var alive_playback := tree.get("parameters/Alive/playback") as AnimationNodeStateMachinePlayback
-		tree.set("parameters/Alive/Grounded/blend_position", 0.0)
+		var alive_playback := tree.get("parameters/Alive/Base/playback") as AnimationNodeStateMachinePlayback
+		var upper_playback := tree.get("parameters/Alive/UpperActions/playback") as AnimationNodeStateMachinePlayback
+		tree.set("parameters/Alive/Base/Grounded/Movement/blend_position", 0.0)
+		tree.set("parameters/Alive/Base/Grounded/Stride/scale", 1.0)
+		tree.set("parameters/Alive/UpperBlend/blend_amount", 0.0)
 		alive_playback.start(&"Grounded")
+		upper_playback.start(&"Guard")
 		playback.start(&"Alive")
 
 

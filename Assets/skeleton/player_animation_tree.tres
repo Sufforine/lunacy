@@ -1,4 +1,4 @@
-[gd_resource type="AnimationNodeStateMachine" load_steps=42 format=3 uid="uid://ddxn8hy4lctyv"]
+[gd_resource type="AnimationNodeStateMachine" load_steps=57 format=3 uid="uid://ddxn8hy4lctyv"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_nn4br"]
 animation = &"Idle"
@@ -28,6 +28,17 @@ blend_point_2/pos = 2.0
 min_space = 0.0
 max_space = 2.0
 value_label = "Скорость"
+sync = true
+
+[sub_resource type="AnimationNodeTimeScale" id="LocomotionStride"]
+
+[sub_resource type="AnimationNodeBlendTree" id="GroundedLocomotion"]
+nodes/Movement/node = SubResource("AnimationNodeBlendSpace1D_jcda2")
+nodes/Movement/position = Vector2(0, 100)
+nodes/Stride/node = SubResource("LocomotionStride")
+nodes/Stride/position = Vector2(250, 100)
+nodes/output/position = Vector2(500, 100)
+node_connections = ["Stride", 0, "Movement", "output", 0, "Stride"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_guard"]
 animation = &"Idle"
@@ -110,7 +121,7 @@ states/ActionB/node = SubResource("AnimationNodeAnimation_nae2l")
 states/ActionB/position = Vector2(700, 570)
 states/Air/node = SubResource("AnimationNodeAnimation_dram4")
 states/Air/position = Vector2(540, 340)
-states/Grounded/node = SubResource("AnimationNodeBlendSpace1D_jcda2")
+states/Grounded/node = SubResource("GroundedLocomotion")
 states/Grounded/position = Vector2(300, 120)
 states/Guard/node = SubResource("AnimationNodeAnimation_guard")
 states/Guard/position = Vector2(980, 570)
@@ -144,8 +155,62 @@ xfade_time = 0.12
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_eslrm"]
 xfade_time = 0.2
 
+[sub_resource type="AnimationNodeAnimation" id="UpperActionA"]
+animation = &"Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="UpperActionB"]
+animation = &"Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="UpperGuard"]
+animation = &"Idle"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperStartToGuard"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperActionAToActionB"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperActionAToGuard"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperActionBToActionA"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperActionBToGuard"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperGuardToActionA"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="UpperGuardToActionB"]
+xfade_time = 0.1
+
+[sub_resource type="AnimationNodeStateMachine" id="UpperActions"]
+states/ActionA/node = SubResource("UpperActionA")
+states/ActionA/position = Vector2(200, 120)
+states/ActionB/node = SubResource("UpperActionB")
+states/ActionB/position = Vector2(420, 120)
+states/Guard/node = SubResource("UpperGuard")
+states/Guard/position = Vector2(640, 120)
+transitions = ["Start", "Guard", SubResource("UpperStartToGuard"), "ActionA", "ActionB", SubResource("UpperActionAToActionB"), "ActionA", "Guard", SubResource("UpperActionAToGuard"), "ActionB", "ActionA", SubResource("UpperActionBToActionA"), "ActionB", "Guard", SubResource("UpperActionBToGuard"), "Guard", "ActionA", SubResource("UpperGuardToActionA"), "Guard", "ActionB", SubResource("UpperGuardToActionB")]
+
+[sub_resource type="AnimationNodeBlend2" id="UpperBodyBlend"]
+filter_enabled = true
+filters = ["%HumanSkeleton:Spine", "%HumanSkeleton:Chest", "%HumanSkeleton:UpperChest", "%HumanSkeleton:Neck", "%HumanSkeleton:Head", "%HumanSkeleton:LeftShoulder", "%HumanSkeleton:LeftUpperArm", "%HumanSkeleton:LeftLowerArm", "%HumanSkeleton:LeftHand", "%HumanSkeleton:LeftIndexProximal", "%HumanSkeleton:LeftIndexIntermediate", "%HumanSkeleton:LeftIndexDistal", "%HumanSkeleton:index_04_leaf_l", "%HumanSkeleton:LeftMiddleProximal", "%HumanSkeleton:LeftMiddleIntermediate", "%HumanSkeleton:LeftMiddleDistal", "%HumanSkeleton:middle_04_leaf_l", "%HumanSkeleton:LeftLittleProximal", "%HumanSkeleton:LeftLittleIntermediate", "%HumanSkeleton:LeftLittleDistal", "%HumanSkeleton:pinky_04_leaf_l", "%HumanSkeleton:LeftRingProximal", "%HumanSkeleton:LeftRingIntermediate", "%HumanSkeleton:LeftRingDistal", "%HumanSkeleton:ring_04_leaf_l", "%HumanSkeleton:LeftThumbMetacarpal", "%HumanSkeleton:LeftThumbProximal", "%HumanSkeleton:LeftThumbDistal", "%HumanSkeleton:thumb_04_leaf_l", "%HumanSkeleton:RightShoulder", "%HumanSkeleton:RightUpperArm", "%HumanSkeleton:RightLowerArm", "%HumanSkeleton:RightHand", "%HumanSkeleton:RightIndexProximal", "%HumanSkeleton:RightIndexIntermediate", "%HumanSkeleton:RightIndexDistal", "%HumanSkeleton:index_04_leaf_r", "%HumanSkeleton:RightMiddleProximal", "%HumanSkeleton:RightMiddleIntermediate", "%HumanSkeleton:RightMiddleDistal", "%HumanSkeleton:middle_04_leaf_r", "%HumanSkeleton:RightLittleProximal", "%HumanSkeleton:RightLittleIntermediate", "%HumanSkeleton:RightLittleDistal", "%HumanSkeleton:pinky_04_leaf_r", "%HumanSkeleton:RightRingProximal", "%HumanSkeleton:RightRingIntermediate", "%HumanSkeleton:RightRingDistal", "%HumanSkeleton:ring_04_leaf_r", "%HumanSkeleton:RightThumbMetacarpal", "%HumanSkeleton:RightThumbProximal", "%HumanSkeleton:RightThumbDistal", "%HumanSkeleton:thumb_04_leaf_r"]
+sync = true
+
+[sub_resource type="AnimationNodeBlendTree" id="AliveLayers"]
+nodes/Base/node = SubResource("AnimationNodeStateMachine_kp62c")
+nodes/Base/position = Vector2(0, 0)
+nodes/UpperActions/node = SubResource("UpperActions")
+nodes/UpperActions/position = Vector2(0, 250)
+nodes/UpperBlend/node = SubResource("UpperBodyBlend")
+nodes/UpperBlend/position = Vector2(350, 100)
+nodes/output/position = Vector2(650, 100)
+node_connections = ["UpperBlend", 0, "Base", "UpperBlend", 1, "UpperActions", "output", 0, "UpperBlend"]
+
 [resource]
-states/Alive/node = SubResource("AnimationNodeStateMachine_kp62c")
+states/Alive/node = SubResource("AliveLayers")
 states/Alive/position = Vector2(350, 180)
 states/Dead/node = SubResource("AnimationNodeAnimation_dexk0")
 states/Dead/position = Vector2(950, 180)
