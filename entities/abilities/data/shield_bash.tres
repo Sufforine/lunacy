@@ -22,4 +22,6 @@ animation_layer = 1
 movement_multiplier = 0.6
 cooldown = 6.0
 effect_delay = 0.25
+duration = 0.75
+interrupt_flags = 6
 behavior = SubResource("Effect")

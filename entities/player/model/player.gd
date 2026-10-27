@@ -6,10 +6,16 @@ const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 @export var ease_speed: float = 5.0
 @export_group("Movement")
 @export_range(1.0, 3.0, 0.05) var sprint_multiplier: float = 1.6
-@export_range(1.0, 15.0, 0.1) var jump_velocity: float = 8.0
-@export_range(1.0, 8.0, 0.1) var gravity_multiplier: float = 3.0
-@export_range(1.0, 3.0, 0.1) var falling_multiplier: float = 1.5
+@export_group("Jump")
+## Physical shape of the jump. These values are easier to tune than raw gravity.
+@export_range(0.2, 5.0, 0.05) var jump_height: float = 1.1
+@export_range(0.1, 1.0, 0.01) var jump_time_to_apex: float = 0.27
+@export_range(0.1, 1.0, 0.01) var jump_time_to_fall: float = 0.22
+@export_range(0.0, 0.25, 0.01) var jump_coyote_time: float = 0.1
+@export_range(0.0, 0.25, 0.01) var jump_input_buffer: float = 0.12
+@export_range(0.1, 1.0, 0.05) var jump_release_velocity_factor: float = 0.45
 @export_range(10.0, 100.0, 1.0) var terminal_speed: float = 45.0
+@export_group("Movement response")
 @export_range(1.0, 80.0, 1.0) var acceleration: float = 30.0
 @export_range(0.0, 1.0, 0.05) var air_control: float = 0.4
 @export_group("Locomotion animation")
@@ -17,6 +23,8 @@ const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 @export_range(0.1, 20.0, 0.1) var animation_walk_speed: float = 5.0
 @export_range(0.1, 30.0, 0.1) var animation_sprint_speed: float = 8.0
 @export_range(1.0, 30.0, 0.5) var animation_blend_response: float = 12.0
+@export_range(0.05, 1.0, 0.01) var animation_jump_start_duration: float = 0.27
+@export_range(0.05, 1.0, 0.01) var animation_land_duration: float = 0.32
 @export_group("Knockback")
 @export_range(1.0, 200.0, 1.0) var body_mass: float = 70.0
 @export_range(0.0, 50.0, 0.5) var ground_impulse_drag: float = 12.0
@@ -54,6 +62,8 @@ var _sprinting := false
 var animation_tree: AnimationTree
 var _movement_velocity := Vector3.ZERO
 var _external_velocity := Vector3.ZERO
+var _coyote_left := 0.0
+var _jump_buffer_left := 0.0
 var owns_local_profile := false
 
 
@@ -152,12 +162,6 @@ func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority() or SteamLobby.is_gameplay_locked():
 		return
 
-	# Вертикальная физика продолжается даже при заблокированном управлении.
-	if not is_on_floor():
-		var fall_scale := falling_multiplier if velocity.y < 0.0 else 1.0
-		velocity += get_gravity() * gravity_multiplier * fall_scale * delta
-		velocity.y = maxf(velocity.y, -terminal_speed)
-
 	var controls_enabled := not stats.is_downed and not stats.is_dead \
 		and not GameChat.is_typing \
 		and is_processing_input() and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED \
@@ -165,10 +169,9 @@ func _physics_process(delta: float) -> void:
 	if inventory_ui != null and inventory_ui.is_main_panel_open():
 		controls_enabled = false
 
+	_update_jump(delta, controls_enabled)
 	_handle_movement(delta, controls_enabled)
 	if controls_enabled:
-		if Input.is_action_just_pressed("jump") and is_on_floor():
-			velocity.y = jump_velocity
 		_handle_rotation(delta)
 	var previous_position := global_position
 	var applied_external := _external_velocity
@@ -189,6 +192,34 @@ func _physics_process(delta: float) -> void:
 	_movement_velocity.y = 0.0
 	var drag := ground_impulse_drag if is_on_floor() else air_impulse_drag
 	_external_velocity = _external_velocity.move_toward(Vector3.ZERO, drag * delta)
+
+
+func _update_jump(delta: float, controls_enabled: bool) -> void:
+	if is_on_floor():
+		_coyote_left = jump_coyote_time
+	elif _coyote_left > 0.0:
+		_coyote_left = maxf(0.0, _coyote_left - delta)
+
+	if controls_enabled and Input.is_action_just_pressed("jump"):
+		_jump_buffer_left = jump_input_buffer
+	elif _jump_buffer_left > 0.0:
+		_jump_buffer_left = maxf(0.0, _jump_buffer_left - delta)
+
+	if controls_enabled and _jump_buffer_left > 0.0 and _coyote_left > 0.0:
+		velocity.y = 2.0 * jump_height / maxf(jump_time_to_apex, 0.01)
+		_jump_buffer_left = 0.0
+		_coyote_left = 0.0
+		if weapon_combat != null:
+			weapon_combat.try_interrupt(AbilityDefinition.InterruptReason.JUMP)
+
+	if controls_enabled and Input.is_action_just_released("jump") and velocity.y > 0.0:
+		velocity.y *= jump_release_velocity_factor
+
+	# Vertical physics remains active while menus or actions block input.
+	if not is_on_floor():
+		var phase_time := jump_time_to_apex if velocity.y > 0.0 else jump_time_to_fall
+		var gravity := 2.0 * jump_height / pow(maxf(phase_time, 0.01), 2.0)
+		velocity.y = maxf(velocity.y - gravity * delta, -terminal_speed)
 
 
 # ════════════════════════════════════════════════════════

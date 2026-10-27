@@ -3,6 +3,8 @@ extends Node
 const MOVEMENT_PARAMETER := "parameters/Alive/Base/Grounded/Movement/blend_position"
 const STRIDE_PARAMETER := "parameters/Alive/Base/Grounded/Stride/scale"
 const UPPER_WEIGHT_PARAMETER := "parameters/Alive/UpperBlend/blend_amount"
+const JUMP_RATE_PARAMETER := "parameters/Alive/Base/JumpStart/Rate/scale"
+const LAND_RATE_PARAMETER := "parameters/Alive/Base/Land/Rate/scale"
 const FULL_BODY_STATES := [&"ActionA", &"ActionB", &"Guard"]
 
 var hero: Player
@@ -61,6 +63,8 @@ func _ready() -> void:
 	animation_tree.set(MOVEMENT_PARAMETER, 0.0)
 	animation_tree.set(STRIDE_PARAMETER, 1.0)
 	animation_tree.set(UPPER_WEIGHT_PARAMETER, 0.0)
+	_configure_phase_rate(&"JumpStart", hero.animation_jump_start_duration, JUMP_RATE_PARAMETER)
+	_configure_phase_rate(&"Land", hero.animation_land_duration, LAND_RATE_PARAMETER)
 	animation_tree.active = true
 	_base_playback.start(&"Grounded")
 	_upper_playback.start(&"Guard")
@@ -97,7 +101,7 @@ func _register_clip(source: Animation, loop: bool) -> StringName:
 	return path
 
 
-func play_action(ability: AbilityDefinition) -> void:
+func play_action(ability: AbilityDefinition, elapsed: float = 0.0) -> void:
 	if _base_playback == null or _library == null:
 		return
 	cancel_action()
@@ -105,8 +109,8 @@ func play_action(ability: AbilityDefinition) -> void:
 		return
 	_upper_body_action = ability.animation_layer == AbilityDefinition.AnimationLayer.UPPER_BODY
 	_allow_air = not ability.requires_grounded
-	_action_locked = true
-	_action_time_left = ability.get_duration()
+	_action_time_left = maxf(0.0, ability.get_duration() - elapsed)
+	_action_locked = _action_time_left > 0.0
 	# Each layer alternates its own two slots, including consecutive identical attacks.
 	var state: StringName
 	if _upper_body_action:
@@ -117,12 +121,18 @@ func play_action(ability: AbilityDefinition) -> void:
 		state = &"ActionB" if _use_full_b else &"ActionA"
 	var machine := _upper if _upper_body_action else _base
 	var playback := _upper_playback if _upper_body_action else _base_playback
-	(machine.get_node(state) as AnimationNodeAnimation).animation = _register_clip(ability.animation, false)
+	var action_tree := machine.get_node(state) as AnimationNodeBlendTree
+	(action_tree.get_node(&"Clip") as AnimationNodeAnimation).animation = _register_clip(ability.animation, false)
+	var parameter_root := "parameters/Alive/%s/%s" % ["UpperActions" if _upper_body_action else "Base", state]
+	animation_tree.set(parameter_root + "/Rate/scale", ability.get_animation_speed())
+	animation_tree.set(parameter_root + "/Seek/seek_request", -1.0)
 	playback.travel(state)
+	if elapsed > 0.0 and _action_locked:
+		animation_tree.set(parameter_root + "/Seek/seek_request", elapsed * ability.get_animation_speed())
 	_interrupt_landing_for_action()
 
 
-func play_hold(ability: AbilityDefinition) -> void:
+func play_hold(ability: AbilityDefinition, _elapsed: float = 0.0) -> void:
 	if _base_playback == null or _library == null:
 		return
 	cancel_action()
@@ -135,6 +145,17 @@ func play_hold(ability: AbilityDefinition) -> void:
 	(machine.get_node(&"Guard") as AnimationNodeAnimation).animation = clip
 	playback.travel(&"Guard")
 	_interrupt_landing_for_action()
+
+
+func _configure_phase_rate(state: StringName, duration: float, parameter: String) -> void:
+	var phase := _base.get_node(state) as AnimationNodeBlendTree
+	if phase == null:
+		return
+	var clip_node := phase.get_node(&"Clip") as AnimationNodeAnimation
+	if clip_node == null or not animation_player.has_animation(clip_node.animation):
+		return
+	var clip := animation_player.get_animation(clip_node.animation)
+	animation_tree.set(parameter, clip.length / maxf(duration, 0.01))
 
 
 func _interrupt_landing_for_action() -> void:

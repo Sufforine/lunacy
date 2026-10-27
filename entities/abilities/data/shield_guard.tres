@@ -10,6 +10,7 @@ title = "Блок щитом"
 animation = ExtResource("2")
 animation_layer = 1
 movement_multiplier = 0.5
+interrupt_flags = 2
 held = true
 cooldown = 0.0
 effect_delay = 0.0

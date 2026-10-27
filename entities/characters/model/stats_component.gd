@@ -11,6 +11,7 @@ signal level_increased(new_level: int)
 signal downed
 signal died
 signal revived
+signal damage_received(amount: int, magical: bool)
 
 # ── базовые статы героя ──────────────────────────────────
 @export var base_stats: CharacterStats
@@ -259,6 +260,7 @@ func take_damage(amount: int, is_magical: bool = false) -> void:
 		current_shield -= absorbed
 		actual -= int(absorbed)
 
+	damage_received.emit(actual, is_magical)
 	current_health = max(0, current_health - actual)
 	stats_changed.emit()
 
