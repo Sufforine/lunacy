@@ -96,6 +96,9 @@ func _ready() -> void:
 	var quick_bar_hud := get_node_or_null("QuickBarHUD")
 	if quick_bar_hud is Control:
 		(quick_bar_hud as Control).mouse_filter = Control.MOUSE_FILTER_IGNORE
+		# Быстрые слоты игрового HUD теперь находятся в общей нижней панели.
+		# Эти узлы остаются только как совместимые источники иконок для старой сцены.
+		(quick_bar_hud as Control).visible = false
 
 	main_panel.visible = false
 	_collect_inventory_slots()
@@ -107,6 +110,18 @@ func _ready() -> void:
 	_show_inventory_tab()
 	_apply_inventory_theme()
 	GameSettings.inventory_theme_changed.connect(_apply_inventory_theme)
+	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
+	_apply_ui_scale()
+	main_panel.resized.connect(_update_scale_pivot)
+
+
+func _apply_ui_scale() -> void:
+	main_panel.scale = Vector2.ONE * GameSettings.get_ui_scale()
+	_update_scale_pivot.call_deferred()
+
+
+func _update_scale_pivot() -> void:
+	main_panel.pivot_offset = main_panel.size * 0.5
 
 
 # ════════════════════════════════════════════════════════
@@ -1114,9 +1129,10 @@ func _show_attributes_tab() -> void:
 
 func _apply_inventory_theme() -> void:
 	var night := GameSettings.inventory_theme == GameSettings.InventoryTheme.NIGHT
-	var background := Color("152940") if night else Color("e2cfaa")
-	var border := Color("75c9ec") if night else Color("702522")
-	var text_color := Color("e8f5ff") if night else Color("47241f")
+	var palette := GameSettings.get_inventory_theme_palette()
+	var background: Color = palette.background
+	var border: Color = palette.border
+	var text_color: Color = palette.text
 	var style := StyleBoxFlat.new()
 	style.bg_color = background
 	style.border_color = border

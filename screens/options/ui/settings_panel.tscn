@@ -1,20 +1,19 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://screens/options/ui/settings_panel.gd" id="1_settings"]
-
 [ext_resource type="Script" path="res://shared/camera/crosshair.gd" id="2_crosshair"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.075, 0.09, 0.12, 0.98)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.36, 0.41, 0.49, 0.8)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
+bg_color = Color(0.886, 0.812, 0.667, 0.98)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.439, 0.145, 0.133, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 shadow_color = Color(0, 0, 0, 0.45)
 shadow_size = 16
 
@@ -37,7 +36,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.015, 0.02, 0.03, 0.9)
+color = Color(0.12, 0.065, 0.045, 0.78)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -49,20 +48,20 @@ grow_vertical = 2
 mouse_filter = 1
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
-custom_minimum_size = Vector2(600, 680)
+custom_minimum_size = Vector2(680, 610)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_override_styles/panel = SubResource("StyleBox_panel")
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 layout_mode = 2
-theme_override_constants/margin_left = 46
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_right = 46
-theme_override_constants/margin_bottom = 18
+theme_override_constants/margin_left = 38
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 38
+theme_override_constants/margin_bottom = 24
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 14
 
 [node name="Title" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
@@ -70,168 +69,174 @@ theme_override_font_sizes/font_size = 30
 text = "Настройки"
 horizontal_alignment = 1
 
-[node name="VideoTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Tabs" type="TabContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 470)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
-theme_override_font_sizes/font_size = 20
-text = "Изображение"
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 19
 
-[node name="ResolutionRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Graphics" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="Content" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="GraphicsTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Экран"
+
+[node name="ResolutionRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResolutionRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content/ResolutionRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Разрешение"
 
-[node name="ResolutionOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResolutionRow"]
+[node name="ResolutionOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content/ResolutionRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 42)
+custom_minimum_size = Vector2(230, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 
-[node name="RefreshRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="RefreshRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RefreshRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content/RefreshRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
-text = "Частота"
+text = "Частота обновления"
 
-[node name="RefreshOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RefreshRow"]
+[node name="RefreshOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Graphics/Content/RefreshRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 42)
+custom_minimum_size = Vector2(230, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 
-[node name="AudioTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Audio" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs"]
+visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
-theme_override_font_sizes/font_size = 20
-text = "Звук"
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
 
-[node name="MasterLabelRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Content" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="AudioTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Громкость"
+
+[node name="MasterLabelRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterLabelRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content/MasterLabelRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Общая громкость"
 
-[node name="MasterValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterLabelRow"]
+[node name="MasterValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content/MasterLabelRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "100%"
 
-[node name="MasterSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="MasterSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 max_value = 100.0
 step = 1.0
 value = 100.0
 
-[node name="EnvironmentLabelRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="EnvironmentLabelRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/EnvironmentLabelRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content/EnvironmentLabelRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
 text = "Окружение"
 
-[node name="EnvironmentValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/EnvironmentLabelRow"]
+[node name="EnvironmentValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content/EnvironmentLabelRow"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "100%"
 
-[node name="EnvironmentSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="EnvironmentSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Audio/Content"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 30)
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 max_value = 100.0
 step = 1.0
 value = 100.0
 
-[node name="CrosshairTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Game" type="MarginContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs"]
+visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
-theme_override_font_sizes/font_size = 20
-text = "Прицел"
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 12
 
-[node name="CrosshairRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="Scroll" type="ScrollContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Content" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll"]
+custom_minimum_size = Vector2(540, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="InterfaceTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Интерфейс"
+
+[node name="ThemeRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CrosshairRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThemeRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
-text = "Форма"
+text = "Цветовая схема"
 
-[node name="Preview" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CrosshairRow"]
-custom_minimum_size = Vector2(48, 48)
-layout_mode = 2
-mouse_filter = 2
-script = ExtResource("2_crosshair")
-preview_mode = true
-
-[node name="CrosshairOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/CrosshairRow"]
+[node name="InventoryThemeOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThemeRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 
-[node name="ThicknessRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="UIScaleRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ThicknessRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/UIScaleRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
-text = "Толщина / диаметр точки"
+text = "Масштаб интерфейса"
 
-[node name="ThicknessSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ThicknessRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(160, 30)
-layout_mode = 2
-min_value = 1.0
-max_value = 8.0
-step = 1.0
-value = 3.0
-
-[node name="ThicknessValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ThicknessRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(24, 0)
-layout_mode = 2
-theme_override_font_sizes/font_size = 18
-text = "3"
-
-[node name="ChatTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
-theme_override_font_sizes/font_size = 20
-text = "Чат"
-
-[node name="ChatScaleRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ChatScaleRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "Масштаб"
-
-[node name="ChatScaleSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ChatScaleRow"]
+[node name="UIScaleSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/UIScaleRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 30)
 layout_mode = 2
@@ -239,43 +244,95 @@ min_value = -50.0
 max_value = 50.0
 step = 5.0
 
-[node name="ChatScaleValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ChatScaleRow"]
+[node name="UIScaleValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/UIScaleRow"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(54, 0)
+custom_minimum_size = Vector2(58, 0)
 layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "0%"
 
-[node name="InventoryTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.66, 0.76, 0.92, 1)
-theme_override_font_sizes/font_size = 20
-text = "Внешний вид инвентаря"
-
-[node name="InventoryThemeRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="ChatScaleRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/InventoryThemeRow"]
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ChatScaleRow"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 18
-text = "Цветовая схема"
+text = "Масштаб чата"
 
-[node name="InventoryThemeOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/InventoryThemeRow"]
+[node name="ChatScaleSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ChatScaleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 30)
+layout_mode = 2
+min_value = -50.0
+max_value = 50.0
+step = 5.0
+
+[node name="ChatScaleValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ChatScaleRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "0%"
+
+[node name="CrosshairTitle" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Прицел"
+
+[node name="CrosshairRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/CrosshairRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Форма"
+
+[node name="Preview" type="Control" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/CrosshairRow"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("2_crosshair")
+preview_mode = true
+
+[node name="CrosshairOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/CrosshairRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 42)
 layout_mode = 2
 theme_override_font_sizes/font_size = 17
 
+[node name="ThicknessRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThicknessRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "Толщина / размер"
+
+[node name="ThicknessSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThicknessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(220, 30)
+layout_mode = 2
+min_value = 1.0
+max_value = 8.0
+step = 1.0
+value = 3.0
+
+[node name="ThicknessValue" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThicknessRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "3"
+
 [node name="Back" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 46)
 layout_mode = 2
 theme_override_font_sizes/font_size = 19
 text = "Назад"
-
-[connection signal="item_selected" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ResolutionRow/ResolutionOption" to="." method="_on_resolution_selected"]
-[connection signal="item_selected" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/RefreshRow/RefreshOption" to="." method="_on_refresh_selected"]
-[connection signal="value_changed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/MasterSlider" to="." method="_on_master_changed"]
-[connection signal="value_changed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/EnvironmentSlider" to="." method="_on_environment_changed"]
-[connection signal="pressed" from="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Back" to="." method="_on_back_pressed"]

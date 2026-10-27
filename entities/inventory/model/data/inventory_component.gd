@@ -143,12 +143,14 @@ func set_quickslot_data(data: Array) -> void:
 	for i in QUICKSLOT_COUNT:
 		quickslots[i] = null
 	if data == null or data.is_empty():
+		changed.emit()
 		return
 	for i in min(data.size(), QUICKSLOT_COUNT):
 		var id: String = data[i]
 		if id.is_empty():
 			continue
 		quickslots[i] = ItemLibrary.get_item(id)
+	changed.emit()
 
 
 func use_quickslot(slot_index: int, player: Node) -> void:

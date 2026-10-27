@@ -4,6 +4,8 @@ const MAIN_MENU_SCENE := "res://screens/main-menu/ui/main_menu.tscn"
 
 @onready var pause_panel: Control = $CenterContainer
 @onready var settings_panel: Control = $SettingsPanel
+@onready var dimmer: ColorRect = $Dimmer
+@onready var menu_panel: PanelContainer = $CenterContainer/PanelContainer
 
 var _is_open: bool = false
 var _used_tree_pause: bool = false
@@ -19,7 +21,48 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_player = _find_player()
 	settings_panel.connect(&"close_requested", _on_settings_closed)
+	GameSettings.inventory_theme_changed.connect(_apply_theme)
+	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
+	menu_panel.resized.connect(_update_scale_pivot)
+	_apply_theme()
+	_apply_ui_scale()
 	_set_menu_visible(false)
+
+
+func _apply_ui_scale() -> void:
+	menu_panel.scale = Vector2.ONE * GameSettings.get_ui_scale()
+	_update_scale_pivot.call_deferred()
+
+
+func _update_scale_pivot() -> void:
+	menu_panel.pivot_offset = menu_panel.size * 0.5
+
+
+func _apply_theme() -> void:
+	var palette := GameSettings.get_ui_theme_palette()
+	dimmer.color = palette.dimmer
+	var panel_style := _style(palette.background, palette.border, 3, 10)
+	panel_style.shadow_color = Color(0, 0, 0, 0.45)
+	panel_style.shadow_size = 16
+	menu_panel.add_theme_stylebox_override("panel", panel_style)
+	for child in $CenterContainer/PanelContainer/MarginContainer/VBoxContainer.get_children():
+		if child is Label:
+			(child as Label).add_theme_color_override("font_color", palette.text)
+		elif child is Button:
+			var button := child as Button
+			button.add_theme_color_override("font_color", palette.text)
+			button.add_theme_stylebox_override("normal", _style(palette.surface, palette.border, 1, 5))
+			button.add_theme_stylebox_override("hover", _style(palette.surface_hover, palette.border, 2, 5))
+			button.add_theme_stylebox_override("pressed", _style(palette.surface.darkened(0.1), palette.border, 2, 5))
+
+
+func _style(background: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = background
+	style.border_color = border
+	style.set_border_width_all(width)
+	style.set_corner_radius_all(radius)
+	return style
 
 
 func _unhandled_input(event: InputEvent) -> void:

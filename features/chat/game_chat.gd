@@ -48,6 +48,7 @@ func _ready() -> void:
 	_set_typing_visual(false)
 	_apply_chat_scale()
 	GameSettings.chat_scale_changed.connect(_apply_chat_scale)
+	GameSettings.ui_scale_changed.connect(_apply_chat_scale)
 	get_tree().scene_changed.connect(_on_scene_changed)
 	multiplayer.peer_disconnected.connect(func(id: int): _last_sent.erase(id))
 
@@ -135,7 +136,7 @@ func _set_typing_visual(typing: bool) -> void:
 
 
 func _apply_chat_scale() -> void:
-	var factor := 1.0 + GameSettings.chat_scale_percent / 100.0
+	var factor := GameSettings.get_ui_scale() * (1.0 + GameSettings.chat_scale_percent / 100.0)
 	_panel.scale = Vector2(factor, factor)
 	_update_scale_pivot.call_deferred()
 

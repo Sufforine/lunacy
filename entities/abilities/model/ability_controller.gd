@@ -44,8 +44,8 @@ func _ready() -> void:
 			_clock_ready = false
 			_next_clock_sync_msec = 0
 	if hero.is_multiplayer_authority():
-		var bar: Control = load("res://entities/player/ui/weapon_skill_bar.gd").new()
-		bar.name = "WeaponSkillBar"
+		var bar: Control = load("res://entities/player/ui/action_hud.gd").new()
+		bar.name = "ActionHUD"
 		bar.combat = self
 		hero.get_node("CanvasLayer").add_child(bar)
 

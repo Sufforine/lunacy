@@ -48,7 +48,6 @@ const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
 @onready var interaction_prompt: InteractionPrompt = $CanvasLayer/InteractionPrompt
-var hud_bars: HUDBars = null
 var weapon_combat: Node
 var character_animation: Node
 
@@ -111,9 +110,6 @@ func _ready() -> void:
 
 	if is_multiplayer_authority():
 		inventory_ui.set_process_input(true)
-		hud_bars = HUDBars.new()
-		$CanvasLayer.add_child(hud_bars)
-		hud_bars.bind(stats)
 		# Меню создаётся только у владельца этого Player. Поэтому Escape и
 		# полноэкранный интерфейс не дублируются для сетевых копий героев.
 		$CanvasLayer.add_child(PAUSE_MENU_SCENE.instantiate())
