@@ -15,10 +15,8 @@
 extends Control
 class_name InventoryUI
 
-const INVENTORY_ICON := preload("res://Assets/Icons/WoW Icon Pack/Miscellaneous/Bag_01.png")
-const STATS_ICON := preload("res://Assets/Icons/WoW Icon Pack/Miscellaneous/Book_01.png")
-const ATTRIBUTES_ICON := preload("res://Assets/Icons/WoW Icon Pack/Spells/Strength.png")
-const SKILL_TREE_ICON := preload("res://Assets/Icons/WoW Icon Pack/Abilities/TreeofLife.png")
+const InventoryTabs := preload("res://entities/inventory/ui/controllers/inventory_tabs.gd")
+const InventoryChestView := preload("res://entities/inventory/ui/controllers/inventory_chest_view.gd")
 
 # ── ноды ────────────────────────────────────────────────
 @onready var main_panel: Panel          = $MainPanel
@@ -72,14 +70,8 @@ var _drag_source:   DragSource = DragSource.NONE
 var _drag_from_idx: int        = -1
 var _drag_preview:  Control    = null
 
-# ── сундук ──────────────────────────────────────────────
-var _open_chest: Node = null
-var _chest_section: Control = null
-var _chest_grid: GridContainer = null
-var _chest_buttons: Array[Button] = []
-var _chest_icons: Array[TextureRect] = []
-var _player_inventory_label: Label = null
-var _inventory_section_default_position := Vector2.ZERO
+var _tabs := InventoryTabs.new()
+var _chest_view := InventoryChestView.new()
 
 
 # ════════════════════════════════════════════════════════
@@ -104,12 +96,10 @@ func _ready() -> void:
 	_collect_inventory_slots()
 	_collect_equipment_slots()
 	_collect_quickslots()
-	_build_tab_buttons()
-	_build_stats_tab()
-	_build_chest_section()
-	_show_inventory_tab()
-	_apply_inventory_theme()
-	GameSettings.inventory_theme_changed.connect(_apply_inventory_theme)
+	_tabs.build(main_panel)
+	_chest_view.build(self, main_panel, _tabs)
+	_tabs.apply_theme()
+	GameSettings.inventory_theme_changed.connect(_tabs.apply_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	_apply_ui_scale()
 	main_panel.resized.connect(_update_scale_pivot)
@@ -141,18 +131,20 @@ func bind(inventory: InventoryComponent, equipment: EquipmentComponent, stats: S
 	_equipment = equipment
 	if _equipment != null:
 		_equipment.changed.connect(_refresh_equipment)
-		_equipment.changed.connect(_refresh_stats_tab)
+		_equipment.changed.connect(_tabs.refresh)
 
-	if _stats != null and _stats.stats_changed.is_connected(_refresh_stats_tab):
-		_stats.stats_changed.disconnect(_refresh_stats_tab)
+	if _stats != null and _stats.stats_changed.is_connected(_tabs.refresh):
+		_stats.stats_changed.disconnect(_tabs.refresh)
 	_stats = stats
 	if _stats != null:
-		_stats.stats_changed.connect(_refresh_stats_tab)
+		_stats.stats_changed.connect(_tabs.refresh)
+	_tabs.bind(_stats, _equipment)
+	_chest_view.bind(_inventory)
 
 	_refresh_inventory()
 	_refresh_equipment()
 	_refresh_quickslots()
-	_refresh_stats_tab()
+	_tabs.refresh()
 
 
 # ════════════════════════════════════════════════════════
@@ -172,14 +164,14 @@ func _input(event: InputEvent) -> void:
 	# по всей панели, поэтому курсор не обязательно держать над полосой.
 	if main_panel.visible and event is InputEventMouseButton:
 		var wheel_event := event as InputEventMouseButton
-		if wheel_event.pressed and _is_mouse_wheel(wheel_event):
-			if _stats_tab != null and _stats_tab.visible:
-				_scroll_stats(wheel_event)
+		if wheel_event.pressed and _tabs.is_mouse_wheel(wheel_event):
+			if _tabs.is_stats_visible():
+				_tabs.scroll_stats(wheel_event)
 			get_viewport().set_input_as_handled()
 			return
 
 	if event is InputEventKey and event.pressed and not event.echo:
-		if event.is_action_pressed("interact") and _open_chest != null:
+		if event.is_action_pressed("interact") and _chest_view.has_chest():
 			_close_main_panel()
 			get_viewport().set_input_as_handled()
 		elif event.keycode == KEY_I:
@@ -350,8 +342,8 @@ func _on_inv_gui_input(event: InputEvent, idx: int) -> void:
 		if _inventory and not _inventory.is_empty(idx):
 			# При открытом сундуке Ctrl+клик переносит предмет в него.
 			if mb.ctrl_pressed:
-				if _open_chest != null and _open_chest.has_method("request_transfer_from_player"):
-					_open_chest.call("request_transfer_from_player", idx, _inventory)
+				if _chest_view.has_chest():
+					_chest_view.transfer_from_player(idx)
 				else:
 					_quick_equip(idx)
 				return
@@ -664,140 +656,18 @@ func _set_icon(tex: TextureRect, icon: Texture2D) -> void:
 	tex.modulate = Color.WHITE
 
 
-func _build_chest_section() -> void:
-	_chest_section = Control.new()
-	_chest_section.name = "ChestSection"
-	_chest_section.position = Vector2(8, 34)
-	_chest_section.size = Vector2(752, 166)
-	_chest_section.visible = false
-	main_panel.add_child(_chest_section)
-
-	var chest_title := Label.new()
-	chest_title.text = "Сундук"
-	chest_title.position = Vector2(0, 0)
-	chest_title.size = Vector2(752, 24)
-	chest_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	chest_title.add_theme_font_size_override("font_size", 18)
-	_chest_section.add_child(chest_title)
-
-	var grid_center := CenterContainer.new()
-	grid_center.position = Vector2(0, 28)
-	grid_center.size = Vector2(752, 124)
-	_chest_section.add_child(grid_center)
-
-	_chest_grid = GridContainer.new()
-	_chest_grid.columns = 6
-	_chest_grid.add_theme_constant_override("h_separation", 6)
-	_chest_grid.add_theme_constant_override("v_separation", 6)
-	grid_center.add_child(_chest_grid)
-
-	for index in 12:
-		var button := Button.new()
-		button.custom_minimum_size = Vector2(52, 52)
-		button.tooltip_text = "Ctrl + ЛКМ — забрать"
-		_chest_grid.add_child(button)
-		var icon := TextureRect.new()
-		_setup_icon(icon)
-		button.add_child(icon)
-		button.gui_input.connect(func(event: InputEvent) -> void: _on_chest_gui_input(event, index))
-		_chest_buttons.append(button)
-		_chest_icons.append(icon)
-
-	_player_inventory_label = Label.new()
-	_player_inventory_label.text = "Инвентарь"
-	_player_inventory_label.position = Vector2(8, 202)
-	_player_inventory_label.size = Vector2(752, 24)
-	_player_inventory_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_player_inventory_label.add_theme_font_size_override("font_size", 18)
-	_player_inventory_label.visible = false
-	main_panel.add_child(_player_inventory_label)
-
-	var inventory_section := main_panel.get_node_or_null("InventorySection") as Control
-	if inventory_section != null:
-		_inventory_section_default_position = inventory_section.position
-
-
-func _on_chest_gui_input(event: InputEvent, slot_index: int) -> void:
-	if not event is InputEventMouseButton:
-		return
-	var mouse_event := event as InputEventMouseButton
-	if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.ctrl_pressed:
-		if _open_chest != null and _open_chest.has_method("request_transfer_to_player"):
-			_open_chest.call("request_transfer_to_player", slot_index, _inventory)
-		accept_event()
-
-
-func _refresh_chest() -> void:
-	for index in _chest_icons.size():
-		var item: ItemData = null
-		if _open_chest != null and _open_chest.has_method("get_item"):
-			item = _open_chest.call("get_item", index) as ItemData
-		_set_icon(_chest_icons[index], item.icon if item != null and item.icon != null else null)
-
-
+# Публичный API сундука остаётся на InventoryUI для существующих interactable.
 func open_chest(chest: Node) -> void:
-	if chest == null:
-		return
-	if _open_chest == chest and main_panel.visible:
-		_close_main_panel()
-		return
-	_disconnect_chest()
-	_open_chest = chest
-	if _open_chest.has_signal("contents_changed"):
-		_open_chest.connect("contents_changed", _refresh_chest)
-
-	_mouse_mode_before_open = Input.mouse_mode
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-	main_panel.visible = true
-	var title := main_panel.get_node("Title") as Label
-	title.text = "Хранилище"
-	main_panel.get_node("TopRow").visible = false
-	main_panel.get_node("TabBar").visible = false
-	_stats_tab.visible = false
-	_attributes_tab.visible = false
-	_chest_section.visible = true
-	_player_inventory_label.visible = true
-	var inventory_section := main_panel.get_node("InventorySection") as Control
-	inventory_section.visible = true
-	inventory_section.position = Vector2(_inventory_section_default_position.x, 230.0)
-	_refresh_chest()
-	_refresh_inventory()
+	_chest_view.open(chest)
 
 
 func is_chest_open(chest: Node = null) -> bool:
-	if chest == null:
-		return _open_chest != null and main_panel.visible
-	return _open_chest == chest and main_panel.visible
+	return _chest_view.is_open(chest)
 
 
 func close_chest() -> void:
-	if _open_chest != null:
-		_close_main_panel()
+	_chest_view.close()
 
-
-func _disconnect_chest() -> void:
-	if _open_chest == null:
-		return
-	if _open_chest.has_signal("contents_changed") and _open_chest.is_connected("contents_changed", _refresh_chest):
-		_open_chest.disconnect("contents_changed", _refresh_chest)
-	if _open_chest.has_method("set_open_visual"):
-		_open_chest.call("set_open_visual", false)
-	_open_chest = null
-
-
-func _leave_chest_layout() -> void:
-	_disconnect_chest()
-	if _chest_section != null:
-		_chest_section.visible = false
-	if _player_inventory_label != null:
-		_player_inventory_label.visible = false
-	if main_panel != null:
-		var title := main_panel.get_node("Title") as Label
-		title.text = "Инвентарь  [I]"
-		main_panel.get_node("TabBar").visible = true
-		var inventory_section := main_panel.get_node("InventorySection") as Control
-		inventory_section.position = _inventory_section_default_position
-	_show_inventory_tab()
 
 func _use_quickslot_item(slot_index: int) -> void:
 	if _inventory == null:
@@ -891,360 +761,6 @@ func _quick_unequip(eq_idx: int) -> void:
 
 
 # ════════════════════════════════════════════════════════
-# ВКЛАДКИ: Инвентарь / Характеристики
-# Строятся программно поверх существующей раскладки MainPanel,
-# поэтому не требуют правок .tscn.
-# ════════════════════════════════════════════════════════
-
-var _tab_inventory_btn: Button = null
-var _tab_stats_btn:     Button = null
-var _tab_attributes_btn: Button = null
-var _stats_tab:         Control = null
-var _stats_scroll:      ScrollContainer = null
-var _attributes_tab:    Control = null
-var _skill_tree_panel: PanelContainer = null
-var _stats_value_labels: Dictionary = {}  # stat_name → Label
-var _attribute_buttons: Dictionary = {}
-var _level_label: Label = null
-var _attribute_points_label: Label = null
-
-# Отображаемые названия характеристик и показателей
-const CHARACTERISTIC_LABELS := {
-	"strength":  "Сила",
-	"agility":   "Ловкость",
-	"wisdom":    "Мудрость",
-	"intellect": "Интеллект",
-}
-
-const STAT_LABELS := {
-	"health":                 "Здоровье",
-	"mana":                   "Мана",
-	"armor":                  "Броня",
-	"magic_resistance":       "Магическое сопротивление",
-	"attack_speed":           "Скорость атаки",
-	"physical_damage_bonus":  "Увеличение физ. урона",
-	"magical_damage_bonus":   "Увеличение маг. урона",
-	"move_speed":             "Скорость передвижения",
-	"morale":                 "Боевой дух",
-	"crit_chance":            "Шанс крита",
-	"crit_multiplier":        "Множитель крита",
-	"duration":               "Длительность эффектов",
-	"radius":                 "Радиус способностей",
-}
-
-
-func _build_tab_buttons() -> void:
-	var bar := VBoxContainer.new()
-	bar.name = "TabBar"
-	bar.position = Vector2(-56, 36)
-	bar.size = Vector2(50, 172)
-	bar.add_theme_constant_override("separation", 8)
-
-	_tab_inventory_btn = _make_tab_button(INVENTORY_ICON, "Инвентарь")
-	_tab_inventory_btn.button_pressed = true
-	_tab_inventory_btn.pressed.connect(_show_inventory_tab)
-	bar.add_child(_tab_inventory_btn)
-
-	_tab_stats_btn = _make_tab_button(STATS_ICON, "Характеристики")
-	_tab_stats_btn.pressed.connect(_show_stats_tab)
-	bar.add_child(_tab_stats_btn)
-
-	_tab_attributes_btn = _make_tab_button(ATTRIBUTES_ICON, "Атрибуты")
-	_tab_attributes_btn.pressed.connect(_show_attributes_tab)
-	bar.add_child(_tab_attributes_btn)
-
-	main_panel.add_child(bar)
-
-
-func _make_tab_button(icon_texture: Texture2D, hint: String) -> Button:
-	var button := Button.new()
-	button.custom_minimum_size = Vector2(50, 50)
-	button.icon = icon_texture
-	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	button.expand_icon = true
-	button.toggle_mode = true
-	button.tooltip_text = hint
-	return button
-
-
-func _build_stats_tab() -> void:
-
-	_stats_tab = Control.new()
-	_stats_tab.name = "StatsTab"
-	_stats_tab.position = Vector2(16, 36)
-	_stats_tab.size = Vector2(736, 468)
-	_stats_tab.visible = false
-	main_panel.add_child(_stats_tab)
-
-	_stats_scroll = ScrollContainer.new()
-	_stats_scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_stats_scroll.mouse_filter = Control.MOUSE_FILTER_STOP
-	_stats_tab.add_child(_stats_scroll)
-
-	var vbox := VBoxContainer.new()
-	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_stats_scroll.add_child(vbox)
-
-	var stat_title := Label.new()
-	stat_title.text = "Характеристики"
-	stat_title.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(stat_title)
-
-	for key in STAT_LABELS:
-		vbox.add_child(_make_stat_row(key, STAT_LABELS[key]))
-
-	vbox.add_child(HSeparator.new())
-
-	var weapon_title := Label.new()
-	weapon_title.text = "Урон оружия"
-	weapon_title.add_theme_font_size_override("font_size", 16)
-	vbox.add_child(weapon_title)
-
-	vbox.add_child(_make_stat_row("weapon_physical", "Физический урон"))
-	vbox.add_child(_make_stat_row("weapon_magical",  "Магический урон"))
-	_build_attributes_tab()
-
-
-func _build_attributes_tab() -> void:
-	_attributes_tab = Control.new()
-	_attributes_tab.name = "AttributesTab"
-	_attributes_tab.position = Vector2(24, 40)
-	_attributes_tab.size = Vector2(720, 450)
-	_attributes_tab.visible = false
-	main_panel.add_child(_attributes_tab)
-
-	var column := VBoxContainer.new()
-	column.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	column.add_theme_constant_override("separation", 8)
-	_attributes_tab.add_child(column)
-
-	var heading := Label.new()
-	heading.text = "Атрибуты героя"
-	heading.add_theme_font_size_override("font_size", 22)
-	column.add_child(heading)
-	_level_label = Label.new()
-	column.add_child(_level_label)
-	_attribute_points_label = Label.new()
-	column.add_child(_attribute_points_label)
-	column.add_child(HSeparator.new())
-	for key in CHARACTERISTIC_LABELS:
-		column.add_child(_make_stat_row(key, CHARACTERISTIC_LABELS[key], true))
-
-	_skill_tree_panel = PanelContainer.new()
-	_skill_tree_panel.name = "SkillTreePanel"
-	_skill_tree_panel.custom_minimum_size = Vector2(0, 150)
-	_skill_tree_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	column.add_child(_skill_tree_panel)
-
-	var tree_content := CenterContainer.new()
-	_skill_tree_panel.add_child(tree_content)
-	var tree_column := VBoxContainer.new()
-	tree_column.alignment = BoxContainer.ALIGNMENT_CENTER
-	tree_content.add_child(tree_column)
-	var tree_icon := TextureRect.new()
-	tree_icon.texture = SKILL_TREE_ICON
-	tree_icon.custom_minimum_size = Vector2(72, 72)
-	tree_icon.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
-	tree_icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	tree_icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	tree_column.add_child(tree_icon)
-	var tree_label := Label.new()
-	tree_label.text = "Дерево прокачки"
-	tree_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	tree_label.add_theme_font_size_override("font_size", 18)
-	tree_column.add_child(tree_label)
-
-
-func _make_stat_row(key: String, display_name: String, can_increase: bool = false) -> HBoxContainer:
-
-	var row := HBoxContainer.new()
-
-	var name_label := Label.new()
-	name_label.text = display_name
-	name_label.custom_minimum_size = Vector2(260, 0)
-	row.add_child(name_label)
-
-	var value_label := Label.new()
-	value_label.text = "—"
-	_stats_value_labels[key] = value_label
-	row.add_child(value_label)
-
-	if can_increase:
-		var spacer := Control.new()
-		spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(spacer)
-		var increase_button := Button.new()
-		increase_button.text = "+"
-		increase_button.tooltip_text = "Вложить одно очко"
-		increase_button.pressed.connect(func(): _on_attribute_increased(key))
-		_attribute_buttons[key] = increase_button
-		row.add_child(increase_button)
-
-	return row
-
-
-func _show_inventory_tab() -> void:
-	_tab_inventory_btn.button_pressed = true
-	_tab_stats_btn.button_pressed = false
-	_tab_attributes_btn.button_pressed = false
-	_stats_tab.visible = false
-	_attributes_tab.visible = false
-	var top_row := main_panel.get_node_or_null("TopRow")
-	var inv_section := main_panel.get_node_or_null("InventorySection")
-	if top_row:
-		top_row.visible = true
-	if inv_section:
-		inv_section.visible = true
-
-
-func _show_stats_tab() -> void:
-	_tab_inventory_btn.button_pressed = false
-	_tab_stats_btn.button_pressed = true
-	_tab_attributes_btn.button_pressed = false
-	_stats_tab.visible = true
-	_attributes_tab.visible = false
-	var top_row := main_panel.get_node_or_null("TopRow")
-	var inv_section := main_panel.get_node_or_null("InventorySection")
-	if top_row:
-		top_row.visible = false
-	if inv_section:
-		inv_section.visible = false
-	_refresh_stats_tab()
-
-
-func _show_attributes_tab() -> void:
-	_tab_inventory_btn.button_pressed = false
-	_tab_stats_btn.button_pressed = false
-	_tab_attributes_btn.button_pressed = true
-	_stats_tab.visible = false
-	_attributes_tab.visible = true
-	var top_row := main_panel.get_node_or_null("TopRow")
-	var inv_section := main_panel.get_node_or_null("InventorySection")
-	if top_row:
-		top_row.visible = false
-	if inv_section:
-		inv_section.visible = false
-	_refresh_stats_tab()
-
-
-func _apply_inventory_theme() -> void:
-	var night := GameSettings.inventory_theme == GameSettings.InventoryTheme.NIGHT
-	var palette := GameSettings.get_inventory_theme_palette()
-	var background: Color = palette.background
-	var border: Color = palette.border
-	var text_color: Color = palette.text
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = border
-	style.set_border_width_all(4)
-	style.set_corner_radius_all(8)
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 12
-	main_panel.add_theme_stylebox_override("panel", style)
-	if _skill_tree_panel != null:
-		var tree_style := StyleBoxFlat.new()
-		tree_style.bg_color = background.darkened(0.08) if night else background.lightened(0.12)
-		tree_style.border_color = border
-		tree_style.set_border_width_all(2)
-		tree_style.set_corner_radius_all(6)
-		_skill_tree_panel.add_theme_stylebox_override("panel", tree_style)
-	_apply_label_color(main_panel, text_color)
-	for button in [_tab_inventory_btn, _tab_stats_btn, _tab_attributes_btn]:
-		if button != null:
-			_style_tab_button(button, background, border)
-
-
-func _apply_label_color(node: Node, color: Color) -> void:
-	if node is Label:
-		(node as Label).add_theme_color_override("font_color", color)
-	for child in node.get_children():
-		_apply_label_color(child, color)
-
-
-func _style_tab_button(button: Button, background: Color, border: Color) -> void:
-	for state in ["normal", "hover", "pressed", "hover_pressed"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = background.lightened(0.16) if state == "hover" or state == "hover_pressed" else background
-		style.border_color = border
-		style.set_border_width_all(3 if state == "pressed" or state == "hover_pressed" else 2)
-		style.set_corner_radius_all(6)
-		button.add_theme_stylebox_override(state, style)
-
-
-func _is_mouse_wheel(event: InputEventMouseButton) -> bool:
-	return event.button_index == MOUSE_BUTTON_WHEEL_UP \
-		or event.button_index == MOUSE_BUTTON_WHEEL_DOWN
-
-
-func _scroll_stats(event: InputEventMouseButton) -> void:
-	if _stats_scroll == null:
-		return
-	var scroll_bar := _stats_scroll.get_v_scroll_bar()
-	var amount := maxf(scroll_bar.page * 0.18, 36.0) * maxf(event.factor, 1.0)
-	if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-		scroll_bar.value -= amount
-	else:
-		scroll_bar.value += amount
-
-
-# ════════════════════════════════════════════════════════
-# ОБНОВЛЕНИЕ ЗНАЧЕНИЙ
-# ════════════════════════════════════════════════════════
-func _refresh_stats_tab() -> void:
-
-	if _stats == null:
-		return
-	_level_label.text = "Уровень: %d   Опыт: %d/%d" % [
-		_stats.level, _stats.experience, StatsComponent.EXPERIENCE_PER_LEVEL]
-	_attribute_points_label.text = "Свободные очки: %d" % _stats.attribute_points
-	for button in _attribute_buttons.values():
-		(button as Button).disabled = _stats.attribute_points <= 0
-
-	for key in CHARACTERISTIC_LABELS:
-		if _stats_value_labels.has(key):
-			_stats_value_labels[key].text = "%.1f" % _stats.get_characteristic(key)
-	for key in STAT_LABELS:
-		if not _stats_value_labels.has(key):
-			continue
-		var value: float = _stats.get_stat(key)
-		_stats_value_labels[key].text = _format_stat(key, value)
-
-	# Урон оружия — берём из надетого WeaponData, если есть
-	var weapon: ItemData = _equipment.weapon if _equipment else null
-	if weapon != null and weapon is WeaponData:
-		var w := weapon as WeaponData
-		_stats_value_labels["weapon_physical"].text = "%.1f" % w.get_physical_damage(_stats)
-		_stats_value_labels["weapon_magical"].text  = "%.1f" % w.get_magical_damage(_stats)
-	else:
-		_stats_value_labels["weapon_physical"].text = "— (нет оружия)"
-		_stats_value_labels["weapon_magical"].text  = "— (нет оружия)"
-
-
-func _on_attribute_increased(attribute_name: String) -> void:
-	if _stats != null:
-		_stats.request_spend_attribute(attribute_name)
-
-
-func _format_stat(key: String, value: float) -> String:
-	match key:
-		"physical_damage_bonus", "magical_damage_bonus", "duration":
-			return "%.1f%%" % value
-		"crit_chance":
-			return "%.1f%%" % (value * 100.0)
-		"crit_multiplier":
-			return "x%.2f" % value
-		"attack_speed":
-			return "%.2f" % value
-		_:
-			return "%d" % int(value)
-
-
-# ════════════════════════════════════════════════════════
-# ВЫБРАСЫВАНИЕ ПРЕДМЕТОВ В МИР
-# ════════════════════════════════════════════════════════
-
-# Delete над слотом: выбросить предмет из слота инвентаря или быстрого доступа.
-# Слоты экипировки намеренно не трогаем — чтобы не выбросить надетое случайно.
 func _drop_hovered_item() -> void:
 
 	if _inventory == null:
@@ -1351,7 +867,7 @@ func _find_owner_player() -> Node3D:
 # по слотам. При закрытии возвращаем тот режим, что был до открытия.
 # ════════════════════════════════════════════════════════
 func _open_main_panel() -> void:
-	_leave_chest_layout()
+	_chest_view.leave_layout()
 	_mouse_mode_before_open = Input.mouse_mode
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	main_panel.visible = true
@@ -1363,7 +879,7 @@ func is_main_panel_open() -> bool:
 
 func _close_main_panel() -> void:
 	main_panel.visible = false
-	_leave_chest_layout()
+	_chest_view.leave_layout()
 	var owner_player := _find_owner_player()
 	var camera_rig: CameraRig = null
 	if owner_player != null:
