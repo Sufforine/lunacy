@@ -1,0 +1,145 @@
+[gd_scene load_steps=17 format=3]
+
+[ext_resource type="ArrayMesh" path="res://Assets/nature/mission_1/CommonTree_1.obj" id="1_tree_a"]
+[ext_resource type="ArrayMesh" path="res://Assets/nature/mission_1/CommonTree_3.obj" id="2_tree_b"]
+[ext_resource type="ArrayMesh" path="res://Assets/nature/mission_1/Grass_Common_Short.obj" id="3_grass"]
+[ext_resource type="ArrayMesh" path="res://Assets/nature/mission_1/Rock_Medium_1.obj" id="4_rock"]
+[ext_resource type="Texture2D" path="res://Assets/nature/mission_1/Bark_NormalTree.png" id="5_bark"]
+
+[sub_resource type="Environment" id="Environment_forest"]
+background_mode = 1
+background_color = Color(0.33, 0.43, 0.48, 1)
+ambient_light_source = 3
+ambient_light_color = Color(0.55, 0.65, 0.72, 1)
+ambient_light_energy = 0.65
+tonemap_mode = 2
+
+[sub_resource type="StandardMaterial3D" id="Material_ground"]
+albedo_color = Color(0.16, 0.28, 0.11, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_ground"]
+material = SubResource("Material_ground")
+size = Vector3(38, 0.4, 34)
+
+[sub_resource type="BoxShape3D" id="Shape_ground"]
+size = Vector3(38, 0.4, 34)
+
+[sub_resource type="StandardMaterial3D" id="Material_path"]
+albedo_color = Color(0.28, 0.21, 0.12, 1)
+roughness = 1.0
+
+[sub_resource type="BoxMesh" id="Mesh_path"]
+material = SubResource("Material_path")
+size = Vector3(4.4, 0.08, 25)
+
+[sub_resource type="StandardMaterial3D" id="Material_door"]
+albedo_texture = ExtResource("5_bark")
+albedo_color = Color(0.45, 0.28, 0.16, 1)
+roughness = 0.82
+
+[sub_resource type="BoxMesh" id="Mesh_door"]
+material = SubResource("Material_door")
+size = Vector3(3.8, 4.8, 0.35)
+
+[sub_resource type="BoxShape3D" id="Shape_door"]
+size = Vector3(3.8, 4.8, 0.35)
+
+[sub_resource type="MultiMesh" id="MultiMesh_grass"]
+transform_format = 1
+instance_count = 10
+mesh = ExtResource("3_grass")
+buffer = PackedFloat32Array(0.75, 0, 0, -5.5, 0, 0.75, 0, 0, 0, 0, 0.75, 7.5, 0.62, 0, 0, 5.2, 0, 0.62, 0, 0, 0, 0, 0.62, 6.2, 0.82, 0, 0, -7.1, 0, 0.82, 0, 0, 0, 0, 0.82, 2.6, 0.7, 0, 0, 6.8, 0, 0.7, 0, 0, 0, 0, 0.7, 0.3, 0.65, 0, 0, -5.9, 0, 0.65, 0, 0, 0, 0, 0.65, -2.2, 0.8, 0, 0, 7.8, 0, 0.8, 0, 0, 0, 0, 0.8, -4.6, 0.72, 0, 0, -6.6, 0, 0.72, 0, 0, 0, 0, 0.72, -7.8, 0.68, 0, 0, 5.8, 0, 0.68, 0, 0, 0, 0, 0.68, -9.2, 0.78, 0, 0, -8.4, 0, 0.78, 0, 0, 0, 0, 0.78, 10.1, 0.64, 0, 0, 8.1, 0, 0.64, 0, 0, 0, 0, 0.64, 11.7)
+
+[node name="Mission1Entrance" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_forest")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-52, -28, 0)
+light_color = Color(1, 0.86, 0.67, 1)
+light_energy = 1.15
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+position = Vector3(0, -0.2, 0)
+
+[node name="Mesh" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("Mesh_ground")
+
+[node name="Collision" type="CollisionShape3D" parent="Ground"]
+shape = SubResource("Shape_ground")
+
+[node name="Path" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.045, -1.5)
+mesh = SubResource("Mesh_path")
+
+[node name="DungeonDoor" type="StaticBody3D" parent="."]
+position = Vector3(0, 2.4, -14)
+
+[node name="Mesh" type="MeshInstance3D" parent="DungeonDoor"]
+mesh = SubResource("Mesh_door")
+
+[node name="Collision" type="CollisionShape3D" parent="DungeonDoor"]
+shape = SubResource("Shape_door")
+
+[node name="EntranceRocks" type="Node3D" parent="."]
+
+[node name="Left" type="MeshInstance3D" parent="EntranceRocks"]
+position = Vector3(-3.15, 0.2, -14.3)
+rotation_degrees = Vector3(0, 18, -8)
+scale = Vector3(1.5, 2.35, 1.45)
+mesh = ExtResource("4_rock")
+
+[node name="Right" type="MeshInstance3D" parent="EntranceRocks"]
+position = Vector3(3.15, 0.1, -14.2)
+rotation_degrees = Vector3(0, -22, 9)
+scale = Vector3(1.55, 2.25, 1.5)
+mesh = ExtResource("4_rock")
+
+[node name="Top" type="MeshInstance3D" parent="EntranceRocks"]
+position = Vector3(0, 4.7, -14.35)
+rotation_degrees = Vector3(12, 0, 88)
+scale = Vector3(1.15, 2.15, 1.25)
+mesh = ExtResource("4_rock")
+
+[node name="Trees" type="Node3D" parent="."]
+
+[node name="TreeA1" type="MeshInstance3D" parent="Trees"]
+position = Vector3(-9, 0.2, 7)
+rotation_degrees = Vector3(0, 24, 0)
+scale = Vector3(1.05, 1.05, 1.05)
+mesh = ExtResource("1_tree_a")
+
+[node name="TreeA2" type="MeshInstance3D" parent="Trees"]
+position = Vector3(9.5, 0.2, 8.5)
+rotation_degrees = Vector3(0, -38, 0)
+scale = Vector3(0.9, 0.9, 0.9)
+mesh = ExtResource("1_tree_a")
+
+[node name="TreeA3" type="MeshInstance3D" parent="Trees"]
+position = Vector3(-10.5, 0.2, -7)
+rotation_degrees = Vector3(0, 62, 0)
+scale = Vector3(1.15, 1.15, 1.15)
+mesh = ExtResource("1_tree_a")
+
+[node name="TreeB1" type="MeshInstance3D" parent="Trees"]
+position = Vector3(10.8, 0.2, -6)
+rotation_degrees = Vector3(0, 12, 0)
+scale = Vector3(0.88, 0.88, 0.88)
+mesh = ExtResource("2_tree_b")
+
+[node name="TreeB2" type="MeshInstance3D" parent="Trees"]
+position = Vector3(-13, 0.2, 1)
+rotation_degrees = Vector3(0, -56, 0)
+scale = Vector3(0.82, 0.82, 0.82)
+mesh = ExtResource("2_tree_b")
+
+[node name="TreeB3" type="MeshInstance3D" parent="Trees"]
+position = Vector3(13, 0.2, 1.5)
+rotation_degrees = Vector3(0, 48, 0)
+mesh = ExtResource("2_tree_b")
+
+[node name="GrassPatches" type="MultiMeshInstance3D" parent="."]
+multimesh = SubResource("MultiMesh_grass")

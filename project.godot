@@ -23,11 +23,18 @@ ItemLibrary="*res://entities/inventory/model/data/item_library.gd"
 SteamLobby="*res://features/steam-lobby/api/steam_lobby.gd"
 GameSettings="*res://shared/settings/game_settings.gd"
 GameChat="*res://features/chat/game_chat.gd"
+MCPRuntimeBridge="*res://addons/godot_mcp/services/mcp_runtime_bridge.gd"
+MCPInputBridge="*res://addons/godot_mcp/services/mcp_input_bridge.gd"
+MCPScreenshotBridge="*res://addons/godot_mcp/services/mcp_screenshot_bridge.gd"
 
 [display]
 
 window/subwindows/embed_subwindows=false
 window/per_pixel_transparency/allowed=true
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 
 [file_customization]
 
