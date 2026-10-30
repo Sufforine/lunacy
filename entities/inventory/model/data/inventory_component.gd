@@ -273,7 +273,7 @@ func network_request(command: Dictionary) -> void:
 
 func network_item(source: String, index: int) -> ItemData:
 	if source == "equipment":
-		var keys := ["weapon", "helmet", "chestplate", "leggings", "cloak", "trinket_1", "trinket_2"]
+		var keys := ["weapon", "helmet", "chestplate", "leggings", "trinket_1", "trinket_2"]
 		return get_parent().equipment.get(keys[index]) if index >= 0 and index < keys.size() else null
 	return get_source_item(source, index)
 
@@ -283,8 +283,8 @@ func accepts(source: String, index: int, item: ItemData) -> bool:
 		return index >= 0 and index < SLOT_COUNT
 	if source == "quickslot":
 		return index >= 0 and index < QUICKSLOT_COUNT
-	if source == "equipment" and index >= 0 and index < 7:
-		var types := [ItemData.Slot.WEAPON, ItemData.Slot.HELMET, ItemData.Slot.CHESTPLATE, ItemData.Slot.LEGGINGS, ItemData.Slot.CLOAK, ItemData.Slot.TRINKET, ItemData.Slot.TRINKET]
+	if source == "equipment" and index >= 0 and index < 6:
+		var types := [ItemData.Slot.WEAPON, ItemData.Slot.HELMET, ItemData.Slot.CHESTPLATE, ItemData.Slot.LEGGINGS, ItemData.Slot.TRINKET, ItemData.Slot.TRINKET]
 		return item == null or item.slot == types[index]
 	return false
 

@@ -80,61 +80,45 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -384.0
-offset_top = -260.0
-offset_right = 384.0
-offset_bottom = 260.0
+offset_left = -354.0
+offset_top = -214.0
+offset_right = 354.0
+offset_bottom = 214.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Title" type="Label" parent="MainPanel"]
+[node name="TopRow" type="Control" parent="MainPanel"]
 layout_mode = 0
-offset_top = 6.0
-offset_right = 768.0
-offset_bottom = 26.0
-text = "Инвентарь  [I]"
+offset_left = 12.0
+offset_top = 12.0
+offset_right = 280.0
+offset_bottom = 416.0
+
+[node name="EquipmentSection" type="Control" parent="MainPanel/TopRow"]
+clip_contents = true
+layout_mode = 0
+offset_right = 268.0
+offset_bottom = 228.0
+
+[node name="EquipmentLabel" type="Label" parent="MainPanel/TopRow/EquipmentSection"]
+layout_mode = 0
+offset_right = 268.0
+offset_bottom = 24.0
+text = "Экипировка"
 horizontal_alignment = 1
 
-[node name="TopRow" type="HBoxContainer" parent="MainPanel"]
+[node name="SlotHelmet" type="Button" parent="MainPanel/TopRow/EquipmentSection"]
+clip_contents = true
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 0
-offset_left = 8.0
-offset_top = 32.0
-offset_right = 760.0
-offset_bottom = 148.0
-
-[node name="EquipmentSection" type="VBoxContainer" parent="MainPanel/TopRow"]
-clip_contents = true
-layout_mode = 2
-
-[node name="Row1" type="HBoxContainer" parent="MainPanel/TopRow/EquipmentSection"]
-layout_mode = 2
-
-[node name="SlotCloak" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
-clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
-tooltip_text = "Оружие"
-
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotCloak"]
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="SlotHelmet" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
-clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
+offset_left = 102.0
+offset_top = 28.0
+offset_right = 166.0
+offset_bottom = 92.0
 tooltip_text = "Шлем"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotHelmet"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/SlotHelmet"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -145,14 +129,39 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="SlotChestplate" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
+[node name="SlotWeapon" type="Button" parent="MainPanel/TopRow/EquipmentSection"]
 clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_top = 96.0
+offset_right = 64.0
+offset_bottom = 160.0
+tooltip_text = "Оружие"
+
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/SlotWeapon"]
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 3
+stretch_mode = 6
+
+[node name="SlotChestplate" type="Button" parent="MainPanel/TopRow/EquipmentSection"]
+clip_contents = true
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 102.0
+offset_top = 96.0
+offset_right = 166.0
+offset_bottom = 160.0
 tooltip_text = "Доспех"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotChestplate"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/SlotChestplate"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -163,14 +172,18 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="SlotLeggings" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row1"]
+[node name="SlotLeggings" type="Button" parent="MainPanel/TopRow/EquipmentSection"]
 clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 102.0
+offset_top = 164.0
+offset_right = 166.0
+offset_bottom = 228.0
 tooltip_text = "Поножи"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row1/SlotLeggings"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/SlotLeggings"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -181,39 +194,18 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="Row2" type="HBoxContainer" parent="MainPanel/TopRow/EquipmentSection"]
-layout_mode = 2
-
-[node name="SlotWeapon" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+[node name="SlotTrinket1" type="Button" parent="MainPanel/TopRow/EquipmentSection"]
 clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
-tooltip_text = "Плащ"
-
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotWeapon"]
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-expand_mode = 3
-stretch_mode = 6
-
-[node name="Control" type="Control" parent="MainPanel/TopRow/EquipmentSection/Row2"]
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
-
-[node name="SlotTrinket1" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
-clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 204.0
+offset_top = 28.0
+offset_right = 268.0
+offset_bottom = 92.0
 tooltip_text = "Тринкет"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket1"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/SlotTrinket1"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -224,14 +216,18 @@ mouse_filter = 2
 expand_mode = 3
 stretch_mode = 6
 
-[node name="SlotTrinket2" type="Button" parent="MainPanel/TopRow/EquipmentSection/Row2"]
+[node name="SlotTrinket2" type="Button" parent="MainPanel/TopRow/EquipmentSection"]
 clip_contents = true
-custom_minimum_size = Vector2(60, 60)
-layout_mode = 2
-tooltip_text = "Свиток"
+custom_minimum_size = Vector2(64, 64)
+layout_mode = 0
+offset_left = 204.0
+offset_top = 96.0
+offset_right = 268.0
+offset_bottom = 160.0
+tooltip_text = "Тринкет 2"
 
-[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket2"]
-custom_minimum_size = Vector2(60, 60)
+[node name="Icon" type="TextureRect" parent="MainPanel/TopRow/EquipmentSection/SlotTrinket2"]
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -243,7 +239,11 @@ expand_mode = 3
 stretch_mode = 6
 
 [node name="QuickSlotsSection" type="VBoxContainer" parent="MainPanel/TopRow"]
-layout_mode = 2
+layout_mode = 0
+offset_left = 34.0
+offset_top = 244.0
+offset_right = 234.0
+offset_bottom = 332.0
 
 [node name="QLabel" type="Label" parent="MainPanel/TopRow/QuickSlotsSection"]
 layout_mode = 2
@@ -306,10 +306,10 @@ stretch_mode = 6
 
 [node name="InventorySection" type="VBoxContainer" parent="MainPanel"]
 layout_mode = 0
-offset_left = 8.0
-offset_top = 180.0
-offset_right = 760.0
-offset_bottom = 512.0
+offset_left = 292.0
+offset_top = 12.0
+offset_right = 696.0
+offset_bottom = 416.0
 
 [node name="InvGrid" type="GridContainer" parent="MainPanel/InventorySection"]
 clip_contents = true
@@ -318,7 +318,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/h_separation = 4
 theme_override_constants/v_separation = 4
-columns = 9
+columns = 6
 
 [node name="Slot_1" type="Button" parent="MainPanel/InventorySection/InvGrid"]
 clip_contents = true

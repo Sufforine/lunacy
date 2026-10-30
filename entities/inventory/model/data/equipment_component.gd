@@ -9,7 +9,6 @@ var weapon:     ItemData = null
 var helmet:     ItemData = null
 var chestplate: ItemData = null
 var leggings:   ItemData = null
-var cloak:      ItemData = null
 var trinket_1:  ItemData = null
 var trinket_2:  ItemData = null
 
@@ -38,9 +37,6 @@ func equip(item: ItemData) -> void:
 		ItemData.Slot.LEGGINGS:
 			previous = leggings
 			leggings = item
-		ItemData.Slot.CLOAK:
-			previous = cloak
-			cloak = item
 		ItemData.Slot.TRINKET:
 			# Первый свободный слот тринкета, иначе вытесняем второй
 			if trinket_1 == null:
@@ -73,9 +69,6 @@ func unequip(slot: ItemData.Slot) -> void:
 		ItemData.Slot.LEGGINGS:
 			removed = leggings
 			leggings = null
-		ItemData.Slot.CLOAK:
-			removed = cloak
-			cloak = null
 		ItemData.Slot.TRINKET:
 			if trinket_1 != null:
 				removed = trinket_1
@@ -89,7 +82,7 @@ func unequip(slot: ItemData.Slot) -> void:
 		item_unequipped.emit(removed)
 
 
-# Надеть предмет в конкретный слот по индексу UI (0-6).
+# Надеть предмет в конкретный слот по индексу UI (0-5).
 # item == null очищает слот. Нужен чтобы точно выбрать trinket_1 или trinket_2.
 func equip_to_slot(item: ItemData, slot_idx: int) -> void:
 
@@ -112,12 +105,9 @@ func equip_to_slot(item: ItemData, slot_idx: int) -> void:
 			previous = leggings
 			leggings = item
 		4:
-			previous = cloak
-			cloak = item
-		5:
 			previous = trinket_1
 			trinket_1 = item
-		6:
+		5:
 			previous = trinket_2
 			trinket_2 = item
 
@@ -135,7 +125,6 @@ func get_slot_item(slot: ItemData.Slot) -> ItemData:
 		ItemData.Slot.HELMET:     return helmet
 		ItemData.Slot.CHESTPLATE: return chestplate
 		ItemData.Slot.LEGGINGS:   return leggings
-		ItemData.Slot.CLOAK:      return cloak
 		ItemData.Slot.TRINKET:    return trinket_1
 	return null
 
@@ -146,7 +135,6 @@ func get_all_items() -> Array[ItemData]:
 	if helmet:     items.append(helmet)
 	if chestplate: items.append(chestplate)
 	if leggings:   items.append(leggings)
-	if cloak:      items.append(cloak)
 	if trinket_1:  items.append(trinket_1)
 	if trinket_2:  items.append(trinket_2)
 	return items
@@ -162,7 +150,6 @@ func to_dict() -> Dictionary:
 		"helmet":     helmet.resource_path     if helmet     else "",
 		"chestplate": chestplate.resource_path if chestplate else "",
 		"leggings":   leggings.resource_path   if leggings   else "",
-		"cloak":      cloak.resource_path      if cloak      else "",
 		"trinket_1":  trinket_1.resource_path  if trinket_1  else "",
 		"trinket_2":  trinket_2.resource_path  if trinket_2  else "",
 	}
@@ -179,7 +166,6 @@ func load_from_dict(data: Dictionary) -> void:
 	helmet     = _load_item(str(data.get("helmet",     "")))
 	chestplate = _load_item(str(data.get("chestplate", "")))
 	leggings   = _load_item(str(data.get("leggings",   "")))
-	cloak      = _load_item(str(data.get("cloak",      "")))
 	trinket_1  = _load_item(str(data.get("trinket_1",  "")))
 	trinket_2  = _load_item(str(data.get("trinket_2",  "")))
 

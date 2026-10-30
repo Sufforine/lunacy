@@ -5,7 +5,7 @@
 extends Resource
 class_name ItemData
 
-enum Slot { NONE, WEAPON, HELMET, CHESTPLATE, LEGGINGS, CLOAK, TRINKET }
+enum Slot { NONE, WEAPON, HELMET, CHESTPLATE, LEGGINGS, TRINKET }
 
 @export var id: String = ""
 @export var item_name: String = ""

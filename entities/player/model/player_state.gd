@@ -25,7 +25,6 @@ var equipment: Dictionary = {
 	"helmet": "",
 	"chestplate": "",
 	"leggings": "",
-	"cloak": "",
 	"trinket_1": "",
 	"trinket_2": ""
 }

@@ -2,12 +2,9 @@
 # Структура сцены:
 #   InventoryUI (Control)
 #   ├── MainPanel (Panel)                    ← открывается по I
-#   │   ├── EquipmentSection (VBoxContainer)
-#   │   │   ├── Row1 (HBoxContainer): Weapon, Helmet
-#   │   │   ├── Row2 (HBoxContainer): Chestplate, Leggings
-#   │   │   └── Row3 (HBoxContainer): Cloak, Trinket1, Scroll
-#   │   └── InventorySection (VBoxContainer)
-#   │       └── InvGrid (GridContainer)      ← 36 кнопок 9x4
+#   │   ├── TopRow (VBoxContainer)           ← экипировка и быстрые слоты слева
+#   │   └── InventorySection (VBoxContainer) ← инвентарь справа
+#   │       └── InvGrid (GridContainer)      ← 36 кнопок 6x6
 #   ├── QuickBar (HBoxContainer)             ← всегда виден
 #   │   ├── QSlot_1 (Button → Icon)
 #   │   ├── QSlot_2 (Button → Icon)
@@ -28,13 +25,14 @@ var _mouse_mode_before_open: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 
 # Экипировка
 # Экипировка
-@onready var slot_weapon:     Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotWeapon
-@onready var slot_helmet:     Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotHelmet
-@onready var slot_chestplate: Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotChestplate
-@onready var slot_leggings:   Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotLeggings
-@onready var slot_cloak:      Button = $MainPanel/TopRow/EquipmentSection/Row1/SlotCloak
-@onready var slot_trinket1:   Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket1
-@onready var slot_trinket2:     Button = $MainPanel/TopRow/EquipmentSection/Row2/SlotTrinket2
+const INVENTORY_SLOT_SIZE := Vector2(64, 64)
+
+@onready var slot_weapon:     Button = $MainPanel/TopRow/EquipmentSection/SlotWeapon
+@onready var slot_helmet:     Button = $MainPanel/TopRow/EquipmentSection/SlotHelmet
+@onready var slot_chestplate: Button = $MainPanel/TopRow/EquipmentSection/SlotChestplate
+@onready var slot_leggings:   Button = $MainPanel/TopRow/EquipmentSection/SlotLeggings
+@onready var slot_trinket1:   Button = $MainPanel/TopRow/EquipmentSection/SlotTrinket1
+@onready var slot_trinket2:   Button = $MainPanel/TopRow/EquipmentSection/SlotTrinket2
 
 # QuickSlots в MainPanel (для drag & drop)
 @onready var qslot_1: Button = $MainPanel/TopRow/QuickSlotsSection/QRow/QSlot_1
@@ -99,19 +97,16 @@ func _ready() -> void:
 	_tabs.build(main_panel)
 	_chest_view.build(self, main_panel, _tabs)
 	_tabs.apply_theme()
+	_chest_view.apply_theme()
 	GameSettings.inventory_theme_changed.connect(_tabs.apply_theme)
+	GameSettings.inventory_theme_changed.connect(_chest_view.apply_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	_apply_ui_scale()
-	main_panel.resized.connect(_update_scale_pivot)
+	resized.connect(_apply_ui_scale)
 
 
 func _apply_ui_scale() -> void:
-	main_panel.scale = Vector2.ONE * GameSettings.get_ui_scale()
-	_update_scale_pivot.call_deferred()
-
-
-func _update_scale_pivot() -> void:
-	main_panel.pivot_offset = main_panel.size * 0.5
+	_chest_view.apply_layout(GameSettings.get_ui_scale(), get_viewport_rect().size)
 
 
 # ════════════════════════════════════════════════════════
@@ -200,7 +195,9 @@ func _input(event: InputEvent) -> void:
 				_drop_on_inventory(inv_idx)
 			elif eq_idx >= 0:
 				_drop_on_equipment(eq_idx)
-			elif main_panel.visible and not main_panel.get_global_rect().has_point(get_global_mouse_position()):
+			elif main_panel.visible \
+				and not main_panel.get_global_rect().has_point(get_global_mouse_position()) \
+				and not _chest_view.contains_global_point(get_global_mouse_position()):
 				# Отпустили за пределами окна инвентаря — выбросить в мир
 				_drop_dragged_item_in_world()
 			else:
@@ -219,6 +216,7 @@ func _collect_inventory_slots() -> void:
 		if not child is Button:
 			continue
 		var btn := child as Button
+		btn.custom_minimum_size = INVENTORY_SLOT_SIZE
 		# GridContainer распределяет свободное место между строками и
 		# столбцами только тогда, когда сами слоты разрешают расширение.
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -236,9 +234,9 @@ func _collect_equipment_slots() -> void:
 
 	var btns: Array = [
 		slot_weapon, slot_helmet, slot_chestplate,
-		slot_leggings, slot_cloak, slot_trinket1, slot_trinket2
+		slot_leggings, slot_trinket1, slot_trinket2
 	]
-	var tips := ["Оружие", "Шлем", "Доспех", "Поножи", "Плащ", "Тринкет", "Тринкет 2"]
+	var tips := ["Оружие", "Шлем", "Доспех", "Поножи", "Тринкет", "Тринкет 2"]
 	_eq_buttons.clear()
 	_eq_icons.clear()
 
@@ -250,6 +248,7 @@ func _collect_equipment_slots() -> void:
 			_eq_icons.append(null)
 			continue
 		_eq_buttons.append(btn)
+		btn.custom_minimum_size = INVENTORY_SLOT_SIZE
 		var tex := _find_texture_rect(btn)
 		_eq_icons.append(tex)
 		if tex:
@@ -272,6 +271,7 @@ func _collect_quickslots() -> void:
 	for i in _qs_buttons.size():
 		# Слоты внутри MainPanel — drag & drop
 		var btn: Button = _qs_buttons[i]
+		btn.custom_minimum_size = INVENTORY_SLOT_SIZE
 		var tex := _find_texture_rect(btn)
 		_qs_icons.append(tex)
 		if tex:
@@ -303,7 +303,7 @@ func _refresh_equipment() -> void:
 		return
 	var items := [
 		_equipment.weapon, _equipment.helmet, _equipment.chestplate,
-		_equipment.leggings, _equipment.cloak, _equipment.trinket_1, _equipment.trinket_2
+		_equipment.leggings, _equipment.trinket_1, _equipment.trinket_2
 	]
 	for i in items.size():
 		var eq: ItemData = items[i]
@@ -558,9 +558,8 @@ func _eq_slot_item(idx: int) -> ItemData:
 		1: return _equipment.helmet
 		2: return _equipment.chestplate
 		3: return _equipment.leggings
-		4: return _equipment.cloak
-		5: return _equipment.trinket_1
-		6: return _equipment.trinket_2
+		4: return _equipment.trinket_1
+		5: return _equipment.trinket_2
 	return null
 
 
@@ -570,9 +569,8 @@ func _eq_enum(idx: int) -> ItemData.Slot:
 		1: return ItemData.Slot.HELMET
 		2: return ItemData.Slot.CHESTPLATE
 		3: return ItemData.Slot.LEGGINGS
-		4: return ItemData.Slot.CLOAK
+		4: return ItemData.Slot.TRINKET
 		5: return ItemData.Slot.TRINKET
-		6: return ItemData.Slot.TRINKET
 	return ItemData.Slot.NONE
 
 
@@ -711,7 +709,7 @@ func _quick_equip(inv_idx: int) -> void:
 
 
 # Вернуть индекс UI-слота экипировки для данного предмета.
-# Для TRINKET: предпочитаем пустой слот, иначе trinket_1 (idx 5).
+# Для TRINKET: предпочитаем пустой слот, иначе trinket_1 (idx 4).
 func _find_eq_slot_for(item: ItemData) -> int:
 
 	match item.slot:
@@ -719,15 +717,14 @@ func _find_eq_slot_for(item: ItemData) -> int:
 		ItemData.Slot.HELMET:     return 1
 		ItemData.Slot.CHESTPLATE: return 2
 		ItemData.Slot.LEGGINGS:   return 3
-		ItemData.Slot.CLOAK:      return 4
 		ItemData.Slot.TRINKET:
 			# Предпочесть пустой слот
 			if _equipment.trinket_1 == null:
-				return 5
+				return 4
 			if _equipment.trinket_2 == null:
-				return 6
+				return 5
 			# Оба заняты — вытесняем trinket_1
-			return 5
+			return 4
 
 	return -1
 

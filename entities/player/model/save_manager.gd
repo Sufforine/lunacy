@@ -25,7 +25,6 @@ const EMPTY_EQUIPMENT := {
 	"helmet":     "",
 	"chestplate": "",
 	"leggings":   "",
-	"cloak":      "",
 	"trinket_1":  "",
 	"trinket_2":  "",
 }
@@ -392,7 +391,7 @@ func load_profile() -> void:
 	PlayerProfile.attribute_points = max(0, int(data.get("attribute_points", 0)))
 	PlayerProfile.inventory      = data.get("inventory", [])
 	PlayerProfile.quickslots     = data.get("quickslots", ["", "", ""])
-	PlayerProfile.equipment      = data.get("equipment", EMPTY_EQUIPMENT.duplicate())
+	PlayerProfile.equipment      = _normalize_equipment(data.get("equipment", {}))
 
 	var loaded_appearance: Variant = data.get("appearance", null)
 	if loaded_appearance is Dictionary:
@@ -492,12 +491,15 @@ func _serialize_inventory() -> Array:
 
 
 func _serialize_equipment() -> Dictionary:
-	if PlayerProfile.equipment is Dictionary:
-		var result := EMPTY_EQUIPMENT.duplicate()
-		for key in PlayerProfile.equipment:
-			result[key] = PlayerProfile.equipment[key]
-		return result
-	return EMPTY_EQUIPMENT.duplicate()
+	return _normalize_equipment(PlayerProfile.equipment)
+
+
+func _normalize_equipment(value: Variant) -> Dictionary:
+	var result := EMPTY_EQUIPMENT.duplicate()
+	if value is Dictionary:
+		for key in EMPTY_EQUIPMENT:
+			result[key] = str((value as Dictionary).get(key, ""))
+	return result
 
 
 func _serialize_quickslots() -> Array:

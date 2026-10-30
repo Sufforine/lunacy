@@ -1,5 +1,6 @@
 extends RefCounted
 
+const PANEL_BORDER_WIDTH := 4
 const INVENTORY_ICON := preload("res://Assets/Icons/WoW Icon Pack/Miscellaneous/Bag_01.png")
 const STATS_ICON := preload("res://Assets/Icons/WoW Icon Pack/Miscellaneous/Book_01.png")
 const ATTRIBUTES_ICON := preload("res://Assets/Icons/WoW Icon Pack/Spells/Strength.png")
@@ -142,7 +143,7 @@ func apply_theme() -> void:
 	var style := StyleBoxFlat.new()
 	style.bg_color = background
 	style.border_color = border
-	style.set_border_width_all(4)
+	style.set_border_width_all(PANEL_BORDER_WIDTH)
 	style.set_corner_radius_all(8)
 	style.shadow_color = Color(0, 0, 0, 0.45)
 	style.shadow_size = 12
@@ -151,7 +152,7 @@ func apply_theme() -> void:
 		var tree_style := StyleBoxFlat.new()
 		tree_style.bg_color = background.darkened(0.08) if night else background.lightened(0.12)
 		tree_style.border_color = border
-		tree_style.set_border_width_all(2)
+		tree_style.set_border_width_all(PANEL_BORDER_WIDTH)
 		tree_style.set_corner_radius_all(6)
 		_skill_tree_panel.add_theme_stylebox_override("panel", tree_style)
 	_apply_label_color(_main_panel, palette.text)
@@ -162,7 +163,7 @@ func apply_theme() -> void:
 func _build_tab_buttons() -> void:
 	var bar := VBoxContainer.new()
 	bar.name = "TabBar"
-	bar.position = Vector2(-56, 36)
+	bar.position = Vector2(-56, 16)
 	bar.size = Vector2(50, 172)
 	bar.add_theme_constant_override("separation", 8)
 	_tab_bar = bar
@@ -192,8 +193,8 @@ func _make_tab_button(icon_texture: Texture2D, hint: String) -> Button:
 func _build_stats_tab() -> void:
 	_stats_tab = Control.new()
 	_stats_tab.name = "StatsTab"
-	_stats_tab.position = Vector2(16, 36)
-	_stats_tab.size = Vector2(736, 468)
+	_stats_tab.position = Vector2(16, 16)
+	_stats_tab.size = Vector2(676, 396)
 	_stats_tab.visible = false
 	_main_panel.add_child(_stats_tab)
 	_stats_scroll = ScrollContainer.new()
@@ -221,8 +222,8 @@ func _build_stats_tab() -> void:
 func _build_attributes_tab() -> void:
 	_attributes_tab = Control.new()
 	_attributes_tab.name = "AttributesTab"
-	_attributes_tab.position = Vector2(24, 40)
-	_attributes_tab.size = Vector2(720, 450)
+	_attributes_tab.position = Vector2(24, 20)
+	_attributes_tab.size = Vector2(660, 388)
 	_attributes_tab.visible = false
 	_main_panel.add_child(_attributes_tab)
 	var column := VBoxContainer.new()
@@ -314,7 +315,7 @@ func _style_tab_button(button: Button, background: Color, border: Color) -> void
 		var style := StyleBoxFlat.new()
 		style.bg_color = background.lightened(0.16) if state in ["hover", "hover_pressed"] else background
 		style.border_color = border
-		style.set_border_width_all(3 if state in ["pressed", "hover_pressed"] else 2)
+		style.set_border_width_all(PANEL_BORDER_WIDTH)
 		style.set_corner_radius_all(6)
 		button.add_theme_stylebox_override(state, style)
 
