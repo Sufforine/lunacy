@@ -316,7 +316,7 @@ func _has_movement_restriction() -> bool:
 
 func mitigate_damage(amount: int, magical: bool) -> int:
 	if blocking and _active_ability != null and not magical and _can_continue(_active_ability):
-		return maxi(1, int(round(amount * (1.0 - _active_ability.physical_damage_reduction))))
+		return maxi(0, int(round(amount * (1.0 - _active_ability.physical_damage_reduction))))
 	return amount
 
 
@@ -368,35 +368,8 @@ func _clock_sample(client_sent_msec: int, server_received_msec: int) -> void:
 	_clock_best_rtt_msec = minf(_clock_best_rtt_msec, rtt)
 
 
-# Shared host-only damage delivery, usable by melee and future executors.
+# All damage sources use the same host-owned transaction.
 func apply_damage(target: Node, physical: int, magical: int) -> void:
-	if SteamLobby.is_session_active() and not multiplayer.is_server():
-		return
-	if not is_instance_valid(target) or target is Player:
-		return
-	var target_stats := target.get_node_or_null("StatsComponent") as StatsComponent
-	if target_stats == null or target_stats.is_dead:
-		return
-	if physical > 0:
-		target_stats.take_damage(physical)
-	if magical > 0:
-		target_stats.take_damage(magical, true)
-	if SteamLobby.is_session_active():
-		_confirm_hit.rpc(target.get_path(), target_stats.current_health, target_stats.current_shield, target_stats.is_downed, target_stats.is_dead)
-
-
-@rpc("any_peer", "call_remote", "reliable", 1)
-func _confirm_hit(target_path: NodePath, health: int, shield: float, downed: bool, dead: bool) -> void:
-	if multiplayer.get_remote_sender_id() != 1:
-		return
-	var target := get_node_or_null(target_path)
-	if target == null or target is Player:
-		return
-	var target_stats := target.get_node_or_null("StatsComponent") as StatsComponent
-	if target_stats != null:
-		# Absolute result avoids double damage with the existing HP synchronizer.
-		target_stats.current_health = health
-		target_stats.current_shield = shield
-		target_stats.is_downed = downed
-		target_stats.is_dead = dead
-		target_stats.stats_changed.emit()
+	if target is Player:
+		return # Cooperative friendly fire remains disabled.
+	DamageSystem.apply_hit(hero, target, physical, magical)

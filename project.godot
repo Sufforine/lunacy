@@ -16,6 +16,8 @@ config/features=PackedStringArray("4.5", "Forward Plus")
 
 [autoload]
 
+DamageSystem="*res://features/combat/damage_system.gd"
+
 InputManager="*res://shared/input/input_manager.gd"
 PlayerProfile="*res://entities/player/model/player_profile.gd"
 SaveManager="*res://entities/player/model/save_manager.gd"

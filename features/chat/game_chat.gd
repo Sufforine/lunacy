@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-const HELP := "/give <id или название предмета> — выдать предмет; /xp <число> — опыт; /items — список предметов; /help — команды."
+const HELP := "/give <id или название предмета> — выдать предмет; /xp <число> — опыт; /hurt <число> — нанести себе урон; /noclip — включить или выключить полёт (WASD, Space/Ctrl, Shift); /items — список предметов; /help — команды."
 var is_typing := false
 var _panel: PanelContainer
 var _history: RichTextLabel

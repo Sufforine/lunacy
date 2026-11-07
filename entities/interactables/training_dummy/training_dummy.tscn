@@ -1,0 +1,76 @@
+[gd_scene load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://entities/characters/model/stats_component.gd" id="1"]
+[ext_resource type="Script" path="res://entities/characters/model/character_stats.gd" id="2"]
+
+[sub_resource type="Resource" id="Stats"]
+script = ExtResource("2")
+strength = 0
+agility = 0
+intellect = 0
+wisdom = 0
+health = 1000
+armor = 0
+magic_resistance = 0
+
+[sub_resource type="StandardMaterial3D" id="Wood"]
+albedo_color = Color(0.42, 0.23, 0.1, 1)
+
+[sub_resource type="StandardMaterial3D" id="Cloth"]
+albedo_color = Color(0.75, 0.61, 0.36, 1)
+
+[sub_resource type="BoxMesh" id="Post"]
+size = Vector3(0.16, 2.1, 0.16)
+material = SubResource("Wood")
+
+[sub_resource type="BoxMesh" id="Body"]
+size = Vector3(0.85, 0.9, 0.5)
+material = SubResource("Cloth")
+
+[sub_resource type="SphereMesh" id="Head"]
+radius = 0.28
+height = 0.56
+material = SubResource("Cloth")
+
+[sub_resource type="BoxShape3D" id="Shape"]
+size = Vector3(0.9, 2.4, 0.55)
+
+[node name="TrainingDummy" type="StaticBody3D"]
+collision_layer = 4
+collision_mask = 0
+
+[node name="Post" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.05, 0)
+mesh = SubResource("Post")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.35, 0)
+mesh = SubResource("Body")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+position = Vector3(0, 2.1, 0)
+mesh = SubResource("Head")
+
+[node name="Arms" type="MeshInstance3D" parent="."]
+position = Vector3(0, 1.6, 0)
+rotation = Vector3(0, 0, 1.5707963)
+mesh = SubResource("Post")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 1.2, 0)
+shape = SubResource("Shape")
+
+[node name="StatsComponent" type="Node" parent="."]
+script = ExtResource("1")
+base_stats = SubResource("Stats")
+uses_player_progress = false
+training_target = true
+
+[node name="Name" type="Label3D" parent="."]
+position = Vector3(0, 2.8, 0)
+billboard = 1
+text = "Тренировочный манекен
+Бессмертный"
+font_size = 32
+pixel_size = 0.007
+outline_size = 8

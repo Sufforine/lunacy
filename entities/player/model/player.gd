@@ -6,6 +6,7 @@ const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 @export var ease_speed: float = 5.0
 @export_group("Movement")
 @export_range(1.0, 3.0, 0.05) var sprint_multiplier: float = 1.6
+@export_range(1.0, 50.0, 0.5) var noclip_speed: float = 10.0
 @export_group("Jump")
 ## Physical shape of the jump. These values are easier to tune than raw gravity.
 @export_range(0.2, 5.0, 0.05) var jump_height: float = 1.1
@@ -48,6 +49,7 @@ const PAUSE_MENU_SCENE := preload("res://screens/pause/ui/pause_menu.tscn")
 @onready var inventory: InventoryComponent = $InventoryComponent
 @onready var inventory_ui                  = $CanvasLayer/InventoryUI
 @onready var interaction_prompt: InteractionPrompt = $CanvasLayer/InteractionPrompt
+@onready var collision_shape: CollisionShape3D = $Collision
 var weapon_combat: Node
 var character_animation: Node
 
@@ -64,6 +66,13 @@ var _external_velocity := Vector3.ZERO
 var _coyote_left := 0.0
 var _jump_buffer_left := 0.0
 var owns_local_profile := false
+var noclip_enabled := false:
+	set(value):
+		noclip_enabled = value
+		if is_node_ready():
+			_update_noclip_collision()
+var _normal_collision_layer := 0
+var _normal_collision_mask := 0
 
 
 # ════════════════════════════════════════════════════════
@@ -71,6 +80,9 @@ var owns_local_profile := false
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
 	owns_local_profile = is_multiplayer_authority()
+	_normal_collision_layer = collision_layer
+	_normal_collision_mask = collision_mask
+	_update_noclip_collision()
 
 	add_to_group("player")
 
@@ -164,6 +176,11 @@ func _physics_process(delta: float) -> void:
 		and not SteamLobby.is_mission_loading()
 	if inventory_ui != null and inventory_ui.is_main_panel_open():
 		controls_enabled = false
+	if noclip_enabled:
+		_handle_noclip_movement(delta, controls_enabled)
+		if controls_enabled:
+			_handle_rotation(delta)
+		return
 
 	_update_jump(delta, controls_enabled)
 	_handle_movement(delta, controls_enabled)
@@ -242,6 +259,63 @@ func _handle_movement(delta: float, controls_enabled: bool) -> void:
 		_movement_velocity = _movement_velocity.limit_length(speed)
 	velocity.x = _movement_velocity.x + _external_velocity.x
 	velocity.z = _movement_velocity.z + _external_velocity.z
+
+
+func _handle_noclip_movement(delta: float, controls_enabled: bool) -> void:
+	var direction := Vector3.ZERO
+	if controls_enabled:
+		direction = InputManager.get_input_direction()
+		if camera_rig != null:
+			direction = camera_rig.get_camera_relative_direction(direction)
+		direction.y = float(Input.is_action_pressed("jump")) - float(Input.is_key_pressed(KEY_CTRL))
+		direction = direction.normalized()
+	var speed := noclip_speed
+	_sprinting = controls_enabled and Input.is_action_pressed("sprint") and not direction.is_zero_approx()
+	if _sprinting:
+		speed *= sprint_multiplier
+	velocity = Vector3.ZERO
+	_movement_velocity = Vector3.ZERO
+	_external_velocity = Vector3.ZERO
+	global_position += direction * speed * delta
+	locomotion_speed = 0.0
+	if not stats.is_downed and not stats.is_dead:
+		animation_state = AnimationState.IDLE
+
+
+func set_noclip_enabled(enabled: bool) -> bool:
+	if SteamLobby.is_session_active():
+		if not multiplayer.is_server():
+			return noclip_enabled
+		var owner_id := get_multiplayer_authority()
+		if owner_id != multiplayer.get_unique_id():
+			_rpc_set_noclip_enabled.rpc_id(owner_id, enabled)
+	_apply_noclip_enabled(enabled)
+	return enabled
+
+
+@rpc("any_peer", "call_remote", "reliable")
+func _rpc_set_noclip_enabled(enabled: bool) -> void:
+	if multiplayer.get_remote_sender_id() != 1 or not is_multiplayer_authority():
+		return
+	_apply_noclip_enabled(enabled)
+
+
+func _apply_noclip_enabled(enabled: bool) -> void:
+	noclip_enabled = enabled
+	velocity = Vector3.ZERO
+	_movement_velocity = Vector3.ZERO
+	_external_velocity = Vector3.ZERO
+
+
+func _update_noclip_collision() -> void:
+	collision_layer = 0 if noclip_enabled else _normal_collision_layer
+	collision_mask = 0 if noclip_enabled else _normal_collision_mask
+	if collision_shape != null:
+		collision_shape.set_deferred("disabled", noclip_enabled)
+
+
+func apply_debug_damage(amount: int) -> void:
+	DamageSystem.apply_hit(self, self, amount, 0)
 
 
 func _update_locomotion_state(previous_position: Vector3, applied_external: Vector3, delta: float) -> void:

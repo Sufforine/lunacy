@@ -16,6 +16,7 @@ signal damage_received(amount: int, magical: bool)
 # ── базовые статы героя ──────────────────────────────────
 @export var base_stats: CharacterStats
 @export var uses_player_progress: bool = true
+@export var training_target: bool = false
 
 @onready var equipment: EquipmentComponent = get_node_or_null("../EquipmentComponent") as EquipmentComponent
 @onready var effects: EffectsComponent     = get_node_or_null("../EffectsComponent") as EffectsComponent
@@ -57,6 +58,7 @@ var _agony_timer: float = 0.0
 # READY
 # ════════════════════════════════════════════════════════
 func _ready() -> void:
+	add_to_group("combat_stats")
 
 	if base_stats == null:
 		push_error("StatsComponent: base_stats не назначен в инспекторе")
@@ -87,7 +89,7 @@ func _ready() -> void:
 # PROCESS — таймер агонии
 # ════════════════════════════════════════════════════════
 func _process(delta: float) -> void:
-	if SteamLobby.is_session_active() and not get_parent().is_multiplayer_authority():
+	if not DamageSystem.is_authority() or SteamLobby.is_gameplay_locked():
 		return
 
 	if not is_downed or is_dead:
@@ -243,37 +245,18 @@ func get_magical_damage_total(base_magic: float) -> float:
 # ════════════════════════════════════════════════════════
 func take_damage(amount: int, is_magical: bool = false) -> void:
 
-	if is_dead:
-		return
-	var combat := get_parent().get_node_or_null("WeaponCombat")
-	if combat != null:
-		amount = combat.mitigate_damage(amount, is_magical)
-
-	var resistance: float = get_stat(
-		"magic_resistance" if is_magical else "armor"
-	)
-	var actual: int = max(1, amount - int(resistance))
-
-	# Щит поглощает урон первым
-	if current_shield > 0.0:
-		var absorbed: float = min(current_shield, float(actual))
-		current_shield -= absorbed
-		actual -= int(absorbed)
-
-	damage_received.emit(actual, is_magical)
-	current_health = max(0, current_health - actual)
-	stats_changed.emit()
-
-	if current_health == 0 and not is_downed:
-		_trigger_down()
+	DamageSystem.apply_hit(get_parent(), get_parent(), 0 if is_magical else amount, amount if is_magical else 0)
 
 
 func heal(amount: int) -> void:
+	if not DamageSystem.is_authority() or amount <= 0:
+		return
 
 	if is_dead:
 		return
 	current_health = min(current_health + amount, int(get_stat("health")))
 	stats_changed.emit()
+	DamageSystem.sync_stats(self)
 
 
 func restore_mana(amount: int) -> void:
@@ -311,9 +294,12 @@ func _trigger_death() -> void:
 	print("StatsComponent: %s погиб." % get_parent().name)
 	died.emit()
 	stats_changed.emit()
+	DamageSystem.sync_stats(self)
 
 
 func revive(revive_health: int = 1) -> void:
+	if not DamageSystem.is_authority():
+		return
 	if not is_downed or is_dead:
 		return
 	is_downed      = false
@@ -321,6 +307,7 @@ func revive(revive_health: int = 1) -> void:
 	current_health = max(1, revive_health)
 	revived.emit()
 	stats_changed.emit()
+	DamageSystem.sync_stats(self)
 
 
 # ════════════════════════════════════════════════════════

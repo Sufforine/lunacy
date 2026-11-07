@@ -28,13 +28,13 @@ func execute_chat_command(peer_id: int, message: String) -> String:
 					break
 	if hero == null:
 		return "Команды выдачи доступны после появления героя в мире."
-	if hero.inventory.network_pending:
-		return "Дождитесь завершения операции с инвентарём."
 	var separator := message.find(" ")
 	var command := message.substr(0, separator) if separator >= 0 else message
 	var argument := message.substr(separator + 1).strip_edges() if separator >= 0 else ""
 	match command.to_lower():
 		"/give":
+			if hero.inventory.network_pending:
+				return "Дождитесь завершения операции с инвентарём."
 			var selected: ItemData = null
 			argument = argument.trim_prefix('"').trim_suffix('"')
 			for item in ItemLibrary.all_items():
@@ -60,6 +60,16 @@ func execute_chat_command(peer_id: int, message: String) -> String:
 				_session.update_progress(peer_id, progress)
 				_lobby._rpc_apply_progress.rpc(peer_id, progress)
 			return "Выдано опыта: %d" % int(argument)
+		"/hurt":
+			if not argument.is_valid_int() or int(argument) < 1 or int(argument) > 100000:
+				return "Использование: /hurt <число от 1 до 100000>."
+			hero.apply_debug_damage(int(argument))
+			return "Базовый урон: %d (учитываются защита и щит)" % int(argument)
+		"/noclip":
+			if not argument.is_empty():
+				return "Использование: /noclip."
+			var enabled := hero.set_noclip_enabled(not hero.noclip_enabled)
+			return "Noclip включён. WASD — движение, Space/Ctrl — вверх/вниз, Shift — ускорение." if enabled else "Noclip выключен."
 	return "Неизвестная команда. /help — список команд."
 
 

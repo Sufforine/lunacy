@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cs0c4pqfplg4y"]
+[gd_scene load_steps=14 format=3 uid="uid://cs0c4pqfplg4y"]
 
 [ext_resource type="Script" path="res://screens/hub/ui/hub.gd" id="1_45dd6"]
 [ext_resource type="PackedScene" path="res://screens/hub/ui/hub_architecture.tscn" id="2_oal32"]
@@ -7,6 +7,8 @@
 [ext_resource type="Script" path="res://screens/hub/ui/exit_door.gd" id="5_k7ck2"]
 [ext_resource type="PackedScene" path="res://Assets/interactables/chest.tscn" id="6_3f7a2"]
 [ext_resource type="Script" path="res://Assets/interactables/chest.gd" id="7_w8eu4"]
+
+[ext_resource type="PackedScene" path="res://entities/interactables/training_dummy/training_dummy.tscn" id="8_dummy"]
 
 [sub_resource type="Environment" id="Environment_m30j0"]
 background_mode = 1
@@ -208,3 +210,6 @@ pixel_size = 0.008
 billboard = 1
 text = "Инженер"
 font_size = 40
+
+[node name="TrainingDummy" parent="." instance=ExtResource("8_dummy")]
+position = Vector3(10, 0, -16)

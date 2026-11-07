@@ -41,7 +41,7 @@ func _server_inventory_operation(peer_id: int, sequence: int, revision: int, com
 					hero.stats.add_experience(item.experience_amount)
 					_lobby._rpc_apply_progress.rpc(peer_id, hero.stats.get_progress_data())
 				elif item.heal_hp > 0 or item.heal_mana > 0:
-					# Only inventory ownership changes here; combat authority is unchanged.
+					# The host applies HP; clients receive the authoritative snapshot.
 					if item.is_consumable:
 						inv.consume_network_item(source, index, item.id)
 					_lobby._rpc_inventory_use_effect.rpc(peer_id, item.id)
@@ -89,11 +89,11 @@ func _rpc_inventory_snapshot(peer_id: int, sequence: int, revision: int, items: 
 func _rpc_inventory_use_effect(peer_id: int, item_id: String) -> void:
 	var hero := _hero_for_peer(peer_id)
 	var item := ItemLibrary.get_item(item_id)
-	if hero != null and item != null and hero.is_multiplayer_authority():
+	if hero == null or item == null:
+		return
+	if multiplayer.is_server():
 		item.use(hero)
-	elif hero != null and item != null and item.heal_mana > 0:
-		# Ability costs are validated on the host; keep its mana copy in sync
-		# with this already-authorized potion use (without applying HP twice).
+	elif item.heal_mana > 0:
 		hero.stats.restore_mana(item.heal_mana)
 
 

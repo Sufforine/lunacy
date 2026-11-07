@@ -32,6 +32,9 @@ properties/2/replication_mode = 2
 properties/3/path = NodePath(".:locomotion_speed")
 properties/3/spawn = true
 properties/3/replication_mode = 1
+properties/4/path = NodePath(".:noclip_enabled")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D"]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 0, 0, 0)

@@ -346,3 +346,7 @@ func _rpc_spawn_ready(transition_id: int) -> void:
 
 func _handle_transition_peer_left(id: int) -> void:
 	_transition_service._handle_transition_peer_left(id)
+
+
+func combat_scene_epoch() -> int:
+	return _transition_service._scene_transition_id

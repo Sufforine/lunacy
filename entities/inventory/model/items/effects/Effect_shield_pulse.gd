@@ -15,6 +15,9 @@ extends EffectLogic
 const SHIELD_AMOUNT := 30.0
 
 func on_tick(_player: Node, stats: StatsComponent, _effects: EffectsComponent) -> void:
+	if not DamageSystem.is_authority():
+		return
 	stats.current_shield += SHIELD_AMOUNT
 	stats.stats_changed.emit()
+	DamageSystem.sync_stats(stats)
 	print("effect_shield_pulse: +%.0f щита (всего %.0f)" % [SHIELD_AMOUNT, stats.current_shield])
