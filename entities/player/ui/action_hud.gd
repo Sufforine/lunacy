@@ -136,10 +136,10 @@ func _build_slot_content(slot: Control, action: StringName) -> Dictionary:
 	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	icon.offset_left = 4.0
-	icon.offset_top = 4.0
-	icon.offset_right = -4.0
-	icon.offset_bottom = -4.0
+	icon.offset_left = 8.0
+	icon.offset_top = 8.0
+	icon.offset_right = -8.0
+	icon.offset_bottom = -8.0
 	content.add_child(icon)
 	var overlay := Label.new()
 	overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -269,32 +269,29 @@ func _apply_theme() -> void:
 	var background: Color = palette.background
 	var border: Color = palette.border
 	var text_color: Color = palette.text
-	var panel_style := _style(background, border, 4, 9)
-	panel_style.shadow_color = Color(0, 0, 0, 0.5)
-	panel_style.shadow_size = 10
+	FantasyUI.apply_root(self, palette)
+	# The Kenney panel texture below already contains its background and edge.
+	# A transparent StyleBox avoids the second rectangular boundary.
+	var panel_style := FantasyUI.panel_style(Color.TRANSPARENT, border, 0, false)
 	_panel.add_theme_stylebox_override("panel", panel_style)
 	var slot_color := background.darkened(0.22)
+	FantasyUI.decorate_filled_panel(_panel, background, border)
 	for slot in _ability_slots:
-		slot.add_theme_stylebox_override("panel", _style(slot_color, border, 2, 5))
+		# PanelContainer content margins made ability icons smaller than the
+		# neighboring quick slots. A zero-margin background keeps all six cells equal.
+		slot.add_theme_stylebox_override("panel", FantasyUI.borderless_bar_style(slot_color))
+		FantasyUI.decorate_inventory_cell(slot, slot_color)
 	for slot in _quick_slots:
-		slot.add_theme_stylebox_override("normal", _style(slot_color, border, 2, 5))
-		slot.add_theme_stylebox_override("hover", _style(slot_color.lightened(0.12), border, 2, 5))
-		slot.add_theme_stylebox_override("pressed", _style(slot_color.darkened(0.1), border, 3, 5))
+		slot.add_theme_stylebox_override("normal", FantasyUI.button_style(slot_color, border, 2))
+		slot.add_theme_stylebox_override("hover", FantasyUI.button_style(slot_color.lightened(0.12), palette.accent, 2))
+		slot.add_theme_stylebox_override("pressed", FantasyUI.button_style(slot_color.darkened(0.1), palette.accent, 3))
+		FantasyUI.decorate_inventory_slot(slot, slot_color, border)
 	for key in _key_labels:
 		key.add_theme_color_override("font_color", text_color)
-		key.add_theme_stylebox_override("normal", _style(background, border, 1, 3))
-	var track_style := _style(Color(0.035, 0.04, 0.05, 0.92), border, 1, 3)
+		key.add_theme_stylebox_override("normal", FantasyUI.button_style(background, border, 1))
+	var track_style := FantasyUI.borderless_bar_style(Color(0.035, 0.04, 0.05, 0.92))
 	_health_track.add_theme_stylebox_override("panel", track_style)
 	_mana_track.add_theme_stylebox_override("panel", track_style.duplicate())
-
-
-func _style(background: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = border
-	style.set_border_width_all(width)
-	style.set_corner_radius_all(radius)
-	return style
 
 
 func _action_text(action: StringName) -> String:

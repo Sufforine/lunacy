@@ -57,6 +57,8 @@ func _ready() -> void:
 	_update_save_label()
 	_clear_players_list()
 	_avatar_placeholder = _make_avatar_placeholder()
+	GameSettings.inventory_theme_changed.connect(_apply_theme)
+	_apply_theme()
 
 	if steam_lobby:
 		steam_lobby.lobby_ready.connect(_on_lobby_ready)
@@ -64,6 +66,12 @@ func _ready() -> void:
 		steam_lobby.players_updated.connect(_on_players_updated)
 	if not Steam.avatar_loaded.is_connected(_on_avatar_loaded):
 		Steam.avatar_loaded.connect(_on_avatar_loaded)
+
+
+func _apply_theme() -> void:
+	var palette := GameSettings.get_ui_theme_palette()
+	FantasyUI.apply_root(self, palette)
+	FantasyUI.decorate_panels(self, palette.border, palette.surface)
 
 
 # ════════════════════════════════════════════════════════
@@ -256,6 +264,8 @@ func _open_save_picker() -> void:
 		btn.custom_minimum_size = Vector2(0, 32)
 		btn.pressed.connect(func(): _on_save_selected(info))
 		save_picker_list.add_child(btn)
+		var palette := GameSettings.get_ui_theme_palette()
+		FantasyUI.decorate_button(btn, palette.surface, palette.border)
 
 	save_name_input.text = ""
 	save_picker.popup_centered(Vector2i(280, 320))

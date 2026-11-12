@@ -111,29 +111,22 @@ func _update_scale_pivot() -> void:
 
 func _apply_theme() -> void:
 	var palette := GameSettings.get_ui_theme_palette()
+	FantasyUI.apply_root(background, palette)
 	background.color = palette.dimmer.darkened(0.18)
 	_waiting_color = palette.text.darkened(0.38)
 	_ready_color = palette.text
-	var panel_style := _style(palette.background, palette.border, 3, 14)
+	var panel_style := FantasyUI.panel_style(palette.background, palette.border, 3)
 	panel_style.content_margin_left = 56.0
 	panel_style.content_margin_top = 38.0
 	panel_style.content_margin_right = 56.0
 	panel_style.content_margin_bottom = 38.0
 	panel.add_theme_stylebox_override("panel", panel_style)
+	FantasyUI.decorate_panel(panel, palette.border)
 	title_label.add_theme_color_override("font_color", palette.text)
 	status_label.add_theme_color_override("font_color", palette.text.darkened(0.2))
-	progress_bar.add_theme_stylebox_override("background", _style(palette.surface, palette.border, 1, 4))
-	progress_bar.add_theme_stylebox_override("fill", _style(palette.accent, palette.border, 1, 4))
+	progress_bar.add_theme_stylebox_override("background", FantasyUI.bar_style(palette.surface, palette.border, 1))
+	progress_bar.add_theme_stylebox_override("fill", FantasyUI.bar_style(palette.accent, palette.border, 1))
 	for peer_id in _player_labels:
 		var label := _player_labels[peer_id] as Label
 		if label != null:
 			label.add_theme_color_override("font_color", _ready_color if bool(_player_ready.get(peer_id, false)) else _waiting_color)
-
-
-func _style(background_color: Color, border_color: Color, width: int, radius: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background_color
-	style.border_color = border_color
-	style.set_border_width_all(width)
-	style.set_corner_radius_all(radius)
-	return style

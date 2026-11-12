@@ -144,12 +144,12 @@ func _update_volume_labels() -> void:
 
 func _apply_theme() -> void:
 	var palette := GameSettings.get_ui_theme_palette()
+	FantasyUI.apply_root(self, palette)
 	dimmer.color = palette.dimmer
-	var panel_style := _style(palette.background, palette.border, 3, 12)
-	panel_style.shadow_color = Color(0, 0, 0, 0.45)
-	panel_style.shadow_size = 16
+	var panel_style := FantasyUI.panel_style(palette.background, palette.border, 3)
 	panel.add_theme_stylebox_override("panel", panel_style)
-	tabs.add_theme_stylebox_override("panel", _style(palette.background.darkened(0.04), palette.border, 1, 7))
+	FantasyUI.decorate_panels(panel, palette.border, palette.surface)
+	tabs.add_theme_stylebox_override("panel", FantasyUI.panel_style(palette.background.darkened(0.04), palette.border, 1, false))
 	tabs.add_theme_color_override("font_selected_color", palette.text)
 	tabs.add_theme_color_override("font_unselected_color", palette.text.darkened(0.25))
 	_apply_theme_to_children(panel, palette)
@@ -164,23 +164,15 @@ func _apply_theme_to_children(node: Node, palette: Dictionary) -> void:
 			var button := child as Button
 			button.add_theme_color_override("font_color", palette.text)
 			button.add_theme_color_override("font_hover_color", palette.text)
-			button.add_theme_stylebox_override("normal", _style(palette.surface, palette.border, 1, 5))
-			button.add_theme_stylebox_override("hover", _style(palette.surface_hover, palette.border, 2, 5))
-			button.add_theme_stylebox_override("pressed", _style(palette.surface.darkened(0.1), palette.border, 2, 5))
+			button.add_theme_stylebox_override("normal", FantasyUI.button_style(palette.surface, palette.border, 2))
+			button.add_theme_stylebox_override("hover", FantasyUI.button_style(palette.surface_hover, palette.accent, 2))
+			button.add_theme_stylebox_override("pressed", FantasyUI.button_style(palette.surface.darkened(0.1), palette.accent, 3))
+			FantasyUI.decorate_button(button, palette.surface, palette.border)
 		elif child is HSlider:
 			var slider := child as HSlider
-			slider.add_theme_stylebox_override("slider", _style(palette.surface, palette.border, 1, 4))
-			slider.add_theme_stylebox_override("grabber_area", _style(palette.accent, palette.border, 1, 4))
+			slider.add_theme_stylebox_override("slider", FantasyUI.bar_style(palette.surface, palette.border, 1))
+			slider.add_theme_stylebox_override("grabber_area", FantasyUI.bar_style(palette.accent, palette.border, 1))
 		_apply_theme_to_children(child, palette)
-
-
-func _style(background: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = border
-	style.set_border_width_all(width)
-	style.set_corner_radius_all(radius)
-	return style
 
 
 func _on_back_pressed() -> void:

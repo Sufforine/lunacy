@@ -140,21 +140,15 @@ func apply_theme() -> void:
 	var palette := GameSettings.get_inventory_theme_palette()
 	var background: Color = palette.background
 	var border: Color = palette.border
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = border
-	style.set_border_width_all(PANEL_BORDER_WIDTH)
-	style.set_corner_radius_all(8)
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 12
+	FantasyUI.apply_root(_main_panel, palette)
+	var style := FantasyUI.panel_style(background, border, PANEL_BORDER_WIDTH)
 	_main_panel.add_theme_stylebox_override("panel", style)
+	FantasyUI.decorate_panels(_main_panel, border, background.darkened(0.08))
 	if _skill_tree_panel != null:
-		var tree_style := StyleBoxFlat.new()
-		tree_style.bg_color = background.darkened(0.08) if night else background.lightened(0.12)
-		tree_style.border_color = border
-		tree_style.set_border_width_all(PANEL_BORDER_WIDTH)
-		tree_style.set_corner_radius_all(6)
+		var tree_background: Color = background.darkened(0.08) if night else background.lightened(0.12)
+		var tree_style := FantasyUI.panel_style(tree_background, border, PANEL_BORDER_WIDTH, false)
 		_skill_tree_panel.add_theme_stylebox_override("panel", tree_style)
+		FantasyUI.decorate_panel(_skill_tree_panel, border)
 	_apply_label_color(_main_panel, palette.text)
 	for button in [_inventory_button, _stats_button, _attributes_button]:
 		_style_tab_button(button, background, border)
@@ -312,12 +306,10 @@ func _apply_label_color(node: Node, color: Color) -> void:
 
 func _style_tab_button(button: Button, background: Color, border: Color) -> void:
 	for state in ["normal", "hover", "pressed", "hover_pressed"]:
-		var style := StyleBoxFlat.new()
-		style.bg_color = background.lightened(0.16) if state in ["hover", "hover_pressed"] else background
-		style.border_color = border
-		style.set_border_width_all(PANEL_BORDER_WIDTH)
-		style.set_corner_radius_all(6)
+		var state_background := background.lightened(0.16) if state in ["hover", "hover_pressed"] else background
+		var style := FantasyUI.button_style(state_background, border, PANEL_BORDER_WIDTH)
 		button.add_theme_stylebox_override(state, style)
+	FantasyUI.decorate_button(button, background, border)
 
 
 func _format_stat(key: String, value: float) -> String:

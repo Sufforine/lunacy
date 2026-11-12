@@ -98,8 +98,10 @@ func _ready() -> void:
 	_chest_view.build(self, main_panel, _tabs)
 	_tabs.apply_theme()
 	_chest_view.apply_theme()
+	_apply_slot_theme()
 	GameSettings.inventory_theme_changed.connect(_tabs.apply_theme)
 	GameSettings.inventory_theme_changed.connect(_chest_view.apply_theme)
+	GameSettings.inventory_theme_changed.connect(_apply_slot_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	_apply_ui_scale()
 	resized.connect(_apply_ui_scale)
@@ -107,6 +109,19 @@ func _ready() -> void:
 
 func _apply_ui_scale() -> void:
 	_chest_view.apply_layout(GameSettings.get_ui_scale(), get_viewport_rect().size)
+
+
+func _apply_slot_theme() -> void:
+	var palette := GameSettings.get_inventory_theme_palette()
+	var slot_color: Color = palette.background.darkened(0.16)
+	for button in _inv_buttons:
+		FantasyUI.decorate_inventory_slot(button, slot_color, palette.border)
+	for button in _eq_buttons:
+		if button != null:
+			FantasyUI.decorate_inventory_slot(button, slot_color, palette.border)
+	for button in _qs_buttons:
+		if button != null:
+			FantasyUI.decorate_inventory_slot(button, slot_color, palette.border)
 
 
 # ════════════════════════════════════════════════════════
@@ -645,6 +660,10 @@ func _setup_icon(tex: TextureRect) -> void:
 	tex.expand_mode = TextureRect.EXPAND_FIT_WIDTH_PROPORTIONAL
 	tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	tex.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tex.offset_left = 8.0
+	tex.offset_top = 8.0
+	tex.offset_right = -8.0
+	tex.offset_bottom = -8.0
 
 
 func _set_icon(tex: TextureRect, icon: Texture2D) -> void:

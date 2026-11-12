@@ -26,15 +26,19 @@ func _update_pivot() -> void:
 
 func _apply_theme() -> void:
 	var palette := GameSettings.get_ui_theme_palette()
-	var style := StyleBoxFlat.new()
-	style.bg_color = palette.background
-	style.border_color = palette.border
-	style.set_border_width_all(2)
-	style.set_corner_radius_all(9)
-	style.shadow_color = Color(0, 0, 0, 0.55)
-	style.shadow_size = 7
+	FantasyUI.apply_root(self, palette)
+	# The prompt uses a transparent-center Kenney frame, so it does not need a
+	# second panel or rectangular shadow behind the key label.
+	var style := FantasyUI.panel_style(Color.TRANSPARENT, palette.border, 0, false)
 	key_panel.add_theme_stylebox_override("panel", style)
+	FantasyUI.decorate_interaction_prompt(key_panel, palette.border)
 	key_label.add_theme_color_override("font_color", palette.text)
+	key_label.add_theme_color_override("font_outline_color", Color.TRANSPARENT)
+	key_label.add_theme_color_override("font_shadow_color", Color.TRANSPARENT)
+	key_label.add_theme_constant_override("outline_size", 0)
+	key_label.add_theme_constant_override("shadow_offset_x", 0)
+	key_label.add_theme_constant_override("shadow_offset_y", 0)
+	key_label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
 
 
 func show_action(action: StringName = &"interact") -> void:

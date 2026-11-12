@@ -11,6 +11,7 @@ func build(host: Node3D) -> void:
 	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	ignore_mouse(root)
 	layer.add_child(root)
+	_host._ui_root = root
 	_host._title_ui = _build_title()
 	_host._stage_ui = _build_stage()
 	_host._edit_ui = _build_editor()

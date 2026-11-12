@@ -16,6 +16,7 @@ var _tabs
 var _inventory: InventoryComponent
 var _chest: Node
 var _panel: Panel
+var _buttons: Array[Button] = []
 var _icons: Array[TextureRect] = []
 
 
@@ -57,6 +58,7 @@ func build(host, main_panel: Panel, tabs) -> void:
 		_host._setup_icon(icon)
 		button.add_child(icon)
 		button.gui_input.connect(func(event: InputEvent): _on_slot_input(event, index))
+		_buttons.append(button)
 		_icons.append(icon)
 	apply_theme()
 
@@ -120,14 +122,12 @@ func apply_theme() -> void:
 	if _panel == null:
 		return
 	var palette := GameSettings.get_inventory_theme_palette()
-	var style := StyleBoxFlat.new()
-	style.bg_color = palette.background
-	style.border_color = palette.border
-	style.set_border_width_all(4)
-	style.set_corner_radius_all(8)
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 12
+	FantasyUI.apply_root(_panel, palette)
+	var style := FantasyUI.panel_style(palette.background, palette.border, 4)
 	_panel.add_theme_stylebox_override("panel", style)
+	FantasyUI.decorate_panels(_panel, palette.border, palette.surface)
+	for button in _buttons:
+		FantasyUI.decorate_inventory_slot(button, palette.background.darkened(0.16), palette.border)
 	_apply_label_color(_panel, palette.text)
 
 

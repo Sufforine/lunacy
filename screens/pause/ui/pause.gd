@@ -40,29 +40,21 @@ func _update_scale_pivot() -> void:
 
 func _apply_theme() -> void:
 	var palette := GameSettings.get_ui_theme_palette()
+	FantasyUI.apply_root(self, palette)
 	dimmer.color = palette.dimmer
-	var panel_style := _style(palette.background, palette.border, 3, 10)
-	panel_style.shadow_color = Color(0, 0, 0, 0.45)
-	panel_style.shadow_size = 16
+	var panel_style := FantasyUI.panel_style(palette.background, palette.border, 3)
 	menu_panel.add_theme_stylebox_override("panel", panel_style)
+	FantasyUI.decorate_panels(menu_panel, palette.border, palette.surface)
 	for child in $CenterContainer/PanelContainer/MarginContainer/VBoxContainer.get_children():
 		if child is Label:
 			(child as Label).add_theme_color_override("font_color", palette.text)
 		elif child is Button:
 			var button := child as Button
 			button.add_theme_color_override("font_color", palette.text)
-			button.add_theme_stylebox_override("normal", _style(palette.surface, palette.border, 1, 5))
-			button.add_theme_stylebox_override("hover", _style(palette.surface_hover, palette.border, 2, 5))
-			button.add_theme_stylebox_override("pressed", _style(palette.surface.darkened(0.1), palette.border, 2, 5))
-
-
-func _style(background: Color, border: Color, width: int, radius: int) -> StyleBoxFlat:
-	var style := StyleBoxFlat.new()
-	style.bg_color = background
-	style.border_color = border
-	style.set_border_width_all(width)
-	style.set_corner_radius_all(radius)
-	return style
+			button.add_theme_stylebox_override("normal", FantasyUI.button_style(palette.surface, palette.border, 2))
+			button.add_theme_stylebox_override("hover", FantasyUI.button_style(palette.surface_hover, palette.accent, 2))
+			button.add_theme_stylebox_override("pressed", FantasyUI.button_style(palette.surface.darkened(0.1), palette.accent, 3))
+			FantasyUI.decorate_button(button, palette.surface, palette.border)
 
 
 func _unhandled_input(event: InputEvent) -> void:

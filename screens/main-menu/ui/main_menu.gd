@@ -61,6 +61,7 @@ var _edit_ui: Control
 var _mode_ui: Control
 var _world_ui: Control
 var _confirm_ui: Control
+var _ui_root: Control
 
 var _character_label: Label
 var _back_button: Button
@@ -125,11 +126,21 @@ func _ready() -> void:
 
 	_world_view.build(self)
 	_view_builder.build(self)
+	GameSettings.inventory_theme_changed.connect(_apply_ui_theme)
+	_apply_ui_theme()
 	if start_in_character_editor:
 		_camera.position = stage_camera_position
 		_show_stage()
 	else:
 		_set_state(State.TITLE)
+
+
+func _apply_ui_theme() -> void:
+	if _ui_root == null:
+		return
+	var palette := GameSettings.get_ui_theme_palette()
+	FantasyUI.apply_root(_ui_root, palette)
+	FantasyUI.decorate_panels(_ui_root, palette.border, palette.surface)
 
 
 func _process(delta: float) -> void:
@@ -463,6 +474,8 @@ func _refresh_world_list() -> void:
 		button.custom_minimum_size = Vector2(0.0, 42.0)
 		button.pressed.connect(func(): _on_world_selected(info))
 		_world_list.add_child(button)
+		var palette := GameSettings.get_ui_theme_palette()
+		FantasyUI.decorate_button(button, palette.surface, palette.border)
 
 	_world_start_button.disabled = _selected_world_name.is_empty()
 
