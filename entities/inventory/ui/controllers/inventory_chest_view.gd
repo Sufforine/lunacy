@@ -52,7 +52,7 @@ func build(host, main_panel: Panel, tabs) -> void:
 	for index in 12:
 		var button := Button.new()
 		button.custom_minimum_size = SLOT_SIZE
-		button.tooltip_text = "Ctrl + ЛКМ — забрать"
+		button.tooltip_text = "Перетащить предмет или Ctrl + ЛКМ — быстро забрать"
 		grid.add_child(button)
 		var icon := TextureRect.new()
 		_host._setup_icon(icon)
@@ -99,9 +99,35 @@ func has_chest() -> bool:
 	return _chest != null
 
 
-func transfer_from_player(slot_index: int) -> void:
+func transfer_from_player(slot_index: int, chest_slot_index: int = -1) -> void:
 	if _chest != null and _chest.has_method("request_transfer_from_player"):
-		_chest.call("request_transfer_from_player", slot_index, _inventory)
+		_chest.call("request_transfer_from_player", slot_index, _inventory, chest_slot_index)
+
+
+func transfer_to_player(chest_slot_index: int, inventory_slot_index: int = -1) -> void:
+	if _chest != null and _chest.has_method("request_transfer_to_player"):
+		_chest.call("request_transfer_to_player", chest_slot_index, _inventory, inventory_slot_index)
+
+
+func get_item(slot_index: int) -> ItemData:
+	if _chest == null or not _chest.has_method("get_item"):
+		return null
+	return _chest.call("get_item", slot_index) as ItemData
+
+
+func slot_at_mouse() -> int:
+	if _panel == null or not _panel.visible:
+		return -1
+	var mouse: Vector2 = _host.get_global_mouse_position()
+	for index in _buttons.size():
+		if _buttons[index].get_global_rect().has_point(mouse):
+			return index
+	return -1
+
+
+func restore_drag_icon(slot_index: int) -> void:
+	if slot_index >= 0 and slot_index < _icons.size() and _icons[slot_index] != null:
+		_icons[slot_index].modulate = Color.WHITE
 
 
 func close() -> void:
@@ -224,7 +250,13 @@ func refresh() -> void:
 func _on_slot_input(event: InputEvent, slot_index: int) -> void:
 	if event is InputEventMouseButton:
 		var mouse_event := event as InputEventMouseButton
-		if mouse_event.pressed and mouse_event.button_index == MOUSE_BUTTON_LEFT and mouse_event.ctrl_pressed:
-			if _chest != null and _chest.has_method("request_transfer_to_player"):
-				_chest.call("request_transfer_to_player", slot_index, _inventory)
+		if not mouse_event.pressed or mouse_event.button_index != MOUSE_BUTTON_LEFT:
+			return
+		if mouse_event.ctrl_pressed:
+			transfer_to_player(slot_index)
 			_host.accept_event()
+			return
+		var item := get_item(slot_index)
+		if item != null:
+			_host._start_chest_drag(slot_index, item.icon)
+			_icons[slot_index].modulate = Color(0.35, 0.35, 0.35, 0.5)

@@ -56,9 +56,9 @@ func _server_inventory_operation(peer_id: int, sequence: int, revision: int, com
 			var scene := get_tree().current_scene
 			if chest != null and scene != null and scene.is_ancestor_of(chest) and chest.has_method("_player_is_close") and chest.call("_player_is_close", hero):
 				if str(command.kind) == "chest_put" and item != null:
-					chest.call("_server_transfer_from_player", peer_id, index, item.id, [])
+					chest.call("_server_transfer_from_player", peer_id, index, item.id, [], int(command.get("target_index", -1)))
 				elif str(command.kind) == "chest_take" and chest.call("get_item", index) != null and chest.call("get_item", index).id == str(command.get("expected", "")):
-					chest.call("_server_transfer_to_player", peer_id, index, [])
+					chest.call("_server_transfer_to_player", peer_id, index, [], int(command.get("target_index", -1)))
 	inv.network_revision += 1
 	_publish_inventory(peer_id, sequence)
 

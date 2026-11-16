@@ -85,9 +85,9 @@ func apply_world_progress(progress: Dictionary) -> void:
 		_set_data(saved_slots)
 
 
-func request_transfer_from_player(slot_index: int, inventory: InventoryComponent) -> void:
+func request_transfer_from_player(slot_index: int, inventory: InventoryComponent, chest_slot_index: int = -1) -> void:
 	if SteamLobby.is_session_active():
-		inventory.network_request({"kind": "chest_put", "index": slot_index, "chest": str(get_path())})
+		inventory.network_request({"kind": "chest_put", "index": slot_index, "target_index": chest_slot_index, "chest": str(get_path())})
 		return
 	if inventory == null:
 		return
@@ -95,50 +95,60 @@ func request_transfer_from_player(slot_index: int, inventory: InventoryComponent
 	if item == null:
 		return
 	var inventory_data := inventory.get_data()
-	_server_transfer_from_player(multiplayer.get_unique_id(), slot_index, item.id, inventory_data)
+	_server_transfer_from_player(multiplayer.get_unique_id(), slot_index, item.id, inventory_data, chest_slot_index)
 
 
-func request_transfer_to_player(slot_index: int, inventory: InventoryComponent) -> void:
+func request_transfer_to_player(slot_index: int, inventory: InventoryComponent, inventory_slot_index: int = -1) -> void:
 	if SteamLobby.is_session_active():
 		var item := get_item(slot_index)
 		if item == null:
 			return
-		inventory.network_request({"kind": "chest_take", "index": slot_index, "chest": str(get_path()), "expected": item.id})
+		inventory.network_request({"kind": "chest_take", "index": slot_index, "target_index": inventory_slot_index, "chest": str(get_path()), "expected": item.id})
 		return
 	if inventory == null or get_item(slot_index) == null:
 		return
 	var inventory_data := inventory.get_data()
-	_server_transfer_to_player(multiplayer.get_unique_id(), slot_index, inventory_data)
+	_server_transfer_to_player(multiplayer.get_unique_id(), slot_index, inventory_data, inventory_slot_index)
 
 
-func _server_transfer_from_player(peer_id: int, slot_index: int, expected_item_id: String, inventory_data: Array) -> void:
+func _server_transfer_from_player(peer_id: int, slot_index: int, expected_item_id: String, inventory_data: Array, chest_slot_index: int = -1) -> void:
 	var player := _player_for_peer(peer_id)
 	var inventory := _inventory_for_player(player)
 	if inventory == null or not _player_is_close(player):
 		return
 	# Inventory is owned by the host during a session.
 	var item := inventory.get_item(slot_index)
-	var free_slot := _first_free_slot()
-	if item == null or item.id != expected_item_id or free_slot < 0:
+	var target_slot := chest_slot_index if chest_slot_index >= 0 and chest_slot_index < SLOT_COUNT else _first_free_slot()
+	if item == null or item.id != expected_item_id or target_slot < 0:
 		_send_inventory_state(peer_id, inventory)
 		return
-	slots[free_slot] = item
-	inventory.slots[slot_index] = null
+	var displaced := slots[target_slot]
+	slots[target_slot] = item
+	inventory.slots[slot_index] = displaced
 	inventory.changed.emit()
 	_commit_transfer(peer_id, inventory)
 
 
-func _server_transfer_to_player(peer_id: int, slot_index: int, inventory_data: Array) -> void:
+func _server_transfer_to_player(peer_id: int, slot_index: int, inventory_data: Array, inventory_slot_index: int = -1) -> void:
 	var player := _player_for_peer(peer_id)
 	var inventory := _inventory_for_player(player)
 	if inventory == null or not _player_is_close(player):
 		return
 	# Inventory is owned by the host during a session.
 	var item := get_item(slot_index)
-	if item == null or not inventory.add_item(item):
+	if item == null:
 		_send_inventory_state(peer_id, inventory)
 		return
-	slots[slot_index] = null
+	if inventory_slot_index >= 0 and inventory_slot_index < inventory.slots.size():
+		var displaced := inventory.get_item(inventory_slot_index)
+		inventory.slots[inventory_slot_index] = item
+		slots[slot_index] = displaced
+		inventory.changed.emit()
+	elif inventory.add_item(item):
+		slots[slot_index] = null
+	else:
+		_send_inventory_state(peer_id, inventory)
+		return
 	_commit_transfer(peer_id, inventory)
 
 

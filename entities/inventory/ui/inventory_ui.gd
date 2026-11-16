@@ -63,7 +63,7 @@ var _qs_buttons: Array[Button]       = []
 var _qs_icons:   Array[TextureRect]  = []
 
 # ── drag ─────────────────────────────────────────────────
-enum DragSource { NONE, INVENTORY, EQUIPMENT, QUICKSLOT }
+enum DragSource { NONE, INVENTORY, EQUIPMENT, QUICKSLOT, CHEST }
 var _drag_source:   DragSource = DragSource.NONE
 var _drag_from_idx: int        = -1
 var _drag_preview:  Control    = null
@@ -201,12 +201,15 @@ func _input(event: InputEvent) -> void:
 			var inv_idx := _inv_slot_at_mouse()
 			var eq_idx  := _eq_slot_at_mouse()
 			var qs_idx  := _qs_slot_at_mouse()
-			if qs_idx >= 0:
-				_drop_on_quickslot(qs_idx)
+			var chest_idx := _chest_view.slot_at_mouse()
+			if chest_idx >= 0:
+				_drop_on_chest(chest_idx)
 			elif inv_idx >= 0:
 				_drop_on_inventory(inv_idx)
 			elif eq_idx >= 0:
 				_drop_on_equipment(eq_idx)
+			elif qs_idx >= 0:
+				_drop_on_quickslot(qs_idx)
 			elif main_panel.visible \
 				and not main_panel.get_global_rect().has_point(get_global_mouse_position()) \
 				and not _chest_view.contains_global_point(get_global_mouse_position()):
@@ -214,6 +217,7 @@ func _input(event: InputEvent) -> void:
 				_drop_dragged_item_in_world()
 			else:
 				_cancel_drag()
+			get_viewport().set_input_as_handled()
 
 
 # ════════════════════════════════════════════════════════
@@ -420,6 +424,9 @@ func _drop_on_inventory(to_idx: int) -> void:
 	var src  := _drag_source
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+	if src == DragSource.CHEST:
+		_chest_view.transfer_to_player(from, to_idx)
+		return
 	if SteamLobby.is_session_active():
 		var sources := {DragSource.INVENTORY: "inventory", DragSource.EQUIPMENT: "equipment", DragSource.QUICKSLOT: "quickslot"}
 		_inventory.network_request({"kind": "move", "source": sources.get(src, ""), "index": from, "target": "inventory", "target_index": to_idx})
@@ -449,6 +456,17 @@ func _drop_on_inventory(to_idx: int) -> void:
 				_inventory.move_to_quickslot(to_idx, from)  # swap inv↔qs
 
 
+func _drop_on_chest(to_idx: int) -> void:
+	_destroy_preview()
+	_restore_drag_icon()
+	var from := _drag_from_idx
+	var src := _drag_source
+	_drag_source = DragSource.NONE
+	_drag_from_idx = -1
+	if src == DragSource.INVENTORY:
+		_chest_view.transfer_from_player(from, to_idx)
+
+
 func _drop_on_equipment(to_idx: int) -> void:
 
 	_destroy_preview()
@@ -457,6 +475,8 @@ func _drop_on_equipment(to_idx: int) -> void:
 	var src  := _drag_source
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+	if src == DragSource.CHEST:
+		return
 	if SteamLobby.is_session_active():
 		var sources := {DragSource.INVENTORY: "inventory", DragSource.EQUIPMENT: "equipment", DragSource.QUICKSLOT: "quickslot"}
 		_inventory.network_request({"kind": "move", "source": sources.get(src, ""), "index": from, "target": "equipment", "target_index": to_idx})
@@ -502,6 +522,8 @@ func _drop_on_quickslot(to_idx: int) -> void:
 	var src  := _drag_source
 	_drag_source   = DragSource.NONE
 	_drag_from_idx = -1
+	if src == DragSource.CHEST:
+		return
 	if SteamLobby.is_session_active():
 		var sources := {DragSource.INVENTORY: "inventory", DragSource.EQUIPMENT: "equipment", DragSource.QUICKSLOT: "quickslot"}
 		_inventory.network_request({"kind": "move", "source": sources.get(src, ""), "index": from, "target": "quickslot", "target_index": to_idx})
@@ -545,6 +567,8 @@ func _restore_drag_icon() -> void:
 			if _drag_from_idx >= 0 and _drag_from_idx < _qs_icons.size():
 				if _qs_icons[_drag_from_idx]:
 					_qs_icons[_drag_from_idx].modulate = Color.WHITE
+		DragSource.CHEST:
+			_chest_view.restore_drag_icon(_drag_from_idx)
 
 
 # ════════════════════════════════════════════════════════
@@ -636,6 +660,14 @@ func _create_preview(icon: Texture2D) -> void:
 	_drag_preview.add_child(tex)
 	add_child(_drag_preview)
 	_drag_preview.global_position = get_global_mouse_position() - _drag_preview.size * 0.5
+
+
+func _start_chest_drag(slot_index: int, icon: Texture2D) -> void:
+	if _drag_source != DragSource.NONE:
+		_cancel_drag()
+	_drag_source = DragSource.CHEST
+	_drag_from_idx = slot_index
+	_create_preview(icon)
 
 
 func _destroy_preview() -> void:
@@ -808,7 +840,7 @@ func _drop_dragged_item_in_world() -> void:
 	var src  := _drag_source
 
 	# Надетое снаряжение за пределы окна не выбрасываем — возвращаем на место
-	if src == DragSource.EQUIPMENT or _inventory == null:
+	if src in [DragSource.EQUIPMENT, DragSource.CHEST] or _inventory == null:
 		_cancel_drag()
 		return
 
