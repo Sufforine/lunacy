@@ -45,7 +45,6 @@ func _ready() -> void:
 	_build_interface()
 	_inventory.changed.connect(_refresh_quickslots)
 	_stats.stats_changed.connect(_refresh_bars)
-	GameSettings.inventory_theme_changed.connect(_apply_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	_apply_theme()
 	_apply_ui_scale()
@@ -265,7 +264,7 @@ func _apply_ui_scale() -> void:
 
 
 func _apply_theme() -> void:
-	var palette := GameSettings.get_inventory_theme_palette()
+	var palette := GameSettings.get_ui_theme_palette()
 	var background: Color = palette.background
 	var border: Color = palette.border
 	var text_color: Color = palette.text
@@ -280,7 +279,7 @@ func _apply_theme() -> void:
 		# PanelContainer content margins made ability icons smaller than the
 		# neighboring quick slots. A zero-margin background keeps all six cells equal.
 		slot.add_theme_stylebox_override("panel", FantasyUI.borderless_bar_style(slot_color))
-		FantasyUI.decorate_inventory_cell(slot, slot_color)
+		FantasyUI.decorate_inventory_cell(slot, slot_color, border)
 	for slot in _quick_slots:
 		slot.add_theme_stylebox_override("normal", FantasyUI.button_style(slot_color, border, 2))
 		slot.add_theme_stylebox_override("hover", FantasyUI.button_style(slot_color.lightened(0.12), palette.accent, 2))
@@ -288,7 +287,7 @@ func _apply_theme() -> void:
 		FantasyUI.decorate_inventory_slot(slot, slot_color, border)
 	for key in _key_labels:
 		key.add_theme_color_override("font_color", text_color)
-		key.add_theme_stylebox_override("normal", FantasyUI.button_style(background, border, 1))
+		key.add_theme_stylebox_override("normal", FantasyUI.borderless_bar_style(background))
 	var track_style := FantasyUI.borderless_bar_style(Color(0.035, 0.04, 0.05, 0.92))
 	_health_track.add_theme_stylebox_override("panel", track_style)
 	_mana_track.add_theme_stylebox_override("panel", track_style.duplicate())

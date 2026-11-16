@@ -99,9 +99,6 @@ func _ready() -> void:
 	_tabs.apply_theme()
 	_chest_view.apply_theme()
 	_apply_slot_theme()
-	GameSettings.inventory_theme_changed.connect(_tabs.apply_theme)
-	GameSettings.inventory_theme_changed.connect(_chest_view.apply_theme)
-	GameSettings.inventory_theme_changed.connect(_apply_slot_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	_apply_ui_scale()
 	resized.connect(_apply_ui_scale)
@@ -112,7 +109,7 @@ func _apply_ui_scale() -> void:
 
 
 func _apply_slot_theme() -> void:
-	var palette := GameSettings.get_inventory_theme_palette()
+	var palette := GameSettings.get_ui_theme_palette()
 	var slot_color: Color = palette.background.darkened(0.16)
 	for button in _inv_buttons:
 		FantasyUI.decorate_inventory_slot(button, slot_color, palette.border)

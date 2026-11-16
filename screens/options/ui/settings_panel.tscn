@@ -4,18 +4,11 @@
 [ext_resource type="Script" path="res://shared/camera/crosshair.gd" id="2_crosshair"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBox_panel"]
-bg_color = Color(0.886, 0.812, 0.667, 0.98)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.439, 0.145, 0.133, 1)
+bg_color = Color(0.0705882, 0.0784314, 0.0941176, 0.98)
 corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
-shadow_color = Color(0, 0, 0, 0.45)
-shadow_size = 16
 
 [node name="SettingsPanel" type="Control"]
 process_mode = 3
@@ -36,7 +29,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 0
-color = Color(0.12, 0.065, 0.045, 0.78)
+color = Color(0.01, 0.025, 0.045, 0.9)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -209,22 +202,6 @@ theme_override_constants/separation = 10
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Интерфейс"
-
-[node name="ThemeRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
-layout_mode = 2
-theme_override_constants/separation = 16
-
-[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThemeRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 18
-text = "Цветовая схема"
-
-[node name="InventoryThemeOption" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content/ThemeRow"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 42)
-layout_mode = 2
-theme_override_font_sizes/font_size = 17
 
 [node name="UIScaleRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/Tabs/Game/Scroll/Content"]
 layout_mode = 2

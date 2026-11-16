@@ -9,7 +9,6 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	visible = false
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
-	GameSettings.inventory_theme_changed.connect(_apply_theme)
 	key_panel.resized.connect(_update_pivot)
 	_apply_ui_scale()
 	_apply_theme()
@@ -34,10 +33,7 @@ func _apply_theme() -> void:
 	FantasyUI.decorate_interaction_prompt(key_panel, palette.border)
 	key_label.add_theme_color_override("font_color", palette.text)
 	key_label.add_theme_color_override("font_outline_color", Color.TRANSPARENT)
-	key_label.add_theme_color_override("font_shadow_color", Color.TRANSPARENT)
 	key_label.add_theme_constant_override("outline_size", 0)
-	key_label.add_theme_constant_override("shadow_offset_x", 0)
-	key_label.add_theme_constant_override("shadow_offset_y", 0)
 	key_label.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
 
 

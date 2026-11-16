@@ -5,6 +5,7 @@ const INVENTORY_ICON := preload("res://Assets/Icons/WoW Icon Pack/Miscellaneous/
 const STATS_ICON := preload("res://Assets/Icons/WoW Icon Pack/Miscellaneous/Book_01.png")
 const ATTRIBUTES_ICON := preload("res://Assets/Icons/WoW Icon Pack/Spells/Strength.png")
 const SKILL_TREE_ICON := preload("res://Assets/Icons/WoW Icon Pack/Abilities/TreeofLife.png")
+const AVAILABLE_ATTRIBUTE_BORDER := Color("f2c94c")
 
 const CHARACTERISTIC_LABELS := {
 	"strength": "Сила",
@@ -118,8 +119,14 @@ func refresh() -> void:
 	_level_label.text = "Уровень: %d   Опыт: %d/%d" % [
 		_stats.level, _stats.experience, StatsComponent.EXPERIENCE_PER_LEVEL]
 	_attribute_points_label.text = "Свободные очки: %d" % _stats.attribute_points
+	var can_increase := _stats.attribute_points > 0
 	for button in _attribute_buttons.values():
-		(button as Button).disabled = _stats.attribute_points <= 0
+		var increase_button := button as Button
+		increase_button.disabled = not can_increase
+		FantasyUI.set_button_border_color(
+			increase_button,
+			AVAILABLE_ATTRIBUTE_BORDER if can_increase else FantasyUI.BUTTON_BORDER_COLOR
+		)
 	for key in CHARACTERISTIC_LABELS:
 		_value_labels[key].text = "%.1f" % _stats.get_characteristic(key)
 	for key in STAT_LABELS:
@@ -136,8 +143,7 @@ func refresh() -> void:
 func apply_theme() -> void:
 	if _main_panel == null:
 		return
-	var night := GameSettings.inventory_theme == GameSettings.InventoryTheme.NIGHT
-	var palette := GameSettings.get_inventory_theme_palette()
+	var palette := GameSettings.get_ui_theme_palette()
 	var background: Color = palette.background
 	var border: Color = palette.border
 	FantasyUI.apply_root(_main_panel, palette)
@@ -145,7 +151,7 @@ func apply_theme() -> void:
 	_main_panel.add_theme_stylebox_override("panel", style)
 	FantasyUI.decorate_panels(_main_panel, border, background.darkened(0.08))
 	if _skill_tree_panel != null:
-		var tree_background: Color = background.darkened(0.08) if night else background.lightened(0.12)
+		var tree_background: Color = background.darkened(0.08)
 		var tree_style := FantasyUI.panel_style(tree_background, border, PANEL_BORDER_WIDTH, false)
 		_skill_tree_panel.add_theme_stylebox_override("panel", tree_style)
 		FantasyUI.decorate_panel(_skill_tree_panel, border)
@@ -306,7 +312,7 @@ func _apply_label_color(node: Node, color: Color) -> void:
 
 func _style_tab_button(button: Button, background: Color, border: Color) -> void:
 	for state in ["normal", "hover", "pressed", "hover_pressed"]:
-		var state_background := background.lightened(0.16) if state in ["hover", "hover_pressed"] else background
+		var state_background := FantasyUI.BUTTON_PRESSED_COLOR if state in ["pressed", "hover_pressed"] else background
 		var style := FantasyUI.button_style(state_background, border, PANEL_BORDER_WIDTH)
 		button.add_theme_stylebox_override(state, style)
 	FantasyUI.decorate_button(button, background, border)

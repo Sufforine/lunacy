@@ -19,7 +19,6 @@ signal close_requested
 @onready var ui_scale_value: Label = %UIScaleValue
 @onready var chat_scale_slider: HSlider = %ChatScaleSlider
 @onready var chat_scale_value: Label = %ChatScaleValue
-@onready var inventory_theme_option: OptionButton = %InventoryThemeOption
 
 
 func _ready() -> void:
@@ -41,11 +40,7 @@ func _ready() -> void:
 	_update_percent_label(ui_scale_value, ui_scale_slider.value)
 	chat_scale_slider.set_value_no_signal(GameSettings.chat_scale_percent)
 	_update_percent_label(chat_scale_value, chat_scale_slider.value)
-	inventory_theme_option.add_item("День", GameSettings.InventoryTheme.DAY)
-	inventory_theme_option.add_item("Ночь", GameSettings.InventoryTheme.NIGHT)
-	inventory_theme_option.select(inventory_theme_option.get_item_index(GameSettings.inventory_theme))
 	_connect_controls()
-	GameSettings.inventory_theme_changed.connect(_apply_theme)
 	_apply_theme()
 
 
@@ -58,12 +53,7 @@ func _connect_controls() -> void:
 	thickness_slider.value_changed.connect(_on_thickness_changed)
 	ui_scale_slider.value_changed.connect(_on_ui_scale_changed)
 	chat_scale_slider.value_changed.connect(_on_chat_scale_changed)
-	inventory_theme_option.item_selected.connect(_on_inventory_theme_selected)
 	back_button.pressed.connect(_on_back_pressed)
-
-
-func _on_inventory_theme_selected(index: int) -> void:
-	GameSettings.set_inventory_theme(inventory_theme_option.get_item_id(index))
 
 
 func _on_crosshair_selected(index: int) -> void:
@@ -164,9 +154,10 @@ func _apply_theme_to_children(node: Node, palette: Dictionary) -> void:
 			var button := child as Button
 			button.add_theme_color_override("font_color", palette.text)
 			button.add_theme_color_override("font_hover_color", palette.text)
+			button.add_theme_color_override("font_pressed_color", FantasyUI.BUTTON_PRESSED_TEXT_COLOR)
 			button.add_theme_stylebox_override("normal", FantasyUI.button_style(palette.surface, palette.border, 2))
-			button.add_theme_stylebox_override("hover", FantasyUI.button_style(palette.surface_hover, palette.accent, 2))
-			button.add_theme_stylebox_override("pressed", FantasyUI.button_style(palette.surface.darkened(0.1), palette.accent, 3))
+			button.add_theme_stylebox_override("hover", FantasyUI.button_style(palette.surface, palette.accent, 2))
+			button.add_theme_stylebox_override("pressed", FantasyUI.button_style(FantasyUI.BUTTON_PRESSED_COLOR, palette.accent, 3))
 			FantasyUI.decorate_button(button, palette.surface, palette.border)
 		elif child is HSlider:
 			var slider := child as HSlider

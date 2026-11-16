@@ -21,7 +21,6 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_player = _find_player()
 	settings_panel.connect(&"close_requested", _on_settings_closed)
-	GameSettings.inventory_theme_changed.connect(_apply_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	menu_panel.resized.connect(_update_scale_pivot)
 	_apply_theme()
@@ -52,8 +51,8 @@ func _apply_theme() -> void:
 			var button := child as Button
 			button.add_theme_color_override("font_color", palette.text)
 			button.add_theme_stylebox_override("normal", FantasyUI.button_style(palette.surface, palette.border, 2))
-			button.add_theme_stylebox_override("hover", FantasyUI.button_style(palette.surface_hover, palette.accent, 2))
-			button.add_theme_stylebox_override("pressed", FantasyUI.button_style(palette.surface.darkened(0.1), palette.accent, 3))
+			button.add_theme_stylebox_override("hover", FantasyUI.button_style(palette.surface, palette.accent, 2))
+			button.add_theme_stylebox_override("pressed", FantasyUI.button_style(FantasyUI.BUTTON_PRESSED_COLOR, palette.accent, 3))
 			FantasyUI.decorate_button(button, palette.surface, palette.border)
 
 

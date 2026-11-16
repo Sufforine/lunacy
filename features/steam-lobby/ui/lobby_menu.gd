@@ -57,7 +57,6 @@ func _ready() -> void:
 	_update_save_label()
 	_clear_players_list()
 	_avatar_placeholder = _make_avatar_placeholder()
-	GameSettings.inventory_theme_changed.connect(_apply_theme)
 	_apply_theme()
 
 	if steam_lobby:

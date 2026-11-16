@@ -121,7 +121,7 @@ func leave_layout() -> void:
 func apply_theme() -> void:
 	if _panel == null:
 		return
-	var palette := GameSettings.get_inventory_theme_palette()
+	var palette := GameSettings.get_ui_theme_palette()
 	FantasyUI.apply_root(_panel, palette)
 	var style := FantasyUI.panel_style(palette.background, palette.border, 4)
 	_panel.add_theme_stylebox_override("panel", style)

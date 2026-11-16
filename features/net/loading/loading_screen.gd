@@ -17,7 +17,6 @@ var _ready_color := Color(0.94, 0.97, 1.0, 1.0)
 
 
 func _ready() -> void:
-	GameSettings.inventory_theme_changed.connect(_apply_theme)
 	GameSettings.ui_scale_changed.connect(_apply_ui_scale)
 	panel.resized.connect(_update_scale_pivot)
 	_apply_theme()

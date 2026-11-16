@@ -2,11 +2,9 @@ extends Node
 
 signal crosshair_changed
 signal chat_scale_changed
-signal inventory_theme_changed
 signal ui_scale_changed
 
 enum CrosshairShape { DOT, CROSS, CIRCLE }
-enum InventoryTheme { DAY, NIGHT }
 
 const SETTINGS_PATH := "user://settings.cfg"
 const ENVIRONMENT_BUS := &"Environment"
@@ -20,7 +18,6 @@ var crosshair_shape: int = CrosshairShape.DOT
 var crosshair_thickness: float = 3.0
 var chat_scale_percent: float = 0.0
 var ui_scale_percent: float = 0.0
-var inventory_theme: int = InventoryTheme.DAY
 
 
 func set_crosshair_shape(value: int) -> void:
@@ -51,29 +48,15 @@ func get_ui_scale() -> float:
 	return 1.0 + ui_scale_percent / 100.0
 
 
-func set_inventory_theme(value: int) -> void:
-	var selected := clampi(value, InventoryTheme.DAY, InventoryTheme.NIGHT)
-	if inventory_theme == selected:
-		return
-	inventory_theme = selected
-	inventory_theme_changed.emit()
-	_save_settings()
-
-
-func get_inventory_theme_palette() -> Dictionary:
-	return get_ui_theme_palette()
-
-
 func get_ui_theme_palette() -> Dictionary:
-	var night := inventory_theme == InventoryTheme.NIGHT
 	return {
-		"background": Color("152940") if night else Color("e2cfaa"),
-		"border": Color("75c9ec") if night else Color("702522"),
-		"text": Color("e8f5ff") if night else Color("47241f"),
-		"surface": Color("0b1c2d") if night else Color("b9aa8c"),
-		"surface_hover": Color("214566") if night else Color("cfbb94"),
-		"accent": Color("75c9ec") if night else Color("a33d32"),
-		"dimmer": Color(0.01, 0.025, 0.045, 0.9) if night else Color(0.12, 0.065, 0.045, 0.78),
+		"background": Color("121418"),
+		"border": Color("858b94"),
+		"text": Color("f4f6f8"),
+		"surface": Color("121418"),
+		"surface_hover": Color("ffffff"),
+		"accent": Color("858b94"),
+		"dimmer": Color(0.015, 0.017, 0.021, 0.92),
 	}
 
 
@@ -211,8 +194,6 @@ func _load_settings() -> void:
 	crosshair_thickness = clampf(float(config.get_value("crosshair", "thickness", crosshair_thickness)), 1.0, 8.0)
 	chat_scale_percent = clampf(float(config.get_value("chat", "scale_percent", chat_scale_percent)), -50.0, 50.0)
 	ui_scale_percent = clampf(float(config.get_value("ui", "scale_percent", ui_scale_percent)), -50.0, 50.0)
-	var saved_theme: Variant = config.get_value("ui", "theme", config.get_value("inventory", "theme", inventory_theme))
-	inventory_theme = clampi(int(saved_theme), InventoryTheme.DAY, InventoryTheme.NIGHT)
 
 
 func _save_settings() -> void:
@@ -225,8 +206,6 @@ func _save_settings() -> void:
 	config.set_value("crosshair", "thickness", crosshair_thickness)
 	config.set_value("chat", "scale_percent", chat_scale_percent)
 	config.set_value("ui", "scale_percent", ui_scale_percent)
-	config.set_value("ui", "theme", inventory_theme)
-	config.set_value("inventory", "theme", inventory_theme)
 	var error := config.save(SETTINGS_PATH)
 	if error != OK:
 		push_warning("GameSettings: не удалось сохранить настройки (%s)" % error_string(error))

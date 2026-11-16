@@ -1,5 +1,7 @@
 extends RefCounted
 
+const DIVIDER_FADE_TEXTURE := preload("res://Assets/ui/kenney_fantasy_ui_borders/divider_fade_000.png")
+
 var _host
 
 
@@ -86,7 +88,7 @@ func _build_stage() -> Control:
 	_host._back_button = make_button("Назад", _host._on_back_pressed, 140.0)
 	_host._select_button = make_button("Выбрать", _host._on_select_pressed)
 	_host._delete_button = make_button("Удалить", _host._on_delete_pressed, 140.0)
-	_host._delete_button.modulate = Color(1.0, 0.6, 0.6)
+	FantasyUI.mark_danger_button(_host._delete_button)
 	_host._create_button = make_button("Создать персонажа", _host._on_create_pressed, 260.0)
 	_host._cancel_choice_button = make_button("Отмена", _host._on_cancel_choice_pressed, 140.0)
 	for button in [_host._back_button, _host._select_button, _host._delete_button, _host._create_button, _host._cancel_choice_button]:
@@ -223,8 +225,7 @@ func _build_world_select() -> Control:
 	_host._world_list = VBoxContainer.new()
 	_host._world_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(_host._world_list)
-	column.add_child(HSeparator.new())
-	column.add_child(make_label("Создать новый мир", 18))
+	column.add_child(_make_fade_divider())
 	var create_row := HBoxContainer.new()
 	create_row.add_theme_constant_override("separation", 8)
 	column.add_child(create_row)
@@ -277,7 +278,7 @@ func _build_delete_confirmation() -> Control:
 	column.add_child(buttons)
 	buttons.add_child(make_button("Отмена", _host._on_delete_cancelled, 150.0))
 	var confirm := make_button("Удалить", _host._on_delete_confirmed, 150.0)
-	confirm.modulate = Color(1.0, 0.5, 0.5)
+	FantasyUI.mark_danger_button(confirm)
 	buttons.add_child(confirm)
 	return center
 
@@ -289,3 +290,24 @@ func _padded_margin(horizontal: int, vertical: int) -> MarginContainer:
 	margin.add_theme_constant_override("margin_top", vertical)
 	margin.add_theme_constant_override("margin_bottom", vertical)
 	return margin
+
+
+func _make_fade_divider() -> HBoxContainer:
+	var divider := HBoxContainer.new()
+	divider.custom_minimum_size = Vector2(0.0, 22.0)
+	divider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	divider.add_theme_constant_override("separation", 0)
+	ignore_mouse(divider)
+	for flipped in [false, true]:
+		var half := TextureRect.new()
+		half.texture = DIVIDER_FADE_TEXTURE
+		half.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		half.stretch_mode = TextureRect.STRETCH_SCALE
+		half.flip_h = flipped
+		half.custom_minimum_size = Vector2(96.0, 22.0)
+		half.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		half.modulate = GameSettings.get_ui_theme_palette().border
+		half.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		ignore_mouse(half)
+		divider.add_child(half)
+	return divider

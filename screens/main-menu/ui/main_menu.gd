@@ -126,7 +126,6 @@ func _ready() -> void:
 
 	_world_view.build(self)
 	_view_builder.build(self)
-	GameSettings.inventory_theme_changed.connect(_apply_ui_theme)
 	_apply_ui_theme()
 	if start_in_character_editor:
 		_camera.position = stage_camera_position
