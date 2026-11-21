@@ -3,36 +3,36 @@
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_nn4br"]
 animation = &"Idle"
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_nae2l"]
-animation = &"Idle"
+[sub_resource type="AnimationNodeTimeScale" id="BaseActionARate"]
 
 [sub_resource type="AnimationNodeTimeSeek" id="BaseActionASeek"]
 
-[sub_resource type="AnimationNodeTimeScale" id="BaseActionARate"]
-
 [sub_resource type="AnimationNodeBlendTree" id="BaseActionA"]
+nodes/output/position = Vector2(660, 100)
 nodes/Clip/node = SubResource("AnimationNodeAnimation_nn4br")
 nodes/Clip/position = Vector2(0, 100)
 nodes/Seek/node = SubResource("BaseActionASeek")
 nodes/Seek/position = Vector2(220, 100)
 nodes/Rate/node = SubResource("BaseActionARate")
 nodes/Rate/position = Vector2(440, 100)
-nodes/output/position = Vector2(660, 100)
-node_connections = ["Seek", 0, "Clip", "Rate", 0, "Seek", "output", 0, "Rate"]
+node_connections = [&"output", 0, &"Rate", &"Seek", 0, &"Clip", &"Rate", 0, &"Seek"]
 
-[sub_resource type="AnimationNodeTimeSeek" id="BaseActionBSeek"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_nae2l"]
+animation = &"Idle"
 
 [sub_resource type="AnimationNodeTimeScale" id="BaseActionBRate"]
 
+[sub_resource type="AnimationNodeTimeSeek" id="BaseActionBSeek"]
+
 [sub_resource type="AnimationNodeBlendTree" id="BaseActionB"]
+nodes/output/position = Vector2(660, 100)
 nodes/Clip/node = SubResource("AnimationNodeAnimation_nae2l")
 nodes/Clip/position = Vector2(0, 100)
 nodes/Seek/node = SubResource("BaseActionBSeek")
 nodes/Seek/position = Vector2(220, 100)
 nodes/Rate/node = SubResource("BaseActionBRate")
 nodes/Rate/position = Vector2(440, 100)
-nodes/output/position = Vector2(660, 100)
-node_connections = ["Seek", 0, "Clip", "Rate", 0, "Seek", "output", 0, "Rate"]
+node_connections = [&"output", 0, &"Rate", &"Seek", 0, &"Clip", &"Rate", 0, &"Seek"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dram4"]
 animation = &"Jump"
@@ -61,12 +61,12 @@ sync = true
 [sub_resource type="AnimationNodeTimeScale" id="LocomotionStride"]
 
 [sub_resource type="AnimationNodeBlendTree" id="GroundedLocomotion"]
+nodes/output/position = Vector2(500, 100)
 nodes/Movement/node = SubResource("AnimationNodeBlendSpace1D_jcda2")
 nodes/Movement/position = Vector2(0, 100)
 nodes/Stride/node = SubResource("LocomotionStride")
 nodes/Stride/position = Vector2(250, 100)
-nodes/output/position = Vector2(500, 100)
-node_connections = ["Stride", 0, "Movement", "output", 0, "Stride"]
+node_connections = [&"output", 0, &"Stride", &"Stride", 0, &"Movement"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_guard"]
 animation = &"Idle"
@@ -77,12 +77,12 @@ animation = &"Jump_Start"
 [sub_resource type="AnimationNodeTimeScale" id="JumpStartRate"]
 
 [sub_resource type="AnimationNodeBlendTree" id="JumpStartTree"]
+nodes/output/position = Vector2(480, 100)
 nodes/Clip/node = SubResource("AnimationNodeAnimation_7h24w")
 nodes/Clip/position = Vector2(0, 100)
 nodes/Rate/node = SubResource("JumpStartRate")
 nodes/Rate/position = Vector2(240, 100)
-nodes/output/position = Vector2(480, 100)
-node_connections = ["Rate", 0, "Clip", "output", 0, "Rate"]
+node_connections = [&"output", 0, &"Rate", &"Rate", 0, &"Clip"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ungbq"]
 animation = &"Jump_Land"
@@ -90,12 +90,12 @@ animation = &"Jump_Land"
 [sub_resource type="AnimationNodeTimeScale" id="LandRate"]
 
 [sub_resource type="AnimationNodeBlendTree" id="LandTree"]
+nodes/output/position = Vector2(480, 100)
 nodes/Clip/node = SubResource("AnimationNodeAnimation_ungbq")
 nodes/Clip/position = Vector2(0, 100)
 nodes/Rate/node = SubResource("LandRate")
 nodes/Rate/position = Vector2(240, 100)
-nodes/output/position = Vector2(480, 100)
-node_connections = ["Rate", 0, "Clip", "output", 0, "Rate"]
+node_connections = [&"output", 0, &"Rate", &"Rate", 0, &"Clip"]
 
 [sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_pgqm2"]
 
@@ -180,62 +180,39 @@ states/Land/position = Vector2(780, 340)
 transitions = ["Start", "Grounded", SubResource("AnimationNodeStateMachineTransition_pgqm2"), "Grounded", "JumpStart", SubResource("AnimationNodeStateMachineTransition_knmmu"), "Grounded", "Air", SubResource("AnimationNodeStateMachineTransition_txkvb"), "JumpStart", "Air", SubResource("AnimationNodeStateMachineTransition_nm0oy"), "JumpStart", "Land", SubResource("AnimationNodeStateMachineTransition_lfrkd"), "Air", "Land", SubResource("AnimationNodeStateMachineTransition_6rkgr"), "Land", "Grounded", SubResource("AnimationNodeStateMachineTransition_3j71g"), "Grounded", "ActionA", SubResource("AnimationNodeStateMachineTransition_3isjb"), "Land", "ActionA", SubResource("AnimationNodeStateMachineTransition_ty8yu"), "ActionA", "Grounded", SubResource("AnimationNodeStateMachineTransition_56s2f"), "ActionA", "JumpStart", SubResource("AnimationNodeStateMachineTransition_pevcn"), "ActionA", "Air", SubResource("AnimationNodeStateMachineTransition_y4qon"), "Grounded", "ActionB", SubResource("AnimationNodeStateMachineTransition_02wet"), "Land", "ActionB", SubResource("AnimationNodeStateMachineTransition_3bwe4"), "ActionB", "Grounded", SubResource("AnimationNodeStateMachineTransition_c18lm"), "ActionB", "JumpStart", SubResource("AnimationNodeStateMachineTransition_fhc5o"), "ActionB", "Air", SubResource("AnimationNodeStateMachineTransition_uc5tf"), "ActionA", "ActionB", SubResource("AnimationNodeStateMachineTransition_cxjde"), "ActionB", "ActionA", SubResource("AnimationNodeStateMachineTransition_5lx26"), "Land", "JumpStart", SubResource("AnimationNodeStateMachineTransition_x6756"), "Land", "Air", SubResource("AnimationNodeStateMachineTransition_eff7f"), "Grounded", "Guard", SubResource("AnimationNodeStateMachineTransition_guard"), "Guard", "Grounded", SubResource("AnimationNodeStateMachineTransition_guard"), "ActionA", "Guard", SubResource("AnimationNodeStateMachineTransition_guard"), "Guard", "ActionA", SubResource("AnimationNodeStateMachineTransition_guard"), "ActionB", "Guard", SubResource("AnimationNodeStateMachineTransition_guard"), "Guard", "ActionB", SubResource("AnimationNodeStateMachineTransition_guard"), "Land", "Guard", SubResource("AnimationNodeStateMachineTransition_guard"), "Guard", "Land", SubResource("AnimationNodeStateMachineTransition_guard"), "Air", "Guard", SubResource("AnimationNodeStateMachineTransition_guard"), "Guard", "Air", SubResource("AnimationNodeStateMachineTransition_guard"), "JumpStart", "Guard", SubResource("AnimationNodeStateMachineTransition_guard"), "Guard", "JumpStart", SubResource("AnimationNodeStateMachineTransition_guard"), "Air", "ActionA", SubResource("AnimationNodeStateMachineTransition_guard"), "Air", "ActionB", SubResource("AnimationNodeStateMachineTransition_guard"), "JumpStart", "ActionA", SubResource("AnimationNodeStateMachineTransition_guard"), "JumpStart", "ActionB", SubResource("AnimationNodeStateMachineTransition_guard")]
 graph_offset = Vector2(0, 86.87259)
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dexk0"]
-animation = &"Death01"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8kp03"]
-animation = &"Crouch_Idle"
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_x1v2w"]
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ea8lw"]
-xfade_time = 0.12
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jbu7n"]
-xfade_time = 0.12
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ocq54"]
-xfade_time = 0.2
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_wwrhh"]
-xfade_time = 0.12
-
-[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_eslrm"]
-xfade_time = 0.2
-
 [sub_resource type="AnimationNodeAnimation" id="UpperActionA"]
 animation = &"Idle"
 
-[sub_resource type="AnimationNodeAnimation" id="UpperActionB"]
-animation = &"Idle"
+[sub_resource type="AnimationNodeTimeScale" id="UpperActionARate"]
 
 [sub_resource type="AnimationNodeTimeSeek" id="UpperActionASeek"]
 
-[sub_resource type="AnimationNodeTimeScale" id="UpperActionARate"]
-
 [sub_resource type="AnimationNodeBlendTree" id="UpperActionATree"]
+nodes/output/position = Vector2(660, 100)
 nodes/Clip/node = SubResource("UpperActionA")
 nodes/Clip/position = Vector2(0, 100)
 nodes/Seek/node = SubResource("UpperActionASeek")
 nodes/Seek/position = Vector2(220, 100)
 nodes/Rate/node = SubResource("UpperActionARate")
 nodes/Rate/position = Vector2(440, 100)
-nodes/output/position = Vector2(660, 100)
-node_connections = ["Seek", 0, "Clip", "Rate", 0, "Seek", "output", 0, "Rate"]
+node_connections = [&"output", 0, &"Rate", &"Seek", 0, &"Clip", &"Rate", 0, &"Seek"]
 
-[sub_resource type="AnimationNodeTimeSeek" id="UpperActionBSeek"]
+[sub_resource type="AnimationNodeAnimation" id="UpperActionB"]
+animation = &"Idle"
 
 [sub_resource type="AnimationNodeTimeScale" id="UpperActionBRate"]
 
+[sub_resource type="AnimationNodeTimeSeek" id="UpperActionBSeek"]
+
 [sub_resource type="AnimationNodeBlendTree" id="UpperActionBTree"]
+nodes/output/position = Vector2(660, 100)
 nodes/Clip/node = SubResource("UpperActionB")
 nodes/Clip/position = Vector2(0, 100)
 nodes/Seek/node = SubResource("UpperActionBSeek")
 nodes/Seek/position = Vector2(220, 100)
 nodes/Rate/node = SubResource("UpperActionBRate")
 nodes/Rate/position = Vector2(440, 100)
-nodes/output/position = Vector2(660, 100)
-node_connections = ["Seek", 0, "Clip", "Rate", 0, "Seek", "output", 0, "Rate"]
+node_connections = [&"output", 0, &"Rate", &"Seek", 0, &"Clip", &"Rate", 0, &"Seek"]
 
 [sub_resource type="AnimationNodeAnimation" id="UpperGuard"]
 animation = &"Idle"
@@ -272,18 +249,41 @@ transitions = ["Start", "Guard", SubResource("UpperStartToGuard"), "ActionA", "A
 
 [sub_resource type="AnimationNodeBlend2" id="UpperBodyBlend"]
 filter_enabled = true
-filters = ["%HumanSkeleton:Spine", "%HumanSkeleton:Chest", "%HumanSkeleton:UpperChest", "%HumanSkeleton:Neck", "%HumanSkeleton:Head", "%HumanSkeleton:LeftShoulder", "%HumanSkeleton:LeftUpperArm", "%HumanSkeleton:LeftLowerArm", "%HumanSkeleton:LeftHand", "%HumanSkeleton:LeftIndexProximal", "%HumanSkeleton:LeftIndexIntermediate", "%HumanSkeleton:LeftIndexDistal", "%HumanSkeleton:index_04_leaf_l", "%HumanSkeleton:LeftMiddleProximal", "%HumanSkeleton:LeftMiddleIntermediate", "%HumanSkeleton:LeftMiddleDistal", "%HumanSkeleton:middle_04_leaf_l", "%HumanSkeleton:LeftLittleProximal", "%HumanSkeleton:LeftLittleIntermediate", "%HumanSkeleton:LeftLittleDistal", "%HumanSkeleton:pinky_04_leaf_l", "%HumanSkeleton:LeftRingProximal", "%HumanSkeleton:LeftRingIntermediate", "%HumanSkeleton:LeftRingDistal", "%HumanSkeleton:ring_04_leaf_l", "%HumanSkeleton:LeftThumbMetacarpal", "%HumanSkeleton:LeftThumbProximal", "%HumanSkeleton:LeftThumbDistal", "%HumanSkeleton:thumb_04_leaf_l", "%HumanSkeleton:RightShoulder", "%HumanSkeleton:RightUpperArm", "%HumanSkeleton:RightLowerArm", "%HumanSkeleton:RightHand", "%HumanSkeleton:RightIndexProximal", "%HumanSkeleton:RightIndexIntermediate", "%HumanSkeleton:RightIndexDistal", "%HumanSkeleton:index_04_leaf_r", "%HumanSkeleton:RightMiddleProximal", "%HumanSkeleton:RightMiddleIntermediate", "%HumanSkeleton:RightMiddleDistal", "%HumanSkeleton:middle_04_leaf_r", "%HumanSkeleton:RightLittleProximal", "%HumanSkeleton:RightLittleIntermediate", "%HumanSkeleton:RightLittleDistal", "%HumanSkeleton:pinky_04_leaf_r", "%HumanSkeleton:RightRingProximal", "%HumanSkeleton:RightRingIntermediate", "%HumanSkeleton:RightRingDistal", "%HumanSkeleton:ring_04_leaf_r", "%HumanSkeleton:RightThumbMetacarpal", "%HumanSkeleton:RightThumbProximal", "%HumanSkeleton:RightThumbDistal", "%HumanSkeleton:thumb_04_leaf_r"]
+filters = ["%HumanSkeleton:Chest", "%HumanSkeleton:Head", "%HumanSkeleton:LeftHand", "%HumanSkeleton:LeftIndexDistal", "%HumanSkeleton:LeftIndexIntermediate", "%HumanSkeleton:LeftIndexProximal", "%HumanSkeleton:LeftLittleDistal", "%HumanSkeleton:LeftLittleIntermediate", "%HumanSkeleton:LeftLittleProximal", "%HumanSkeleton:LeftLowerArm", "%HumanSkeleton:LeftMiddleDistal", "%HumanSkeleton:LeftMiddleIntermediate", "%HumanSkeleton:LeftMiddleProximal", "%HumanSkeleton:LeftRingDistal", "%HumanSkeleton:LeftRingIntermediate", "%HumanSkeleton:LeftRingProximal", "%HumanSkeleton:LeftShoulder", "%HumanSkeleton:LeftThumbDistal", "%HumanSkeleton:LeftThumbMetacarpal", "%HumanSkeleton:LeftThumbProximal", "%HumanSkeleton:LeftUpperArm", "%HumanSkeleton:Neck", "%HumanSkeleton:RightHand", "%HumanSkeleton:RightIndexDistal", "%HumanSkeleton:RightIndexIntermediate", "%HumanSkeleton:RightIndexProximal", "%HumanSkeleton:RightLittleDistal", "%HumanSkeleton:RightLittleIntermediate", "%HumanSkeleton:RightLittleProximal", "%HumanSkeleton:RightLowerArm", "%HumanSkeleton:RightMiddleDistal", "%HumanSkeleton:RightMiddleIntermediate", "%HumanSkeleton:RightMiddleProximal", "%HumanSkeleton:RightRingDistal", "%HumanSkeleton:RightRingIntermediate", "%HumanSkeleton:RightRingProximal", "%HumanSkeleton:RightShoulder", "%HumanSkeleton:RightThumbDistal", "%HumanSkeleton:RightThumbMetacarpal", "%HumanSkeleton:RightThumbProximal", "%HumanSkeleton:RightUpperArm", "%HumanSkeleton:Spine", "%HumanSkeleton:UpperChest", "%HumanSkeleton:index_04_leaf_l", "%HumanSkeleton:index_04_leaf_r", "%HumanSkeleton:middle_04_leaf_l", "%HumanSkeleton:middle_04_leaf_r", "%HumanSkeleton:pinky_04_leaf_l", "%HumanSkeleton:pinky_04_leaf_r", "%HumanSkeleton:ring_04_leaf_l", "%HumanSkeleton:ring_04_leaf_r", "%HumanSkeleton:thumb_04_leaf_l", "%HumanSkeleton:thumb_04_leaf_r"]
 sync = true
 
 [sub_resource type="AnimationNodeBlendTree" id="AliveLayers"]
+nodes/output/position = Vector2(650, 100)
 nodes/Base/node = SubResource("AnimationNodeStateMachine_kp62c")
 nodes/Base/position = Vector2(0, 0)
 nodes/UpperActions/node = SubResource("UpperActions")
 nodes/UpperActions/position = Vector2(0, 250)
 nodes/UpperBlend/node = SubResource("UpperBodyBlend")
 nodes/UpperBlend/position = Vector2(350, 100)
-nodes/output/position = Vector2(650, 100)
-node_connections = ["UpperBlend", 0, "Base", "UpperBlend", 1, "UpperActions", "output", 0, "UpperBlend"]
+node_connections = [&"output", 0, &"UpperBlend", &"UpperBlend", 0, &"Base", &"UpperBlend", 1, &"UpperActions"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dexk0"]
+animation = &"Death01"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_8kp03"]
+animation = &"Crouch_Idle"
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_x1v2w"]
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ea8lw"]
+xfade_time = 0.12
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_jbu7n"]
+xfade_time = 0.12
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_ocq54"]
+xfade_time = 0.2
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_wwrhh"]
+xfade_time = 0.12
+
+[sub_resource type="AnimationNodeStateMachineTransition" id="AnimationNodeStateMachineTransition_eslrm"]
+xfade_time = 0.2
 
 [resource]
 states/Alive/node = SubResource("AliveLayers")

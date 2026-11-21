@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://b3qxvv8cnwgxo"]
+[gd_scene load_steps=4 format=3 uid="uid://b3qxvv8cnwgxo"]
 
-[ext_resource type="Script" path="res://screens/mission/ui/mission.gd" id="1_mission"]
-[ext_resource type="PackedScene" path="res://screens/mission/locations/mission_1_entrance.tscn" id="2_entrance"]
+[ext_resource type="Script" uid="uid://qrmd3vo2e1hg" path="res://screens/mission/ui/mission.gd" id="1_mission"]
+[ext_resource type="PackedScene" uid="uid://bn80xly1g2dau" path="res://screens/mission/locations/mission_1_entrance.tscn" id="2_entrance"]
+[ext_resource type="MeshLibrary" uid="uid://du8add6dchgjw" path="res://Assets/tilesets/dungeonset.tres" id="3_au40i"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_mission")
@@ -11,17 +12,28 @@ script = ExtResource("1_mission")
 [node name="SpawnPoints" type="Node3D" parent="."]
 
 [node name="Spawn_1" type="Marker3D" parent="SpawnPoints"]
-position = Vector3(-2.4, 0.25, 10)
-rotation = Vector3(0, 3.141593, 0)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -2.4, 0.25, 10)
 
 [node name="Spawn_2" type="Marker3D" parent="SpawnPoints"]
-position = Vector3(-0.8, 0.25, 10)
-rotation = Vector3(0, 3.141593, 0)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, -0.8, 0.25, 10)
 
 [node name="Spawn_3" type="Marker3D" parent="SpawnPoints"]
-position = Vector3(0.8, 0.25, 10)
-rotation = Vector3(0, 3.141593, 0)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 0.8, 0.25, 10)
 
 [node name="Spawn_4" type="Marker3D" parent="SpawnPoints"]
-position = Vector3(2.4, 0.25, 10)
-rotation = Vector3(0, 3.141593, 0)
+transform = Transform3D(-1, 0, -3.2584137e-07, 0, 1, 0, 3.2584137e-07, 0, -1, 2.4, 0.25, 10)
+
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource("3_au40i")
+cell_center_y = false
+data = {
+"cells": PackedInt32Array(2, 65530, 655360, 2, 65531, 655360, 2, 65532, 655360, 2, 65533, 655360, 2, 65534, 655360, 2, 65535, 655360, 2, 0, 655360, 2, 1, 655360, 2, 2, 655360, 2, 3, 655360, 2, 4, 655360, 65533, 65530, 0, 65533, 65531, 0, 65533, 65532, 0, 65533, 65533, 0, 65533, 65534, 0, 65533, 65535, 0, 65533, 0, 0, 65533, 1, 0, 65533, 2, 0, 65533, 3, 0, 65533, 4, 0, 2, 65529, 1441793, 65533, 65529, 1, 1, 65529, 1441792, 0, 65529, 1441792, 65535, 65529, 1441792, 65534, 65529, 1441792, 65534, 5, 1048576, 1, 5, 1048576, 65535, 6, 0, 65535, 7, 0, 0, 6, 655360, 0, 7, 655360, 2, 5, 655361, 65533, 5, 1048577, 0, 5, 655363, 65535, 5, 1048579, 1, 0, 2, 1, 1, 2, 1, 2, 2, 1, 3, 2, 1, 65535, 2, 1, 65534, 2, 1, 65533, 2, 1, 65532, 2, 1, 65531, 2, 1, 65530, 2, 0, 65530, 2, 65535, 65530, 2, 65534, 65530, 2, 65534, 65531, 2, 65535, 65531, 2, 0, 65531, 2, 0, 65532, 2, 65535, 65532, 2, 65534, 65532, 2, 65534, 65533, 2, 65535, 65533, 2, 0, 65533, 2, 65535, 65534, 2, 65534, 65534, 2, 0, 65534, 2, 0, 65535, 2, 65535, 65535, 2, 65534, 65535, 2, 65534, 0, 2, 65535, 0, 2, 0, 0, 2, 65535, 1, 2, 65534, 1, 2, 0, 1, 2, 0, 2, 2, 65535, 2, 2, 65534, 2, 2, 65534, 3, 2, 65535, 3, 2, 0, 3, 2, 0, 4, 2, 65535, 4, 2, 65534, 4, 2, 1, 4, 2)
+}
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.614203, -0.12282181)
+light_color = Color(0.36382347, 0.841588, 0.9776259, 1)
+light_energy = 1.9
+light_indirect_energy = 1.759
+light_size = 1.0
+omni_range = 40.999
