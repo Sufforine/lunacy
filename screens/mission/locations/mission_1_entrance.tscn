@@ -106,6 +106,7 @@ shadow_enabled = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.2, 0)
 
 [node name="Mesh" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.078369126, 0)
 mesh = SubResource("Mesh_ground")
 
 [node name="Collision" type="CollisionShape3D" parent="Ground"]
@@ -173,6 +174,4 @@ transform = Transform3D(1, 0, 0, 0, 1.2333726, 0, 0, 0, 1, 0, 4.040287, 0)
 multimesh = SubResource("MultiMesh_mkmvk")
 
 [node name="grass1" parent="." instance=ExtResource("6_tdaks")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.06112, 0, -3.7513428)
-
-[editable path="grass1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.607285, 0, 8.028809)
